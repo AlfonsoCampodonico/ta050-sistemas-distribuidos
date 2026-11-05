@@ -79,14 +79,16 @@ canvas { display: block; width: 100%; }
 .gauge span { font-size: 12px; color: var(--muted); }
 .gauge b.warn { color: var(--warn); }
 
-.batch { display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow-y: auto; }
-.seq { display: grid; grid-template-columns: 12px 44px 70px minmax(0, 1fr) 76px; gap: 8px; align-items: center; font: 13px var(--mono); font-variant-numeric: tabular-nums; }
+.batch { display: flex; flex-direction: column; gap: 4px; height: 362px; overflow-y: auto; scrollbar-gutter: stable; }
+.seq { display: grid; grid-template-columns: 22px 12px 44px 70px minmax(0, 1fr) 76px; gap: 8px; align-items: center; height: 18px; flex: none; font: 13px var(--mono); font-variant-numeric: tabular-nums; }
+.seq .slot { color: var(--muted); opacity: .6; text-align: right; }
+.seq.head { position: sticky; top: 0; background: var(--panel); font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.seq.free .st, .seq.free .kv { opacity: .45; }
 .seq .dot { width: 10px; height: 10px; border-radius: 2px; }
 .seq .bar { height: 8px; background: var(--cell); border-radius: 4px; overflow: hidden; }
 .seq .bar > div { height: 100%; }
 .seq .st { color: var(--muted); }
 .seq .kv { color: var(--muted); text-align: right; }
-.empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
 
 .tablewrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: 14px; }
@@ -132,7 +134,7 @@ tr.best td:first-child { color: var(--ink); }
       <select id="block" class="btn"><option>4</option><option>8</option><option selected>16</option><option>32</option><option>64</option></select>
     </label>
     <label class="field" for="speed"><span>Velocidad</span>
-      <select id="speed" class="btn"><option value="0.1">0,1×</option><option value="0.25" selected>0,25×</option><option value="0.5">0,5×</option><option value="1">1× (tiempo real)</option></select>
+      <select id="speed" class="btn"><option value="0.02">0,02×</option><option value="0.05">0,05×</option><option value="0.1" selected>0,1×</option><option value="0.25">0,25×</option><option value="0.5">0,5×</option><option value="1">1× (tiempo real)</option></select>
     </label>
     <div class="actions">
       <button class="btn primary" id="play">Pausa</button>
@@ -344,10 +346,10 @@ function renderComparison() {
 }
 
 // --- Estado de la animación ---
-const state = { mode: "continuous", mem: "paged", rate: 6, block: 16, speed: 0.25, playing: true };
+const state = { mode: "continuous", mem: "paged", rate: 6, block: 16, speed: 0.1, playing: true };
 let eng, nextReq, pending, hist, lastSample;
 function reset() {
-  eng = new Engine(state.mode, makeKV(state.mem, state.block));
+  eng = new Engine(state.mode, makeKV(state.mem, state.block)); slots = [];
   nextReq = arrivals(state.rate, 3); pending = nextReq(); hist = []; lastSample = 0;
   draw();
 }
@@ -422,17 +424,24 @@ function drawHistory() {
   ctx.fillStyle = css("--muted"); ctx.font = `11px ${css("--mono")}`;
   ctx.fillText(`arriba: ${MAX_BATCH} secuencias · 100%`, 6, h - 8);
 }
+// Cada secuencia queda en el mismo lugar mientras está en el lote, así la tabla no salta.
+let slots = [];
 function drawBatch() {
   const el = document.getElementById("batch");
-  if (!eng.running.length) { el.innerHTML = `<div class="empty">Nadie en el lote${eng.waiting.length ? `; ${eng.waiting.length} esperan memoria` : ""}.</div>`; return; }
-  el.innerHTML = eng.running.map(s => {
+  const live = new Set(eng.running);
+  slots = slots.map(s => live.has(s) ? s : null);
+  for (const s of eng.running) if (!slots.includes(s)) { const i = slots.indexOf(null); slots[i < 0 ? slots.length : i] = s; }
+  const rows = Array.from({ length: MAX_BATCH }, (_, i) => {
+    const s = slots[i];
+    if (!s) return `<div class="seq free"><span class="slot">${i + 1}</span><span></span><span></span><span class="st">libre</span><span class="bar"></span><span class="kv">–</span></div>`;
     const col = `var(${PALETTE[s.req.id % PALETTE.length]})`;
     const phase = s.finished ? "espera" : s.prefilled ? "decode" : "prefill";
     const [u, a] = eng.kv.usage(s.req.id);
-    return `<div class="seq"><span class="dot" style="background:${col}"></span><span>#${s.req.id}</span><span class="st">${phase}</span>
+    return `<div class="seq"><span class="slot">${i + 1}</span><span class="dot" style="background:${col}"></span><span>#${s.req.id}</span><span class="st">${phase}</span>
       <span class="bar" title="${s.gen} de ${s.req.output} tokens"><div style="width:${100 * s.gen / s.req.output}%;background:${col}"></div></span>
       <span class="kv">${u}/${a}</span></div>`;
-  }).join("");
+  });
+  el.innerHTML = `<div class="seq head"><span></span><span></span><span>Pedido</span><span>Fase</span><span>Respuesta</span><span class="kv">KV</span></div>` + rows.join("");
 }
 function drawGauges() {
   const made = eng.tokens.reduce((a, t) => a + t[1], 0), win = Math.min(3, eng.now / 1000) || 1;
@@ -474,7 +483,7 @@ play.onclick = () => { state.playing = !state.playing; play.textContent = state.
 document.getElementById("step").onclick = () => { state.playing = false; play.textContent = "Seguir"; oneStep(); };
 document.getElementById("reset").onclick = reset;
 document.getElementById("cmp-run").onclick = renderComparison;
-if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) state.speed = 0.1, document.getElementById("speed").value = "0.1";
+if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) state.speed = 0.02, document.getElementById("speed").value = "0.02";
 new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
 addEventListener("resize", () => { document.getElementById("mem").width = 0; document.getElementById("hist").width = 0; draw(); });
