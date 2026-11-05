@@ -91,10 +91,14 @@ th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercas
 td.mono { white-space: nowrap; }
 .scope-0 { color: var(--accent); } .scope-1 { color: var(--blue); } .scope-2 { color: var(--warn); }
 .foot { font-size: 12px; color: var(--faint); }
+.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
+.back a{color:var(--muted);text-decoration:none}
+.back a:hover{color:var(--accent)}
 </style>
 
 <div class="wrap">
   <header>
+    <nav class="back"><a href="../">← Volver al inicio</a><a href="../slides/clase-17/">Slides de la clase 17</a></nav>
     <span class="eyebrow">TA050 · Clase 17 · Entrenamiento a escala de frontera</span>
     <h1>Entrenamiento a escala</h1>
     <p class="lead">Dos cosas que cambian cuando un entrenamiento usa decenas de miles de GPUs: algo se rompe todos los días, y dónde cae cada GPU en la red decide qué se puede comunicar rápido.</p>

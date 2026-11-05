@@ -118,10 +118,14 @@ td { font-variant-numeric: tabular-nums; font-family: var(--mono); }
 td:first-child { font-family: var(--sans); }
 tr.best td { color: var(--accent); }
 .foot { font-size: 12px; color: var(--faint); }
+.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
+.back a{color:var(--muted);text-decoration:none}
+.back a:hover{color:var(--accent)}
 </style>
 
 <div class="wrap">
   <header>
+    <nav class="back"><a href="../">← Volver al inicio</a><a href="../slides/clase-19/">Slides de la clase 19</a></nav>
     <span class="eyebrow">TA050 · Clase 19 · Del motor al clúster</span>
     <h1>Clúster de inferencia</h1>
     <p class="lead">Cuatro réplicas de un modelo atienden conversaciones de varios turnos. Cada turno manda la conversación entera, así que casi todo el prompt ya se vio antes. Probá cómo elige réplica el router, qué aporta el caché de prefijos y qué pasa al separar el prefill del decode.</p>

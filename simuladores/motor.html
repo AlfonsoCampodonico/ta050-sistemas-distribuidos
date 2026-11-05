@@ -99,10 +99,14 @@ tr.best td { color: var(--good); font-weight: 600; }
 tr.best td:first-child { color: var(--ink); }
 .note { font-size: 13px; color: var(--muted); max-width: 80ch; margin: 0; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
+.back a{color:var(--muted);text-decoration:none}
+.back a:hover{color:var(--accent)}
 </style>
 
 <div class="wrap">
   <header>
+    <nav class="back"><a href="../">← Volver al inicio</a><a href="../slides/clase-18/">Slides de la clase 18</a></nav>
     <div class="eyebrow">TA050 · Clase 18 · Simulador</div>
     <h1>Motor de inferencia</h1>
     <p class="lead">Una GPU con lugar para 2.048 tokens de KV cache atiende pedidos que llegan solos. Cambiá cómo arma los lotes y cómo reparte la memoria, y mirá qué pasa con el mapa de memoria, el lote y los tiempos.</p>
