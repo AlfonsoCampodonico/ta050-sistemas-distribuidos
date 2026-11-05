@@ -1,12 +1,14 @@
 """Cover slide for the TA050 16–19 series in the new style."""
 SERIES = [(16, "Fundamentos del entrenamiento"), (17, "Entrenamiento a escala de frontera"),
           (18, "Cómo se sirve un modelo"), (19, "Del motor al clúster")]
+SERIES2 = [(20, "Muchos modelos, pocas GPUs"), (21, "Repartir un clúster de GPUs"),
+           (22, "Entrenar con lo que se sirve")]
 MONO = "'Geist Mono', 'Courier New', monospace"
 
 
-def cover(n, title, subtitle, paper, notes):
+def cover(n, title, subtitle, paper, notes, series=None):
     chips = []
-    for k, name in SERIES:
+    for k, name in series or (SERIES if n <= 19 else SERIES2):
         on = k == n
         chips.append(
             f'<div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;'

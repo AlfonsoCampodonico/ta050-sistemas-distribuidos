@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Planificador de GPUs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+/* Clase 21 · un clúster de 256 GPUs compartido: la grilla de GPUs a la izquierda, la cola y los instrumentos a la derecha, comparación abajo. */
+:root {
+  --bg: #0E1114; --panel: #161B20; --panel2: #1A2027; --ink: #F2F3EF; --muted: #A8B3BC; --faint: #7D8892;
+  --line: #2A3138; --cell: #232A31; --accent: #34D399; --accent-ink: #0E1114; --accent-soft: #132A22;
+  --warn: #F5A524; --bad: #FF7A6B;
+  --c0: #34D399; --c1: #F5A524; --c2: #7AA2FF; --c3: #F472B6; --c4: #A78BFA; --c5: #FACC15; --c6: #22D3EE; --c7: #FB923C;
+  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
+    --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
+    --warn: #A35F00; --bad: #C2362B;
+    --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
+  --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
+  --warn: #A35F00; --bad: #C2362B;
+  --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 8px; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); max-width: 72ch; }
+h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.small { font-size: 13px; color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > span { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 11px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg button:disabled { color: var(--faint); cursor: not-allowed; }
+.seg button[aria-pressed="true"]:disabled { color: var(--accent-ink); opacity: .55; }
+input[type=range] { width: 140px; accent-color: var(--accent); }
+.val { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn:disabled { opacity: .6; cursor: progress; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.side { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+.racks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 1100px) and (min-width: 901px), (max-width: 640px) { .racks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.rack { border: 1px solid var(--line); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px; background: var(--panel2); min-width: 0; }
+.rack-h { display: flex; justify-content: space-between; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding-bottom: 2px; }
+.srv { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; padding: 2px; border-radius: 6px; border: 1px dashed transparent; }
+.srv.empty { border-color: var(--line); }
+.gpu { aspect-ratio: 1; border-radius: 3px; background: var(--cell); min-width: 0; }
+.gpu.held { background: repeating-linear-gradient(135deg, var(--hc) 0 3px, transparent 3px 6px); outline: 1px solid var(--hc); outline-offset: -1px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); align-items: center; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+
+.queue { display: flex; flex-wrap: wrap; gap: 6px; min-height: 34px; align-content: flex-start; }
+.job { display: inline-flex; align-items: center; gap: 6px; border-radius: 6px; padding: 3px 7px; font: 600 12px/1.3 var(--mono); color: var(--bg); font-variant-numeric: tabular-nums; }
+.job.head { outline: 2px solid var(--ink); outline-offset: 1px; }
+.job small { font-weight: 500; opacity: .85; }
+.headinfo { font-size: 13px; color: var(--muted); border-left: 2px solid var(--warn); padding-left: 10px; margin: 0; min-height: 40px; }
+.headinfo b { color: var(--ink); }
+
+.gauges { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.gauge span { font-size: 12px; color: var(--muted); }
+.gauge b.warn { color: var(--warn); }
+.gauge b.bad { color: var(--bad); }
+.note { font-size: 13px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 10px; margin: 0; }
+.banner { font-size: 13px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--bad); color: var(--bad); margin: 0; }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 680px; }
+th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+td { font-variant-numeric: tabular-nums; font-family: var(--mono); }
+td:first-child { font-family: var(--sans); }
+tr.best td { color: var(--accent); }
+.foot { font-size: 12px; color: var(--faint); }
+.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
+.back a{color:var(--muted);text-decoration:none}
+.back a:hover{color:var(--accent)}
+</style>
+
+<div class="wrap">
+  <header>
+    <nav class="back"><a href="../">← Volver al inicio</a><a href="../slides/clase-21/">Slides de la clase 21</a></nav>
+    <span class="eyebrow">TA050 · Clase 21 · Repartir un clúster de GPUs</span>
+    <h1>Planificador de GPUs</h1>
+    <p class="lead">Un clúster compartido de 256 GPUs: 4 racks de 8 servidores de 8. Llegan muchos trabajos de 1 GPU y unos pocos de 16 o 32, con duraciones que nadie conoce de antemano. Un trabajo distribuido necesita todas sus GPUs a la vez, y si se reparte en más servidores de los necesarios, corre más lento. Probá cómo decide cada planificador quién usa las GPUs.</p>
+  </header>
+
+  <section class="controls" aria-label="Controles">
+    <div class="field"><span>Orden de la cola</span>
+      <div class="seg" id="order">
+        <button data-v="pod" aria-pressed="false">De a un pod</button>
+        <button data-v="fifo" aria-pressed="false">FIFO</button>
+        <button data-v="bf" aria-pressed="true">FIFO + backfill</button>
+        <button data-v="las" aria-pressed="false">2D-LAS</button>
+        <button data-v="srtf" aria-pressed="false">SRTF</button>
+      </div>
+    </div>
+    <div class="field"><span>Ubicación</span>
+      <div class="seg" id="place">
+        <button data-v="strict" aria-pressed="false">Consolidada siempre</button>
+        <button data-v="any" aria-pressed="false">Donde haya lugar</button>
+        <button data-v="cons" aria-pressed="true">Consolidar si importa</button>
+      </div>
+    </div>
+    <div class="field"><span>Carga · <b class="val" id="load-v">90%</b></span>
+      <input type="range" id="load" min="60" max="120" step="10" value="90" aria-label="Carga del clúster">
+    </div>
+    <div class="field" id="pre-field"><span>Costo de preempción · <b class="val" id="pre-v">1 min</b></span>
+      <input type="range" id="pre" min="0" max="4" step="1" value="1" aria-label="Costo de cada preempción">
+    </div>
+    <div class="field"><span>Velocidad · <b class="val" id="speed-v">30 min/s</b></span>
+      <input type="range" id="speed" min="0" max="4" step="1" value="2" aria-label="Velocidad de la simulación">
+    </div>
+    <div class="actions">
+      <button class="btn" id="play">Pausa</button>
+      <button class="btn" id="reset">Reiniciar</button>
+    </div>
+  </section>
+
+  <div class="main">
+    <section class="panel" aria-labelledby="grid-h">
+      <div class="panel-head">
+        <h2 id="grid-h">Las GPUs</h2>
+        <span class="small mono" id="clock">día 0, 00:00</span>
+      </div>
+      <div class="racks" id="racks"></div>
+      <div class="legend">
+        <span><i style="background:var(--cell)"></i>libre</span>
+        <span><i style="background:var(--c2)"></i>un color por trabajo</span>
+        <span><i style="background:repeating-linear-gradient(135deg,var(--warn) 0 3px,transparent 3px 6px);outline:1px solid var(--warn);outline-offset:-1px"></i>retenida sin correr</span>
+        <span><i style="border:1px dashed var(--faint)"></i>servidor vacío</span>
+      </div>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-labelledby="q-h">
+        <div class="panel-head"><h2 id="q-h">La cola</h2><span class="small mono" id="qcount">0 esperando</span></div>
+        <div class="queue" id="queue"></div>
+        <p class="headinfo" id="headinfo"></p>
+        <p class="small">Cada etiqueta es un trabajo esperando: cuántas GPUs pide y hace cuánto espera. El recuadrado es el que el planificador atiende primero. <b>·s</b>: sensible a la localidad.</p>
+      </section>
+      <section class="panel" aria-labelledby="inst-h">
+        <div class="panel-head"><h2 id="inst-h">Instrumentos</h2><span class="small">últimos 200 trabajos</span></div>
+        <p class="banner" id="dead" hidden></p>
+        <div class="gauges">
+          <div class="gauge"><b id="g-jct">–</b><span>JCT promedio</span></div>
+          <div class="gauge"><b id="g-util">–</b><span>GPUs asignadas ahora</span></div>
+          <div class="gauge"><b id="g-w1">–</b><span>espera, trabajos de 1 GPU</span></div>
+          <div class="gauge"><b id="g-w8">–</b><span>espera, trabajos de más de 8</span></div>
+          <div class="gauge"><b id="g-frag">–</b><span>de las libres, en servidores a medio usar</span></div>
+          <div class="gauge"><b id="g-pre">–</b><span>preempciones</span></div>
+        </div>
+        <p class="note" id="explain"></p>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel" aria-labelledby="cmp-h">
+    <div class="panel-head">
+      <h2 id="cmp-h">Todos los planificadores, con la misma carga</h2>
+      <button class="btn primary" id="cmp-run">Comparar</button>
+    </div>
+    <p class="small" id="cmp-desc">Corre 3.000 trabajos a la carga elegida con cada planificador, sin animación. Tarda unos segundos.</p>
+    <div class="tablewrap">
+      <table id="cmp" hidden>
+        <thead><tr><th>Planificador</th><th>JCT prom.</th><th>espera 1</th><th>espera &gt;8</th><th>frag. &gt;8</th><th>más lento</th><th>preempc.</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="foot">frag. &gt;8: de la espera de los trabajos de más de 8 GPUs, cuánta fue con GPUs libres de sobra pero repartidas. Más lento: tiempo corriendo sobre el ideal, trabajos de varias GPUs. El mismo modelo que <span class="mono">go run ./cmd/sim</span> del repositorio planificar-gpus,. Las proporciones de la carga y las velocidades son ilustrativas; la forma es la de Philly (Jeon et al., ATC 2019).</p>
+  </section>
+</div>
+
+<script>
+// ---------- Modelo: el mismo que repos/planificar-gpus ----------
+const TOPO = { racks: 4, spr: 8, g: 8 };
+const NSRV = TOPO.racks * TOPO.spr, NGPU = NSRV * TOPO.g;
+const SIZES = [[1, 0.70], [2, 0.06], [4, 0.08], [8, 0.10], [16, 0.04], [32, 0.02]];
+const THRESHOLD = 300000, EPS = 1e-6;
+const rackOf = s => Math.floor(s / TOPO.spr);
+const minServers = n => Math.ceil(n / TOPO.g);
+
+function rng(seed) { // mulberry32
+  let a = seed >>> 0;
+  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function trace(n, load, seed) {
+  const r = rng(seed);
+  const normal = () => Math.sqrt(-2 * Math.log(1 - r())) * Math.cos(2 * Math.PI * r());
+  const jobs = []; let total = 0;
+  for (let i = 0; i < n; i++) {
+    let u = r(), g = 32;
+    for (const [k, p] of SIZES) { if (u < p) { g = k; break; } u -= p; }
+    const med = 26 * 60 * (1 + 0.5 * Math.log2(g));
+    const d = Math.max(60, Math.min(med * Math.exp(2 * normal()), 5 * 86400));
+    jobs.push({ id: i, gpus: g, dur: d, sens: g > 1 && r() < 0.5 });
+    total += g * d;
+  }
+  const rate = load * NGPU / (total / n);
+  let t = 0;
+  for (const j of jobs) { t += -Math.log(1 - r()) / rate; j.arrival = t; }
+  return jobs;
+}
+
+class Cluster {
+  constructor() { this.free = new Array(NSRV).fill(TOPO.g); }
+  totalFree() { return this.free.reduce((a, b) => a + b, 0); }
+  frag() { let f = 0, loose = 0; for (const x of this.free) { f += x; if (x < TOPO.g) loose += x; } return f ? loose / f : 0; }
+  alloc(p) { for (const s of p) { if (this.free[s.srv] < s.n) throw new Error("sin lugar"); this.free[s.srv] -= s.n; } }
+  release(p) { for (const s of p) this.free[s.srv] += s.n; }
+  find(n, loc) {
+    const p = this.packed(n); if (p) return p;
+    if (loc === "packed") return null;
+    return this.oneRack(n) || this.spread(n, 0, NSRV);
+  }
+  packed(n) {
+    if (n <= TOPO.g) {
+      let best = -1;
+      this.free.forEach((f, s) => { if (f >= n && (best < 0 || f < this.free[best])) best = s; });
+      return best < 0 ? null : [{ srv: best, n }];
+    }
+    const k = minServers(n); let bestR = -1, bestE = 0;
+    for (let r = 0; r < TOPO.racks; r++) {
+      let e = 0; for (let s = r * TOPO.spr; s < (r + 1) * TOPO.spr; s++) if (this.free[s] === TOPO.g) e++;
+      if (e >= k && (bestR < 0 || e < bestE)) { bestR = r; bestE = e; }
+    }
+    if (bestR < 0) return null;
+    const p = []; let left = n;
+    for (let s = bestR * TOPO.spr; left > 0; s++) if (this.free[s] === TOPO.g) { const t = Math.min(TOPO.g, left); p.push({ srv: s, n: t }); left -= t; }
+    return p;
+  }
+  oneRack(n) {
+    let best = -1, bf = 0;
+    for (let r = 0; r < TOPO.racks; r++) {
+      let f = 0; for (let s = r * TOPO.spr; s < (r + 1) * TOPO.spr; s++) f += this.free[s];
+      if (f >= n && (best < 0 || f < bf)) { best = r; bf = f; }
+    }
+    return best < 0 ? null : this.spread(n, best * TOPO.spr, (best + 1) * TOPO.spr);
+  }
+  spread(n, from, to) {
+    const idx = []; let tot = 0;
+    for (let s = from; s < to; s++) if (this.free[s] > 0) { idx.push(s); tot += this.free[s]; }
+    if (tot < n) return null;
+    idx.sort((a, b) => this.free[b] - this.free[a] || a - b);
+    const p = [];
+    for (const s of idx) { if (!n) break; const t = Math.min(this.free[s], n); p.push({ srv: s, n: t }); n -= t; }
+    return p;
+  }
+}
+function speed(p, sens) {
+  const n = p.reduce((a, s) => a + s.n, 0), racks = new Set(p.map(s => rackOf(s.srv))).size;
+  if (p.length <= minServers(n) && racks === 1) return 1;
+  if (racks === 1) return sens ? 0.6 : 0.95;
+  return sens ? 0.5 : 0.9;
+}
+const sizeOf = g => g === 1 ? "1" : g <= 8 ? "2-8" : ">8";
+
+class Sim {
+  constructor(jobs, pol) {
+    this.p = pol; this.c = new Cluster(); this.now = 0; this.next = 0; this.active = []; this.done = []; this.preempt = 0; this.dead = false;
+    this.jobs = jobs.map(j => ({ ...j, rem: j.dur, att: 0, run: 0, wait: 0, fwait: 0, since: 0, place: null, held: null, started: Infinity, end: 0 }));
+  }
+  nextEvent() {
+    let tn = this.next < this.jobs.length ? this.jobs[this.next].arrival : Infinity;
+    for (const j of this.active) if (j.place) {
+      tn = Math.min(tn, this.now + Math.max(j.rem, 0) / j.speed);
+      if (this.p.order === "las" && j.att < THRESHOLD - EPS) tn = Math.min(tn, this.now + (THRESHOLD - j.att) / j.gpus);
+    }
+    return tn;
+  }
+  advance(t) {
+    const dt = t - this.now; if (dt <= 0) return;
+    const free = this.c.totalFree();
+    for (const j of this.active) {
+      if (j.place) { j.rem -= dt * j.speed; j.att += dt * j.gpus; j.run += dt; }
+      else { j.wait += dt; if (free >= j.gpus) j.fwait += dt; }
+    }
+    this.now = t;
+  }
+  // Procesa eventos hasta el tiempo virtual t (Infinity: hasta terminar).
+  runUntil(t) {
+    for (;;) {
+      if (this.dead) return;
+      const tn = this.nextEvent();
+      if (tn === Infinity || tn > t) return;
+      this.advance(tn);
+      this.active = this.active.filter(j => {
+        if (j.place && j.rem <= EPS) { this.c.release(j.place); j.place = null; j.end = this.now; this.done.push(j); return false; }
+        return true;
+      });
+      while (this.next < this.jobs.length && this.jobs[this.next].arrival <= this.now + EPS) { const j = this.jobs[this.next++]; j.since = j.arrival; this.active.push(j); }
+      this.schedule();
+      if (this.p.order === "pod" && this.c.totalFree() === 0 && this.active.length && this.active.every(j => !j.place)) this.dead = true;
+    }
+  }
+  key(j) {
+    if (this.p.order === "las") return [j.att >= THRESHOLD - EPS ? 1 : 0, j.started === Infinity ? 1e15 + j.arrival : j.started];
+    if (this.p.order === "srtf") return [j.gpus * j.rem, j.arrival];
+    return [0, j.arrival];
+  }
+  ordered() { return [...this.active].sort((a, b) => { const x = this.key(a), y = this.key(b); return x[0] - y[0] || x[1] - y[1]; }); }
+  loc(j) { return this.p.place === "strict" || (this.p.place === "cons" && j.sens) ? "packed" : "any"; }
+  start(j, pl) { this.c.alloc(pl); j.place = pl; j.started = Math.min(j.started, this.now); j.speed = speed(pl, j.sens); }
+  schedule() {
+    if (this.p.order === "pod") return this.podByPod();
+    const order = this.ordered(), preemptive = this.p.order === "las" || this.p.order === "srtf";
+    for (let i = 0; i < order.length; i++) {
+      const j = order[i]; if (j.place) continue;
+      const loc = this.loc(j), pl = this.c.find(j.gpus, loc);
+      if (pl) { this.start(j, pl); continue; }
+      if (preemptive && this.preemptFor(j, order.slice(i + 1), loc)) continue;
+      if (this.p.order === "fifo") break;
+    }
+  }
+  preemptFor(j, lower, loc) {
+    const kj = this.key(j)[0];
+    const cand = lower.filter(v => v.place && this.key(v)[0] > kj).sort((a, b) => a.gpus - b.gpus);
+    const victims = [];
+    for (const v of cand) {
+      this.c.release(v.place); victims.push(v);
+      const pl = this.c.find(j.gpus, loc);
+      if (pl) {
+        for (const w of victims) { w.place = null; w.since = this.now; w.rem += this.p.preempt; this.preempt++; }
+        this.start(j, pl); return true;
+      }
+    }
+    for (const v of victims) this.c.alloc(v.place);
+    return false;
+  }
+  podByPod() {
+    for (;;) {
+      let progress = false;
+      for (const j of this.active) {
+        if (j.place || this.c.totalFree() === 0) continue;
+        j.held = j.held || [];
+        const have = j.held.reduce((a, s) => a + s.n, 0); if (have === j.gpus) continue;
+        let srv = -1;
+        for (const s of j.held) if (this.c.free[s.srv] > 0) { srv = s.srv; break; }
+        if (srv < 0) this.c.free.forEach((f, k) => { if (f > 0 && (srv < 0 || f > this.c.free[srv])) srv = k; });
+        this.c.free[srv]--;
+        const sl = j.held.find(s => s.srv === srv); if (sl) sl.n++; else j.held.push({ srv, n: 1 });
+        progress = true;
+      }
+      if (!progress) break;
+    }
+    for (const j of this.active) if (!j.place && j.held && j.held.reduce((a, s) => a + s.n, 0) === j.gpus) {
+      j.place = j.held; j.held = null; j.started = Math.min(j.started, this.now); j.speed = speed(j.place, j.sens);
+    }
+  }
+  summary(win) {
+    const d = win ? this.done.slice(-win) : this.done;
+    const avg = (xs, f) => xs.length ? xs.reduce((a, x) => a + f(x), 0) / xs.length : NaN;
+    const by = k => d.filter(j => sizeOf(j.gpus) === k);
+    const big = by(">8"), multi = d.filter(j => j.gpus > 1);
+    const bw = big.reduce((a, j) => a + j.wait, 0);
+    return {
+      n: d.length, jct: avg(d, j => j.end - j.arrival), w1: avg(by("1"), j => j.wait), w8: avg(big, j => j.wait),
+      frag8: bw > 0 ? big.reduce((a, j) => a + j.fwait, 0) / bw : NaN, slow: avg(multi, j => j.run / j.dur),
+    };
+  }
+}
+
+// ---------- Interfaz ----------
+const $ = s => document.querySelector(s);
+const opt = { order: "bf", place: "cons", load: 0.9, preempt: 60 };
+const PRE = [0, 60, 300, 600, 1800], SPEEDS = [300, 900, 1800, 3600, 3 * 3600];
+let speedV = 1800, playing = true, sim, vt = 0, last = 0, seed = 21;
+const COLORS = 8, col = k => `var(--c${k % COLORS})`;
+const policy = () => ({ order: opt.order, place: opt.place, preempt: opt.preempt });
+
+function seg(id, key, cb) {
+  const root = $(id);
+  root.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b || b.disabled) return;
+    opt[key] = b.dataset.v; root.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); cb && cb(); reset();
+  });
+}
+seg("#order", "order", () => { $("#place").querySelectorAll("button").forEach(b => b.disabled = opt.order === "pod"); });
+seg("#place", "place");
+const fmtDur = s => isNaN(s) ? "–" : s >= 86400 * 2 ? (s / 86400).toFixed(1).replace(".", ",") + " d" : s >= 3600 ? (s / 3600).toFixed(1).replace(".", ",") + " h" : s >= 60 ? Math.round(s / 60) + " min" : Math.round(s) + " s";
+const fmtH = s => isNaN(s) ? "–" : (s / 3600).toFixed(2).replace(".", ",") + " h";
+const pctf = v => isNaN(v) ? "–" : Math.round(100 * v) + "%";
+$("#load").addEventListener("input", e => { opt.load = +e.target.value / 100; $("#load-v").textContent = e.target.value + "%"; reset(); });
+$("#pre").addEventListener("input", e => { opt.preempt = PRE[+e.target.value]; $("#pre-v").textContent = fmtDur(opt.preempt) === "0 s" ? "gratis" : fmtDur(opt.preempt); reset(); });
+$("#speed").addEventListener("input", e => { speedV = SPEEDS[+e.target.value]; $("#speed-v").textContent = speedV >= 3600 ? (speedV / 3600) + " h/s" : (speedV / 60) + " min/s"; });
+$("#play").addEventListener("click", () => { playing = !playing; $("#play").textContent = playing ? "Pausa" : "Seguir"; });
+$("#reset").addEventListener("click", () => { seed++; reset(); });
+
+// La grilla: un div por GPU, se pinta en cada render.
+const cells = [];
+(function buildGrid() {
+  const root = $("#racks");
+  for (let r = 0; r < TOPO.racks; r++) {
+    const rk = document.createElement("div"); rk.className = "rack";
+    rk.innerHTML = `<div class="rack-h"><span>Rack ${r + 1}</span><span data-r="${r}"></span></div>`;
+    for (let s = r * TOPO.spr; s < (r + 1) * TOPO.spr; s++) {
+      const sv = document.createElement("div"); sv.className = "srv"; sv.setAttribute("aria-label", `Servidor ${s + 1}`);
+      cells[s] = { el: sv, gpus: [] };
+      for (let g = 0; g < TOPO.g; g++) { const c = document.createElement("div"); c.className = "gpu"; sv.appendChild(c); cells[s].gpus.push(c); }
+      rk.appendChild(sv);
+    }
+    root.appendChild(rk);
+  }
+})();
+
+function explain() {
+  const o = {
+    pod: "De a un pod: sin gang. Cada trabajo junta GPUs de a una a medida que se liberan y las retiene hasta tener todas (rayadas). Retener y esperar: GPUs tomadas que no hacen nada, y si dos grandes se reparten lo que queda, se traban.",
+    fifo: "FIFO con gang: el primero de la cola entra entero o no pasa nadie. Cuando el primero es grande, quedan GPUs libres que nadie puede usar: bloqueo de cabeza de cola.",
+    bf: "FIFO + backfill: si el primero no entra, pasan los que entran. Los chicos casi no esperan; los grandes esperan más, porque siempre hay un chico que les gana el lugar.",
+    las: "2D-LAS (Tiresias): primero el que menos GPU·tiempo recibió. Los nuevos entran enseguida desalojando a los que ya corrieron más de 300.000 GPU·s; cada desalojo cuesta guardar y recargar un checkpoint.",
+    srtf: "SRTF: primero el que menos GPU·tiempo le falta. Es lo mejor para el JCT promedio, pero necesita saber cuánto dura cada trabajo, y nadie lo sabe: está como referencia.",
+  };
+  const pl = {
+    strict: " Ubicación consolidada siempre: los grandes esperan servidores vacíos en un rack, aunque haya GPUs libres de sobra repartidas.",
+    any: " Ubicación donde haya lugar: arrancan antes, pero repartidos corren más lento (al 60% si son sensibles).",
+    cons: " Consolidar si importa: sólo los trabajos sensibles a la localidad (·s) esperan su lugar; los demás van donde haya.",
+  };
+  $("#explain").textContent = o[opt.order] + (opt.order === "pod" ? "" : pl[opt.place]);
+  $("#pre-field").style.opacity = opt.order === "las" || opt.order === "srtf" ? 1 : 0.5;
+}
+function reset() {
+  sim = new Sim(trace(1500, opt.load, seed), policy());
+  vt = 0; explain(); render();
+}
+function render() {
+  const day = Math.floor(vt / 86400), h = Math.floor(vt % 86400 / 3600), m = Math.floor(vt % 3600 / 60);
+  $("#clock").textContent = `día ${day}, ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  // Ocupación por servidor: lista de (trabajo, GPUs, retenida).
+  const occ = Array.from({ length: NSRV }, () => []);
+  for (const j of sim.active) {
+    if (j.place) for (const s of j.place) occ[s.srv].push([j, s.n, false]);
+    else if (j.held) for (const s of j.held) occ[s.srv].push([j, s.n, true]);
+  }
+  for (let s = 0; s < NSRV; s++) {
+    let k = 0;
+    for (const [j, n, held] of occ[s]) for (let i = 0; i < n; i++) {
+      const c = cells[s].gpus[k++]; c.className = held ? "gpu held" : "gpu";
+      if (held) { c.style.background = ""; c.style.setProperty("--hc", col(j.id)); } else c.style.background = col(j.id);
+      c.title = `trabajo ${j.id}: ${j.gpus} GPU${j.gpus > 1 ? "s" : ""}${held ? ", retenida sin correr" : ""}`;
+    }
+    for (; k < TOPO.g; k++) { const c = cells[s].gpus[k]; c.className = "gpu"; c.style.background = ""; c.title = "libre"; }
+    cells[s].el.classList.toggle("empty", sim.c.free[s] === TOPO.g);
+  }
+  for (let r = 0; r < TOPO.racks; r++) {
+    let f = 0; for (let s = r * TOPO.spr; s < (r + 1) * TOPO.spr; s++) f += sim.c.free[s];
+    $(`[data-r="${r}"]`).textContent = `${f} libres`;
+  }
+  // La cola, en el orden en que la atiende el planificador.
+  const waiting = sim.ordered().filter(j => !j.place && j.arrival <= vt);
+  $("#qcount").textContent = `${waiting.length} esperando`;
+  const shown = waiting.slice(0, 36);
+  $("#queue").innerHTML = shown.map((j, i) => `<span class="job${i === 0 ? " head" : ""}" style="background:${col(j.id)}" title="trabajo ${j.id}">${j.gpus}${j.sens ? "·s" : ""}<small>${fmtDur(vt - j.since)}</small></span>`).join("") +
+    (waiting.length > shown.length ? `<span class="small">+${waiting.length - shown.length} más</span>` : "") || `<span class="small">nadie espera</span>`;
+  const free = sim.c.totalFree(), hj = waiting[0];
+  let info = "";
+  if (hj) {
+    const held = hj.held ? hj.held.reduce((a, s) => a + s.n, 0) : 0;
+    if (opt.order === "pod") info = `El primero pide <b>${hj.gpus}</b> y retiene <b>${held}</b>. Hay ${free} libres.`;
+    else if (free >= hj.gpus) info = `El primero pide <b>${hj.gpus}</b> GPUs y hay <b>${free}</b> libres, pero no en ${hj.gpus > TOPO.g ? `${minServers(hj.gpus)} servidores vacíos de un rack` : "un mismo servidor"}: espera por <b>fragmentación</b>.`;
+    else info = `El primero pide <b>${hj.gpus}</b> GPUs y hay ${free} libres: espera a que terminen otros.` + (opt.order === "fifo" ? ` Con FIFO, nadie le pasa por adelante: <b>${free}</b> GPUs quedan sin usar.` : "");
+  }
+  $("#headinfo").innerHTML = info || "La cola está vacía.";
+  // Instrumentos.
+  const s = sim.summary(200);
+  const set = (id, txt, cls) => { const e = $(id); e.textContent = txt; e.className = cls || ""; };
+  set("#g-jct", fmtH(s.jct)); set("#g-util", pctf(1 - free / NGPU));
+  set("#g-w1", fmtDur(s.w1), s.w1 > 3600 ? "bad" : s.w1 > 600 ? "warn" : "");
+  set("#g-w8", fmtDur(s.w8), s.w8 > 4 * 3600 ? "bad" : s.w8 > 3600 ? "warn" : "");
+  set("#g-frag", pctf(sim.c.frag())); set("#g-pre", String(sim.preempt));
+  const dead = $("#dead");
+  dead.hidden = !sim.dead;
+  if (sim.dead) dead.textContent = "Trabado: no queda ninguna GPU libre, nadie corre, y cada trabajo retiene GPUs que otro necesita. Nadie va a avanzar nunca.";
+}
+let uiAcc = 0;
+function frame(ts) {
+  const dt = Math.min(100, ts - (last || ts)); last = ts;
+  if (playing && !sim.dead) {
+    vt += dt / 1000 * speedV;
+    sim.runUntil(vt);
+    if (sim.next >= sim.jobs.length && !sim.active.length) { seed++; reset(); }
+  }
+  uiAcc += dt;
+  if (uiAcc > 100) { uiAcc = 0; render(); }
+  requestAnimationFrame(frame);
+}
+
+// ---------- Comparación ----------
+const CONFIGS = [
+  ["De a un pod (sin gang)", { order: "pod", place: "any" }],
+  ["FIFO", { order: "fifo", place: "cons" }],
+  ["FIFO + backfill · consolidada siempre", { order: "bf", place: "strict" }],
+  ["FIFO + backfill · donde haya lugar", { order: "bf", place: "any" }],
+  ["FIFO + backfill · consolidar si importa", { order: "bf", place: "cons" }],
+  ["2D-LAS (Tiresias) · consolidar si importa", { order: "las", place: "cons" }],
+  ["SRTF (conoce las duraciones)", { order: "srtf", place: "cons" }],
+];
+$("#cmp-run").addEventListener("click", () => {
+  const btn = $("#cmp-run"); btn.disabled = true;
+  const jobs = trace(3000, opt.load, seed), rows = [];
+  const tb = $("#cmp tbody"); tb.innerHTML = ""; $("#cmp").hidden = false;
+  let k = 0;
+  const one = () => {
+    if (k === CONFIGS.length) {
+      const ok = rows.filter(r => !r.dead), best = ok.reduce((a, r) => r.s.jct < a.s.jct ? r : a, ok[0]);
+      tb.innerHTML = rows.map(r => r.dead
+        ? `<tr><td>${r.name}</td><td colspan="6" style="text-align:left">trabado a los ${fmtDur(r.at)}, con ${r.s.n} de ${jobs.length} terminados</td></tr>`
+        : `<tr class="${r === best ? "best" : ""}"><td>${r.name}</td><td>${fmtH(r.s.jct)}</td><td>${fmtDur(r.s.w1)}</td><td>${fmtDur(r.s.w8)}</td><td>${pctf(r.s.frag8)}</td><td>${isNaN(r.s.slow) ? "–" : r.s.slow.toFixed(2).replace(".", ",") + "×"}</td><td>${r.pre}</td></tr>`).join("");
+      $("#cmp-desc").textContent = `${jobs.length} trabajos al ${Math.round(100 * opt.load)}% de carga, preempción de ${fmtDur(opt.preempt)}. En verde, el de menor JCT promedio.`;
+      btn.disabled = false; return;
+    }
+    const [name, o] = CONFIGS[k++];
+    $("#cmp-desc").textContent = `Corriendo ${k} de ${CONFIGS.length}: ${name}…`;
+    const c = new Sim(jobs, { ...o, preempt: opt.preempt });
+    c.runUntil(Infinity);
+    rows.push({ name, s: c.summary(0), pre: c.preempt, dead: c.dead, at: c.now });
+    setTimeout(one, 10);
+  };
+  setTimeout(one, 10);
+});
+
+reset();
+requestAnimationFrame(frame);
+</script>
+
+</html>

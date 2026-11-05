@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Flota de GPUs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+/* Clase 20 · 64 modelos sobre 16 GPUs en vivo: servidores al centro, instrumentos a la derecha, comparación abajo. */
+:root {
+  --bg: #0E1114; --panel: #161B20; --panel2: #1A2027; --ink: #F2F3EF; --muted: #A8B3BC; --faint: #7D8892;
+  --line: #2A3138; --cell: #232A31; --accent: #34D399; --accent-ink: #0E1114; --accent-soft: #132A22;
+  --warn: #F5A524; --bad: #FF7A6B; --blue: #7AA2FF;
+  --c0: #34D399; --c1: #F5A524; --c2: #7AA2FF; --c3: #F472B6; --c4: #A78BFA; --c5: #FACC15; --c6: #22D3EE; --c7: #FB923C;
+  --t-dram: #34D399; --t-ssd: #F5A524; --t-remote: #FF7A6B;
+  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
+    --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
+    --warn: #A35F00; --bad: #C2362B; --blue: #2C56C9;
+    --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
+    --t-dram: #0E8A60; --t-ssd: #B86E00; --t-remote: #C2362B;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
+  --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
+  --warn: #A35F00; --bad: #C2362B; --blue: #2C56C9;
+  --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
+  --t-dram: #0E8A60; --t-ssd: #B86E00; --t-remote: #C2362B;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 8px; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); max-width: 72ch; }
+h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.small { font-size: 13px; color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > span { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 11px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+input[type=range] { width: 140px; accent-color: var(--accent); }
+.val { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn:disabled { opacity: .55; cursor: progress; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+
+.servers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 560px) { .servers { grid-template-columns: minmax(0, 1fr); } }
+.srv { border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--panel2); min-width: 0; }
+.srv-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.srv-h b { font-size: 14px; font-weight: 600; }
+.gpus { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.gpu { position: relative; height: 64px; border-radius: 8px; border: 1px solid var(--line); background: var(--cell); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 6px 7px; min-width: 0; }
+.gpu .m { font: 600 13px/1 var(--mono); color: var(--accent-ink); position: relative; }
+.gpu .s { font: 500 10px/1.1 var(--mono); position: relative; color: var(--accent-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gpu.free .m, .gpu.free .s { color: var(--faint); }
+.gpu.idle { background: transparent; border-width: 2px; }
+.gpu.idle .m, .gpu.idle .s { color: var(--ink); }
+.gpu.loading { background: repeating-linear-gradient(135deg, var(--cell) 0 6px, transparent 6px 12px); border-width: 2px; }
+.gpu.loading .m, .gpu.loading .s { color: var(--ink); }
+.gpu .bar { position: absolute; left: 0; bottom: 0; height: 4px; background: var(--ink); opacity: .55; }
+.lbl { font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; min-height: 20px; }
+.chip { min-width: 24px; height: 18px; border-radius: 4px; font: 600 10px/18px var(--mono); text-align: center; color: var(--accent-ink); padding: 0 3px; }
+.kv { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+.kv span:last-child { font-family: var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+.meter { height: 6px; border-radius: 3px; background: var(--cell); overflow: hidden; }
+.meter > div { height: 100%; background: var(--warn); width: 0; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+
+.gauges { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.gauge span { font-size: 12px; color: var(--muted); }
+.gauge b.warn { color: var(--warn); }
+.gauge b.bad { color: var(--bad); }
+.tiers { display: flex; height: 14px; border-radius: 4px; overflow: hidden; background: var(--cell); }
+.tiers > div { height: 100%; }
+.note { font-size: 13px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 10px; margin: 0; }
+.log { font: 12px/1.55 var(--mono); color: var(--muted); margin: 0; padding: 0; list-style: none; min-height: 112px; }
+.log li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 640px; }
+th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+td { font-variant-numeric: tabular-nums; font-family: var(--mono); }
+td:first-child { font-family: var(--sans); }
+tr.best td { color: var(--accent); }
+.foot { font-size: 12px; color: var(--faint); }
+.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
+.back a{color:var(--muted);text-decoration:none}
+.back a:hover{color:var(--accent)}
+</style>
+
+<div class="wrap">
+  <header>
+    <nav class="back"><a href="../">← Volver al inicio</a><a href="../slides/clase-20/">Slides de la clase 20</a></nav>
+    <span class="eyebrow">TA050 · Clase 20 · Muchos modelos, pocas GPUs</span>
+    <h1>Flota de GPUs</h1>
+    <p class="lead">64 modelos comparten 4 servidores de 4 GPUs. Casi todos están ociosos casi siempre, y cuando llega un pedido para uno que no está cargado hay que traer su checkpoint de 13 GB: desde la DRAM del servidor, desde su SSD o desde el almacenamiento remoto. Probá dónde arrancar cada modelo, con qué cargador, y cuánto tiempo dejarlo cargado.</p>
+  </header>
+
+  <section class="controls" aria-label="Controles">
+    <div class="field"><span>Dónde arrancar</span>
+      <div class="seg" id="policy">
+        <button data-v="random" aria-pressed="false">Al azar</button>
+        <button data-v="locality" aria-pressed="false">Localidad</button>
+        <button data-v="migrate" aria-pressed="true">Localidad + migración</button>
+        <button data-v="preempt" aria-pressed="false">Localidad + desalojo</button>
+      </div>
+    </div>
+    <div class="field"><span>Cargador</span>
+      <div class="seg" id="loader">
+        <button data-v="naive" aria-pressed="false">Ingenuo</button>
+        <button data-v="fast" aria-pressed="true">En pipeline</button>
+      </div>
+    </div>
+    <div class="field"><span>Keep-alive · <b class="val" id="keep-v">30 s</b></span>
+      <input type="range" id="keep" min="0" max="5" step="1" value="2" aria-label="Keep-alive">
+    </div>
+    <div class="field"><span>Pedidos por segundo · <b class="val" id="rate-v">1</b></span>
+      <input type="range" id="rate" min="0" max="4" step="1" value="1" aria-label="Pedidos por segundo">
+    </div>
+    <div class="field"><span>Velocidad · <b class="val" id="speed-v">10×</b></span>
+      <input type="range" id="speed" min="0" max="4" step="1" value="2" aria-label="Velocidad de la simulación">
+    </div>
+    <div class="actions">
+      <button class="btn" id="play">Pausa</button>
+      <button class="btn" id="reset">Reiniciar</button>
+    </div>
+  </section>
+
+  <div class="main">
+    <section class="panel" aria-labelledby="stage-h">
+      <div class="panel-head">
+        <h2 id="stage-h">Los servidores</h2>
+        <span class="small mono" id="clock">t = 0 s</span>
+      </div>
+      <div class="servers" id="servers"></div>
+      <div class="legend">
+        <span><i style="background:var(--c0)"></i>con pedidos (lleno: número de modelo, abajo cuántos)</span>
+        <span><i style="border:2px solid var(--faint)"></i>cargado y ocioso (la barra es el keep-alive)</span>
+        <span><i style="background:repeating-linear-gradient(135deg,var(--cell) 0 3px,transparent 3px 6px);border:1px solid var(--faint)"></i>cargando</span>
+      </div>
+      <p class="small"><b>DRAM</b>: los checkpoints que el servidor tiene en memoria (entran 10), del más reciente al menos. El SSD tiene 32; lo que no está en ningún lado se baja del almacenamiento remoto.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="inst-h">
+      <div class="panel-head"><h2 id="inst-h">Instrumentos</h2><span class="small">últimos 300 pedidos</span></div>
+      <div class="gauges">
+        <div class="gauge"><b id="g-cold">–</b><span>esperó una carga</span></div>
+        <div class="gauge"><b id="g-mean">–</b><span>demora media</span></div>
+        <div class="gauge"><b id="g-busy">–</b><span>GPU con pedidos</span></div>
+        <div class="gauge"><b id="g-p99">–</b><span>demora p99</span></div>
+        <div class="gauge"><b id="g-idle">–</b><span>GPU cargada y ociosa</span></div>
+        <div class="gauge"><b id="g-mig">–</b><span>mudadas / cortadas</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="kv"><span>De dónde salieron las últimas 60 cargas</span><span id="g-tiers">–</span></div>
+        <div class="tiers" id="tiers"></div>
+        <div class="legend"><span><i style="background:var(--t-dram)"></i>DRAM</span><span><i style="background:var(--t-ssd)"></i>SSD</span><span><i style="background:var(--t-remote)"></i>remoto</span></div>
+      </div>
+      <p class="note" id="explain"></p>
+      <span class="lbl">Últimas cargas</span>
+      <ul class="log" id="log"></ul>
+      <p class="small">Demora: lo que tardó cada pedido de más respecto de tener el modelo cargado y una GPU para él. Anchos de banda ilustrativos, del orden del testbed de ServerlessLLM: red de 10 Gb/s, SSD de 6 GB/s, PCIe de 25 GB/s. Cada GPU atiende hasta 8 pedidos de su modelo a la vez.</p>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="cmp-h">
+    <div class="panel-head">
+      <h2 id="cmp-h">Todas las políticas, con la misma carga</h2>
+      <button class="btn primary" id="cmp-run">Comparar</button>
+    </div>
+    <p class="small" id="cmp-desc">Corre una hora de pedidos en cada configuración, sin animación, con el keep-alive y la tasa elegidos.</p>
+    <div class="tablewrap">
+      <table id="cmp" hidden>
+        <thead><tr><th>Configuración</th><th>frío</th><th>de DRAM</th><th>de remoto</th><th>demora media</th><th>p99</th><th>GPU ociosa</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="foot">El mismo modelo que <span class="mono">go run ./cmd/sim arranque</span> del repositorio servir-tokens (paquete flota).</p>
+  </section>
+</div>
+
+<script>
+// ---------- Modelo (el mismo que flota/flota.go) ----------
+const HW = { net: 1.25, ssd: 6, pcie: 25 };
+const LOADERS = { naive: { pipe: false, eff: 0.3 }, fast: { pipe: true, eff: 1 } };
+const CFG = { servers: 4, gpus: 4, batch: 8, dram: 130, ssd: 416, gb: 13, replicas: 2, prefillMs: 0.25, decodeMs: 25, recomputeMs: 2.5 };
+const MODELS = 64, DURATION = 3600, CV = 4;
+const DRAM = 0, SSD = 1, REMOTE = 2, TIER = ["DRAM", "SSD", "remoto"];
+
+function loadTime(loader, tier, gb) {
+  const l = LOADERS[loader], hops = [];
+  if (tier >= REMOTE) hops.push(HW.net);
+  if (tier >= SSD) hops.push(HW.ssd * l.eff);
+  hops.push(HW.pcie * l.eff);
+  return l.pipe ? gb / Math.min(...hops) : hops.reduce((a, b) => a + gb / b, 0);
+}
+
+function rng(seed) { // mulberry32
+  let a = seed >>> 0;
+  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function workload(rate, seed) {
+  const r = rng(seed);
+  const normal = () => Math.sqrt(-2 * Math.log(1 - r())) * Math.cos(2 * Math.PI * r());
+  const gamma = k => {
+    if (k < 1) return gamma(k + 1) * Math.pow(1 - r(), 1 / k);
+    const d = k - 1 / 3, c = 1 / Math.sqrt(9 * d);
+    for (;;) { const x = normal(); let v = 1 + c * x; if (v <= 0) continue; v = v * v * v; if (Math.log(1 - r()) < 0.5 * x * x + d - d * v + d * Math.log(v)) return d * v; }
+  };
+  let total = 0; const w = [];
+  for (let i = 0; i < MODELS; i++) { w.push(1 / (i + 1)); total += w[i]; }
+  const shape = 1 / (CV * CV), reqs = [];
+  for (let m = 0; m < MODELS; m++) {
+    const scale = 1 / (rate * w[m] / total * shape);
+    let t = r() * gamma(shape) * scale;
+    while (t < DURATION) {
+      const prompt = 8 + Math.floor(r() * 505), output = 8 + Math.floor(r() * 505);
+      reqs.push({ model: m, arrival: t, prompt, output, service: (prompt * CFG.prefillMs + output * CFG.decodeMs) / 1000 });
+      t += gamma(shape) * scale;
+    }
+  }
+  reqs.sort((a, b) => a.arrival - b.arrival);
+  return reqs;
+}
+
+class LRU {
+  constructor(cap) { this.cap = cap; this.used = 0; this.order = []; }
+  has(m) { return this.order.includes(m); }
+  touch(m) { const i = this.order.indexOf(m); if (i >= 0) { this.order.splice(i, 1); this.order.push(m); } }
+  insert(m, gb) {
+    if (this.has(m)) { this.touch(m); return; }
+    if (gb > this.cap) return;
+    while (this.used + gb > this.cap) { this.order.shift(); this.used -= gb; }
+    this.order.push(m); this.used += gb;
+  }
+}
+
+class Heap {
+  constructor() { this.a = []; }
+  get size() { return this.a.length; }
+  less(i, j) { const x = this.a[i], y = this.a[j]; return x.t !== y.t ? x.t < y.t : x.kind < y.kind; }
+  push(e) { const a = this.a; a.push(e); let i = a.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (!this.less(i, p)) break; [a[i], a[p]] = [a[p], a[i]]; i = p; } }
+  peek() { return this.a[0]; }
+  pop() {
+    const a = this.a, top = a[0], last = a.pop();
+    if (a.length) { a[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < a.length && this.less(l, m)) m = l; if (r < a.length && this.less(r, m)) m = r; if (m === i) break; [a[i], a[m]] = [a[m], a[i]]; i = m; } }
+    return top;
+  }
+}
+
+const EV = { arrive: 0, loaded: 1, done: 2, expire: 3, migrated: 4 };
+
+class Fleet {
+  constructor(opt, reqs) {
+    this.opt = opt; this.now = 0; this.q = new Heap(); this.pending = []; this.requeued = []; this.dispatching = false;
+    this.r = rng(23); this.time = [0, 0, 0, 0]; this.done = []; this.loads = []; this.migrations = 0; this.preemptions = 0;
+    this.log = []; this.servers = [];
+    for (let i = 0; i < CFG.servers; i++) {
+      const srv = { id: i, dram: new LRU(CFG.dram), ssd: new LRU(CFG.ssd), loaderFree: 0, slots: [] };
+      for (let g = 0; g < CFG.gpus; g++) srv.slots.push({ srv, idx: g, state: 0, since: 0, model: -1, jobs: [], gen: 0, victim: null, resuming: false, reserved: null, loadTier: 0, readyAt: 0 });
+      this.servers.push(srv);
+    }
+    for (let k = 0; k < CFG.replicas; k++) for (let m = 0; m < MODELS; m++) {
+      const srv = this.servers[(m + k) % CFG.servers];
+      if (srv.ssd.used + CFG.gb <= srv.ssd.cap) srv.ssd.insert(m, CFG.gb);
+    }
+    for (const r of reqs) this.q.push({ t: r.arrival, kind: EV.arrive, j: { ...r, gen: 0, pause: 0, cold: false, preempted: false } });
+  }
+  // estados: 0 libre, 1 cargando, 2 con pedidos, 3 ocioso
+  set(s, st) { this.time[s.state] += this.now - s.since; s.state = st; s.since = this.now; }
+  tier(srv, m) { return srv.dram.has(m) ? DRAM : srv.ssd.has(m) ? SSD : REMOTE; }
+  estimate(srv, m) { return Math.max(0, srv.loaderFree - this.now) + loadTime(this.opt.loader, this.tier(srv, m), CFG.gb); }
+  advance(t) {
+    while (this.q.size && this.q.peek().t <= t) {
+      const e = this.q.pop(); this.now = e.t;
+      if (e.kind === EV.arrive) { this.pending.push(e.j); this.dispatch(); }
+      else if (e.kind === EV.loaded) { if (e.s.gen === e.gen) this.loaded(e.s); }
+      else if (e.kind === EV.done) { if (e.j.gen === e.gen) this.finished(e.j); }
+      else if (e.kind === EV.expire) { if (e.s.gen === e.gen && e.s.state === 3) { this.set(e.s, 0); e.s.gen++; e.s.model = -1; } }
+      else if (e.kind === EV.migrated) { if (e.s.gen === e.gen) this.migrated(e.s); }
+    }
+    if (isFinite(t)) this.now = Math.max(this.now, t);
+  }
+  finishedAll() { return !this.q.size; }
+  dispatch() {
+    if (this.dispatching) return;
+    this.dispatching = true;
+    for (let again = true; again;) {
+      const pend = this.pending; this.pending = []; this.requeued = [];
+      const kept = [];
+      for (const j of pend) { const s = this.instance(j.model); if (s) this.join(s, j); else if (!this.start(j)) kept.push(j); }
+      again = this.requeued.length > 0;
+      this.pending = this.requeued.concat(kept);
+    }
+    this.dispatching = false;
+  }
+  instance(m) {
+    let warming = null;
+    for (const srv of this.servers) for (const s of srv.slots) {
+      if (s.model !== m || s.jobs.length >= CFG.batch || s.reserved || s.victim) continue;
+      if (s.state === 2 || s.state === 3) return s;
+      if (s.state === 1 && !warming) warming = s;
+    }
+    return warming;
+  }
+  join(s, j) { if (s.state === 1) { j.cold = true; s.jobs.push(j); } else this.run(s, j); }
+  available(srv) {
+    let best = null;
+    for (const s of srv.slots) { if (s.state === 0) return s; if (s.state === 3 && (!best || s.since < best.since)) best = s; }
+    return best;
+  }
+  start(j) {
+    const cands = [];
+    for (const srv of this.servers) { const s = this.available(srv); if (s) cands.push(s); }
+    if (this.opt.policy === "random") {
+      if (!cands.length) return false;
+      this.load(cands[Math.floor(this.r() * cands.length)], j); return true;
+    }
+    let best = null, bestT = Infinity;
+    for (const s of cands) { const t = this.estimate(s.srv, j.model); if (t < bestT) { best = s; bestT = t; } }
+    if ((this.opt.policy === "migrate" || this.opt.policy === "preempt") && !j.preempted) {
+      const [src, dst, t] = this.makeRoom(j.model, cands.length > 0);
+      if (src && t < bestT) { if (this.opt.policy === "migrate") this.migrate(src, dst, j); else this.preempt(src, j); return true; }
+    }
+    if (!best) return false;
+    this.load(best, j); return true;
+  }
+  makeRoom(m, anyFree) {
+    let src = null, dst = null, est = Infinity;
+    for (const srv of this.servers) {
+      if (this.available(srv) || !srv.dram.has(m)) continue;
+      for (const s of srv.slots) {
+        if (s.state !== 2 || s.reserved || s.model === m || s.jobs.some(x => x.preempted)) continue;
+        let to = null, move = 0;
+        if (this.opt.policy === "migrate") {
+          if (!anyFree) continue;
+          move = Infinity;
+          for (const other of this.servers) {
+            const d = this.available(other);
+            if (other === srv || !d) continue;
+            const t = this.estimate(other, s.model) + this.resumeTime(s);
+            if (t < move) { to = d; move = t; }
+          }
+          if (!to) continue;
+        }
+        const t = move + this.estimate(srv, m);
+        if (t < est) { src = s; dst = to; est = t; }
+      }
+    }
+    return [src, dst, est];
+  }
+  generated(j) { const dec = this.now - j.start - j.prompt * CFG.prefillMs / 1000; return Math.max(0, Math.min(j.output, Math.floor(dec * 1000 / CFG.decodeMs))); }
+  resumeTime(s) { let n = 0; for (const j of s.jobs) n += j.prompt + this.generated(j); return n * CFG.recomputeMs / 1000; }
+  load(s, j) { this.loadModel(s, j.model); j.cold = true; s.jobs = [j]; }
+  loadModel(s, m) {
+    const srv = s.srv, tier = this.tier(srv, m);
+    const begin = Math.max(this.now, srv.loaderFree), dur = loadTime(this.opt.loader, tier, CFG.gb), done = begin + dur;
+    srv.loaderFree = done;
+    this.loads.push(tier); if (this.opt.live && this.loads.length > 400) this.loads.splice(0, 200);
+    if (this.opt.live) { this.log.unshift({ t: this.now, m, srv: srv.id, g: s.idx, tier, dur: done - this.now }); this.log.length = Math.min(this.log.length, 6); }
+    if (tier === REMOTE) srv.ssd.insert(m, CFG.gb);
+    if (tier === SSD) srv.ssd.touch(m);
+    srv.dram.insert(m, CFG.gb);
+    this.set(s, 1); s.gen++;
+    s.model = m; s.jobs = []; s.victim = null; s.resuming = false; s.loadTier = tier; s.readyAt = done; s.loadStart = this.now;
+    this.q.push({ t: done, kind: EV.loaded, s, gen: s.gen });
+  }
+  loaded(s) {
+    if (s.victim) { this.resume(s); return; }
+    const waiting = s.jobs; s.jobs = [];
+    if (!waiting.length) { this.becomeIdle(s); return; }
+    for (const j of waiting) this.run(s, j);
+  }
+  run(s, j) {
+    if (s.state !== 2) { this.set(s, 2); s.gen++; }
+    s.jobs.push(j); j.slot = s; j.start = this.now; j.end = this.now + j.service; j.gen++;
+    this.q.push({ t: j.end, kind: EV.done, j, gen: j.gen });
+  }
+  finished(j) {
+    const s = j.slot; s.jobs.splice(s.jobs.indexOf(j), 1);
+    this.done.push({ delay: this.now - j.arrival - j.service, cold: j.cold });
+    if (this.opt.live && this.done.length > 4000) this.done.splice(0, 2000);
+    if (s.jobs.length) { this.dispatch(); return; }
+    if (s.reserved) { this.cancelMigration(s); return; }
+    this.becomeIdle(s);
+  }
+  becomeIdle(s) {
+    this.set(s, 3); s.gen++; s.jobs = [];
+    this.dispatch();
+    if (s.state === 3 && isFinite(this.opt.keep)) this.q.push({ t: this.now + this.opt.keep, kind: EV.expire, s, gen: s.gen });
+  }
+  migrate(src, dst, j) { this.migrations++; src.reserved = j; j.cold = true; this.loadModel(dst, src.model); dst.victim = src; }
+  resume(dst) {
+    const src = dst.victim, n = src.jobs.length;
+    let total = this.resumeTime(src), round = total;
+    for (let k = 0; k < 20; k++) { const gen = round * 1000 / CFG.decodeMs; if (gen <= 1) break; round = gen * n * CFG.recomputeMs / 1000; total += round; }
+    dst.gen++; dst.resuming = true;
+    this.q.push({ t: this.now + total, kind: EV.migrated, s: dst, gen: dst.gen });
+  }
+  migrated(dst) {
+    const src = dst.victim; dst.victim = null; dst.resuming = false;
+    if (!src || !src.jobs.length || !src.reserved) { this.becomeIdle(dst); return; }
+    const pause = src.jobs.length * CFG.recomputeMs / 1000;
+    this.set(dst, 2); dst.gen++;
+    for (const j of src.jobs) { j.pause += pause; j.end += pause; j.slot = dst; j.gen++; this.q.push({ t: j.end, kind: EV.done, j, gen: j.gen }); }
+    dst.jobs = src.jobs;
+    const next = src.reserved; src.reserved = null;
+    this.load(src, next);
+    this.dispatch();
+  }
+  cancelMigration(src) {
+    const next = src.reserved; src.reserved = null;
+    this.load(src, next);
+    for (const srv of this.servers) for (const d of srv.slots) if (d.victim === src) { d.victim = null; if (d.resuming) { d.resuming = false; this.becomeIdle(d); } }
+  }
+  preempt(src, j) {
+    this.preemptions++;
+    for (const v of src.jobs) { v.pause += this.now - v.start; v.preempted = true; v.gen++; this.requeued.push(v); }
+    src.jobs = [];
+    this.load(src, j);
+  }
+  summary(window) {
+    const d = window ? this.done.slice(-window) : this.done;
+    const ds = d.map(x => x.delay).sort((a, b) => a - b);
+    const pct = p => ds.length ? ds[Math.min(ds.length - 1, Math.floor(p * ds.length))] : NaN;
+    const times = [...this.time];
+    for (const srv of this.servers) for (const s of srv.slots) times[s.state] += this.now - s.since;
+    const tot = times.reduce((a, b) => a + b, 0) || 1;
+    const loads = window ? this.loads.slice(-60) : this.loads, nl = loads.length || 1;
+    return {
+      n: d.length, cold: d.length ? d.filter(x => x.cold).length / d.length : NaN,
+      mean: ds.length ? ds.reduce((a, b) => a + b, 0) / ds.length : NaN, p99: pct(0.99),
+      busy: times[2] / tot, idle: times[3] / tot,
+      tiers: [0, 1, 2].map(t => loads.filter(x => x === t).length / nl), nloads: loads.length,
+    };
+  }
+}
+
+// ---------- Interfaz ----------
+const $ = s => document.querySelector(s);
+const KEEPS = [0, 10, 30, 60, 300, Infinity], RATES = [0.5, 1, 1.5, 2, 3], SPEEDS = [1, 4, 10, 30, 100];
+const opt = { policy: "migrate", loader: "fast", keep: 30, rate: 1 };
+let speed = 10, playing = true, fl, last = 0;
+
+const keepName = k => isFinite(k) ? k + " s" : "∞";
+function seg(id, key) {
+  const root = $(id);
+  root.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    opt[key] = b.dataset.v; root.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); reset();
+  });
+}
+seg("#policy", "policy"); seg("#loader", "loader");
+$("#keep").addEventListener("input", e => { opt.keep = KEEPS[+e.target.value]; $("#keep-v").textContent = keepName(opt.keep); reset(); });
+$("#rate").addEventListener("input", e => { opt.rate = RATES[+e.target.value]; $("#rate-v").textContent = String(opt.rate).replace(".", ","); reset(); });
+$("#speed").addEventListener("input", e => { speed = SPEEDS[+e.target.value]; $("#speed-v").textContent = speed + "×"; });
+$("#play").addEventListener("click", () => { playing = !playing; $("#play").textContent = playing ? "Pausa" : "Seguir"; });
+$("#reset").addEventListener("click", reset);
+
+const col = m => `var(--c${m % 8})`;
+function buildStage() {
+  const st = $("#servers"); st.innerHTML = "";
+  for (const srv of fl.servers) {
+    const el = document.createElement("div"); el.className = "srv";
+    el.innerHTML = `<div class="srv-h"><b>Servidor ${srv.id + 1}</b><span class="small mono" data-k="ssd"></span></div>
+      <div class="gpus">${srv.slots.map(() => `<div class="gpu"><span class="m"></span><span class="s"></span><div class="bar"></div></div>`).join("")}</div>
+      <span class="lbl">DRAM</span><div class="chips" data-k="dram"></div>
+      <div class="kv"><span>Cola de carga</span><span data-k="queue">–</span></div><div class="meter"><div data-k="qm"></div></div>`;
+    srv.el = el; st.appendChild(el);
+  }
+}
+function explain() {
+  const t = {
+    random: "Al azar: cualquier GPU libre, sin mirar dónde está el checkpoint. Muchas cargas salen del SSD o del almacenamiento remoto.",
+    locality: "Localidad: estima cola + tamaño / ancho de banda en cada servidor con GPU libre y elige el menor (ServerlessLLM §6.1). Casi todas las cargas salen de DRAM.",
+    migrate: "Localidad + migración: si el checkpoint está en la DRAM de un servidor lleno, muda una inferencia a otro servidor (manda los tokens y el destino recalcula el KV cache) para hacerle lugar.",
+    preempt: "Localidad + desalojo: como la migración, pero corta la inferencia y la vuelve a empezar en otro lado. La cortada pierde todo lo que llevaba.",
+  };
+  let s = t[opt.policy];
+  s += opt.loader === "naive" ? " Cargador ingenuo: nivel por nivel y con el 30% del ancho de banda local." : " Cargador en pipeline: 13 GB desde DRAM en 0,5 s, desde SSD en 2,2 s, desde remoto en 10 s.";
+  s += opt.keep === 0 ? " Sin keep-alive: cada modelo se descarga apenas queda ocioso." : isFinite(opt.keep) ? ` Un modelo ocioso queda cargado ${opt.keep} s.` : " Un modelo ocioso queda cargado hasta que otro necesite su GPU.";
+  $("#explain").textContent = s;
+}
+function reset() {
+  fl = new Fleet({ ...opt, live: true }, workload(opt.rate, 5));
+  buildStage(); explain(); render();
+}
+const fmtS = v => isNaN(v) ? "–" : v >= 100 ? Math.round(v) + " s" : v.toFixed(1).replace(".", ",") + " s";
+const pctf = v => isNaN(v) ? "–" : Math.round(100 * v) + "%";
+function render() {
+  $("#clock").textContent = `t = ${Math.floor(fl.now)} s de ${DURATION}`;
+  for (const srv of fl.servers) {
+    srv.el.querySelector('[data-k="ssd"]').textContent = `SSD: ${srv.ssd.order.length} modelos`;
+    srv.el.querySelector('[data-k="dram"]').innerHTML = [...srv.dram.order].reverse().map(m => `<span class="chip" style="background:${col(m)}">${m}</span>`).join("") || `<span class="small">vacía</span>`;
+    const q = Math.max(0, srv.loaderFree - fl.now);
+    srv.el.querySelector('[data-k="queue"]').textContent = q > 0 ? fmtS(q) : "libre";
+    srv.el.querySelector('[data-k="qm"]').style.width = Math.min(100, q * 5) + "%";
+    srv.slots.forEach((s, i) => {
+      const g = srv.el.querySelectorAll(".gpu")[i];
+      const cls = ["free", "loading", "busy", "idle"][s.state];
+      g.className = "gpu " + cls;
+      const c = s.model >= 0 ? col(s.model) : "var(--line)";
+      g.style.background = s.state === 2 ? c : "";
+      g.style.borderColor = s.state === 1 || s.state === 3 ? c : "";
+      g.querySelector(".m").textContent = s.state === 0 ? "libre" : "M" + s.model;
+      let sub = "", bar = 0;
+      if (s.state === 1) { sub = s.victim ? (s.resuming ? "recalcula KV" : "migra · " + TIER[s.loadTier]) : "desde " + TIER[s.loadTier]; bar = (fl.now - s.loadStart) / Math.max(1e-6, s.readyAt - s.loadStart); }
+      else if (s.state === 2) { sub = s.jobs.length + " pedido" + (s.jobs.length > 1 ? "s" : "") + (s.reserved ? " · se muda" : ""); }
+      else if (s.state === 3) { sub = "ocioso"; bar = isFinite(opt.keep) && opt.keep > 0 ? 1 - (fl.now - s.since) / opt.keep : isFinite(opt.keep) ? 0 : 1; }
+      g.querySelector(".s").textContent = sub;
+      g.querySelector(".bar").style.width = Math.max(0, Math.min(1, bar)) * 100 + "%";
+    });
+  }
+  const s = fl.summary(300);
+  const set = (id, txt, cls) => { const e = $(id); e.textContent = txt; e.className = cls || ""; };
+  set("#g-cold", pctf(s.cold)); set("#g-mean", fmtS(s.mean), s.mean > 10 ? "bad" : s.mean > 3 ? "warn" : "");
+  set("#g-p99", fmtS(s.p99), s.p99 > 60 ? "bad" : s.p99 > 20 ? "warn" : "");
+  set("#g-busy", pctf(s.busy)); set("#g-idle", pctf(s.idle)); set("#g-mig", `${fl.migrations} / ${fl.preemptions}`);
+  $("#g-tiers").textContent = s.nloads ? s.tiers.map((x, i) => Math.round(100 * x) + "% " + TIER[i]).join(" · ") : "–";
+  $("#tiers").innerHTML = s.tiers.map((x, i) => `<div style="width:${100 * x}%;background:var(--t-${["dram", "ssd", "remote"][i]})"></div>`).join("");
+  $("#log").innerHTML = fl.log.map(l => `<li>t=${Math.floor(l.t)} s · M${l.m} → S${l.srv + 1}·GPU${l.g + 1} desde ${TIER[l.tier]}, lista en ${fmtS(l.dur)}</li>`).join("") || `<li>todavía nada</li>`;
+}
+let uiAcc = 0;
+function frame(ts) {
+  const dt = Math.min(100, ts - (last || ts)); last = ts;
+  if (playing) {
+    fl.advance(fl.now + dt / 1000 * speed);
+    if (fl.finishedAll()) reset();
+  }
+  uiAcc += dt;
+  if (uiAcc > 100) { uiAcc = 0; render(); }
+  requestAnimationFrame(frame);
+}
+
+// ---------- Comparación ----------
+const CONFIGS = [
+  ["Al azar, cargador ingenuo", { policy: "random", loader: "naive" }],
+  ["Al azar", { policy: "random", loader: "fast" }],
+  ["Localidad", { policy: "locality", loader: "fast" }],
+  ["Localidad + desalojo", { policy: "preempt", loader: "fast" }],
+  ["Localidad + migración", { policy: "migrate", loader: "fast" }],
+];
+$("#cmp-run").addEventListener("click", () => {
+  const btn = $("#cmp-run"); btn.disabled = true;
+  const reqs = workload(opt.rate, 1), rows = [];
+  const tb = $("#cmp tbody"); tb.innerHTML = ""; $("#cmp").hidden = false;
+  let k = 0;
+  const one = () => {
+    if (k === CONFIGS.length) {
+      const best = rows.reduce((a, r) => r.s.mean < a.s.mean ? r : a, rows[0]);
+      tb.innerHTML = rows.map(r => `<tr class="${r === best ? "best" : ""}"><td>${r.name}</td><td>${pctf(r.s.cold)}</td><td>${pctf(r.s.tiers[0])}</td><td>${pctf(r.s.tiers[2])}</td><td>${fmtS(r.s.mean)}</td><td>${fmtS(r.s.p99)}</td><td>${pctf(r.s.idle)}</td></tr>`).join("");
+      $("#cmp-desc").textContent = `${reqs.length} pedidos en una hora a ${String(opt.rate).replace(".", ",")} por segundo, keep-alive de ${keepName(opt.keep)}. En verde, la de menor demora media.`;
+      btn.disabled = false; return;
+    }
+    const [name, o] = CONFIGS[k++];
+    $("#cmp-desc").textContent = `Corriendo ${k} de ${CONFIGS.length}: ${name}…`;
+    const f = new Fleet({ keep: opt.keep, ...o }, reqs);
+    f.advance(Infinity);
+    rows.push({ name, s: f.summary(0) });
+    setTimeout(one, 10);
+  };
+  setTimeout(one, 10);
+});
+
+reset();
+requestAnimationFrame(frame);
+</script>
+
+</html>

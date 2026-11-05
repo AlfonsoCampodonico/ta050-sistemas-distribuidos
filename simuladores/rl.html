@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bucle de RL</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+/* Clase 22 · el bucle de post-entrenamiento con RL: rollouts con cola larga, un trainer, pesos que viajan y staleness. */
+:root {
+  --bg: #0E1114; --panel: #161B20; --panel2: #1A2027; --ink: #F2F3EF; --muted: #A8B3BC; --faint: #7D8892;
+  --line: #2A3138; --cell: #232A31; --accent: #34D399; --accent-ink: #0E1114; --accent-soft: #132A22;
+  --warn: #F5A524; --bad: #FF7A6B; --blue: #7AA2FF; --pink: #F472B6;
+  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
+    --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
+    --warn: #A35F00; --bad: #C2362B; --blue: #2C56C9; --pink: #C0307F;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
+  --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
+  --warn: #A35F00; --bad: #C2362B; --blue: #2C56C9; --pink: #C0307F;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+header { display: flex; flex-direction: column; gap: 8px; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
+h2 { margin: 0; font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 600; text-wrap: balance; }
+h3 { margin: 0; font-size: 15px; font-weight: 600; }
+.lead { margin: 0; color: var(--muted); max-width: 72ch; }
+.small { font-size: 13px; color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > span { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+input[type=range] { width: 170px; max-width: 100%; accent-color: var(--accent); }
+input[type=range]:disabled { opacity: .4; }
+.val { font: 500 13px var(--mono); color: var(--ink); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 11px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font: 13px var(--sans); cursor: pointer; background: transparent; color: var(--ink); }
+.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.tog:disabled { opacity: .4; cursor: default; }
+.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); }
+.tog[aria-pressed="true"] i { background: var(--accent); border-color: var(--accent); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); cursor: pointer; }
+.btn:disabled { opacity: .5; cursor: default; }
+
+.gauges { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+@media (max-width: 860px) { .gauges { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.gauge span { font-size: 12px; color: var(--muted); }
+.gauge b.bad { color: var(--bad); } .gauge b.warn { color: var(--warn); } .gauge b.good { color: var(--accent); }
+.two { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.box { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--panel2); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+.note { font-size: 13px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 10px; margin: 0; min-height: 2.6em; }
+
+.gpus { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 560px) { .gpus { grid-template-columns: minmax(0, 1fr); } }
+.gpu { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; background: var(--panel); min-width: 0; }
+.gpu.pausa { border-color: var(--warn); }
+.gpu .lbl { font: 500 11px/1.2 var(--mono); letter-spacing: .04em; color: var(--faint); display: flex; justify-content: space-between; gap: 8px; }
+.slot { position: relative; height: 9px; border-radius: 3px; background: var(--cell); overflow: hidden; }
+.slot .goal { position: absolute; top: 0; bottom: 0; left: 0; border-right: 2px solid var(--faint); opacity: .55; }
+.slot .done { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 3px; }
+.trainer { display: flex; flex-direction: column; gap: 8px; }
+.state { font: 600 18px/1.2 var(--mono); }
+.bar { height: 10px; border-radius: 5px; background: var(--cell); overflow: hidden; }
+.bar > div { height: 100%; width: 0; background: var(--blue); border-radius: 5px; }
+.pipe { display: flex; align-items: center; gap: 8px; font: 500 12px var(--mono); color: var(--faint); }
+.pipe .arrow { flex: 1; height: 4px; border-radius: 2px; background: var(--cell); position: relative; overflow: hidden; }
+.pipe.on { color: var(--warn); }
+.pipe.on .arrow::after { content: ""; position: absolute; inset: 0; width: 30%; background: var(--warn); animation: flow 0.8s linear infinite; }
+@keyframes flow { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+@media (prefers-reduced-motion: reduce) { .pipe.on .arrow::after { animation: none; width: 100%; } }
+svg { display: block; width: 100%; height: auto; }
+canvas { display: block; width: 100%; height: 92px; border-radius: 6px; background: var(--cell); }
+.tl-labels { display: flex; justify-content: space-between; font: 500 11px var(--mono); color: var(--faint); }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+th.n { text-align: right; }
+tr.best td { color: var(--accent); }
+.foot { font-size: 12px; color: var(--faint); }
+.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
+.back a{color:var(--muted);text-decoration:none}
+.back a:hover{color:var(--accent)}
+</style>
+
+<div class="wrap">
+  <header>
+    <nav class="back"><a href="../">← Volver al inicio</a><a href="../slides/clase-22/">Slides de la clase 22</a></nav>
+    <span class="eyebrow">TA050 · Clase 22 · Entrenar con lo que se sirve</span>
+    <h1>Bucle de RL</h1>
+    <p class="lead">Generar respuestas, puntuarlas y actualizar los pesos, con las mismas GPUs o con pools separados. Mirá cuánto espera cada una a la respuesta más larga, cuánto cuesta llevar los pesos nuevos, y con qué pesos se generó lo que se entrena.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="b-h">
+    <h2 id="b-h">El bucle</h2>
+    <div class="controls">
+      <div class="field"><span>Ubicación y sincronía</span>
+        <div class="seg" id="modo" role="group" aria-label="Modo">
+          <button data-m="col" aria-pressed="true">Colocado</button>
+          <button data-m="par" aria-pressed="false">Colocado + parciales</button>
+          <button data-m="sep" aria-pressed="false">Separado</button>
+        </div>
+      </div>
+      <div class="field"><span>Staleness máxima <i style="text-transform:none;font-style:normal">η</i> · <b class="val" id="eta-v">0</b></span><input type="range" id="eta" min="0" max="9" step="1" value="0" aria-label="Staleness máxima"></div>
+      <div class="field"><span>Opciones</span><div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="tog" id="inter" aria-pressed="true"><i></i>Interrumpible</button>
+        <button class="tog" id="corr" aria-pressed="false"><i></i>Corregir lo viejo</button>
+      </div></div>
+      <div class="field"><span>Velocidad · <b class="val" id="vel-v">40×</b></span><input type="range" id="vel" min="0" max="5" step="1" value="2" aria-label="Velocidad"></div>
+      <div class="field"><span>&nbsp;</span><div style="display:flex;gap:8px"><button class="btn" id="play">Pausa</button><button class="btn" id="reset">Reiniciar</button></div></div>
+    </div>
+    <div class="gauges">
+      <div class="gauge"><b id="g-paso">0</b><span>pasos de entrenamiento</span></div>
+      <div class="gauge"><b id="g-t">0 s</b><span>tiempo (virtual)</span></div>
+      <div class="gauge"><b id="g-ocio">–</b><span>GPU ociosa</span></div>
+      <div class="gauge"><b id="g-stale">–</b><span>staleness promedio · máx</span></div>
+      <div class="gauge"><b id="g-rew">–</b><span>recompensa esperada (máx 0,80)</span></div>
+      <div class="gauge"><b id="g-len">–</b><span>tokens por respuesta, mediana</span></div>
+    </div>
+    <div class="two">
+      <div class="box">
+        <h3 id="gpus-h">GPUs de rollout</h3>
+        <div class="gpus" id="gpus"></div>
+        <div class="legend"><span>cada barra: una respuesta en el lote; la marca, cuánto va a medir; el ancho total, el tope de 8.192 tokens</span></div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>pesos actuales</span><span><i style="background:var(--blue)"></i>1 versión atrás</span><span><i style="background:var(--warn)"></i>2–3 atrás</span><span><i style="background:var(--bad)"></i>4 o más</span></div>
+      </div>
+      <div class="box trainer">
+        <h3 id="tr-h">Trainer</h3>
+        <div class="state" id="tr-state">ocioso</div>
+        <div class="bar"><div id="tr-bar"></div></div>
+        <p class="small" id="tr-sub">esperando un lote completo</p>
+        <div class="pipe" id="pipe"><span id="pipe-l">pesos</span><div class="arrow"></div><span id="pipe-r">rollout</span></div>
+        <h3>Recompensa por tiempo</h3>
+        <svg id="curve" viewBox="0 0 320 130" aria-label="Recompensa esperada en función del tiempo virtual"></svg>
+      </div>
+    </div>
+    <div class="box">
+      <h3>Qué hace cada GPU</h3>
+      <canvas id="tl" role="img" aria-label="Línea de tiempo de cada GPU"></canvas>
+      <div class="tl-labels"><span id="tl-a">hace –</span><span>ahora</span></div>
+      <div class="legend"><span><i style="background:var(--accent)"></i>generando (más claro: lote más vacío)</span><span><i style="background:var(--blue)"></i>entrenando</span><span><i style="background:var(--warn)"></i>moviendo pesos o recalculando KV</span><span><i style="background:var(--cell);border:1px solid var(--line)"></i>ociosa</span></div>
+    </div>
+    <p class="note" id="note"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="c-h">
+    <h2 id="c-h">Comparar</h2>
+    <p class="small">Las mismas 4 GPUs y la misma tarea, 30 pasos, promedio de 4 corridas. Separado: 3 GPUs generan y 1 entrena.</p>
+    <div><button class="btn" id="cmp-run">Comparar</button></div>
+    <p class="small" id="cmp-desc"></p>
+    <div class="tablewrap"><table id="cmp" hidden>
+      <thead><tr><th>Configuración</th><th class="n">Tiempo</th><th class="n">GPU ociosa</th><th class="n">Staleness</th><th class="n">Recompensa</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </section>
+
+  <p class="foot">La misma tarea y un modelo de costo parecido al de <span class="mono">go run ./cmd/sim asinc</span> y <span class="mono">go run ./cmd/sim aprender</span> del repositorio post-entrenamiento, con menos GPUs: 4 GPUs de hasta 16 respuestas cada una, y cada paso son 8 problemas × 4 respuestas. El "modelo" decide cuánto pensar: más largo acierta más, pero pasar los 8.192 tokens vale 0.</p>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const nf = (x, d = 0) => x.toLocaleString("es-AR", { minimumFractionDigits: d, maximumFractionDigits: d });
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+// ---------- La tarea: cuánto pensar ----------
+const TAREA = { escala: 1400, max: 8192, sigma: 0.6 };
+const MU0 = Math.log(300);
+function randn(r) { let u = 0; while (u === 0) u = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * r()); }
+function muestrear(r, mu) {
+  const x = mu + TAREA.sigma * randn(r);
+  const l = Math.max(1, Math.round(Math.exp(x)));
+  const m = { x, largo: l, rec: 0, mub: mu };
+  if (l > TAREA.max) m.largo = TAREA.max; else if (r() < 1 - Math.exp(-l / TAREA.escala)) m.rec = 1;
+  return m;
+}
+function recompensa(mu) {
+  let s = 0, w = 0;
+  for (let i = 0; i < 200; i++) { const z = -5 + 10 * (i + 0.5) / 200, d = Math.exp(-z * z / 2), l = Math.exp(mu + TAREA.sigma * z); w += d; if (l <= TAREA.max) s += d * (1 - Math.exp(-l / TAREA.escala)); }
+  return s / w;
+}
+function actualizar(mu, grupos, lr, corregir) {
+  const s2 = TAREA.sigma ** 2; let g = 0, n = 0;
+  for (const gr of grupos) {
+    const r = gr.map(x => x.rec), m = r.reduce((a, b) => a + b, 0) / r.length;
+    const sd = Math.sqrt(r.reduce((a, b) => a + (b - m) ** 2, 0) / r.length);
+    gr.forEach((x, i) => {
+      n++; if (sd < 1e-9) return;
+      const A = (r[i] - m) / sd;
+      let w = 1;
+      if (corregir) w = Math.min(Math.exp(((x.x - x.mub) ** 2 - (x.x - mu) ** 2) / (2 * s2)), 2);
+      g += w * A * (x.x - mu) / s2;
+    });
+  }
+  return n ? mu + lr * g / n : mu;
+}
+
+// ---------- El bucle, en tiempo virtual (ms) ----------
+const COSTO = { base: 20, porSeq: 0.2, prefill: 0.05, entrenar: 0.4, slots: 16, transicion: 2000, broadcast: 14 / 25 * 1000 * 1.03 };
+class Heap {
+  constructor() { this.a = []; }
+  get size() { return this.a.length; }
+  less(i, j) { const x = this.a[i], y = this.a[j]; return x.t < y.t || (x.t === y.t && x.seq < y.seq); }
+  push(e) { const a = this.a; a.push(e); let i = a.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (!this.less(i, p)) break; [a[i], a[p]] = [a[p], a[i]]; i = p; } }
+  top() { return this.a[0]; }
+  pop() { const a = this.a, top = a[0], last = a.pop(); if (a.length) { a[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < a.length && this.less(l, m)) m = l; if (r < a.length && this.less(r, m)) m = r; if (m === i) break; [a[i], a[m]] = [a[m], a[i]]; i = m; } } return top; }
+}
+
+class Bucle {
+  // o: { modo: "col" | "par" | "sep", eta, inter, corr, seed }
+  constructor(o) {
+    this.o = o; this.sep = o.modo === "sep"; this.par = o.modo === "par";
+    this.gpus = 4; this.nR = this.sep ? 3 : 4; this.B = 8; this.G = 4; this.lr = 0.6;
+    this.r = rng(o.seed || 1); this.now = 0; this.ev = new Heap(); this.seq = 0;
+    this.ws = Array.from({ length: this.nR }, (_, id) => ({ id, act: [], ver: 0, t0: 0, costo: 0, epoca: 0, pausa: 0, drenar: false, util: 0 }));
+    this.pend = []; this.mu = MU0; this.mus = [MU0]; this.ver = 0; this.empez = 0; this.consum = 0; this.listos = [];
+    this.ocupado = false; this.generar = true; this.entrMS = 0; this.staleSum = 0; this.staleMax = 0; this.muestras = 0;
+    this.tr = { fase: "ocioso", desde: 0, hasta: 0, finEntr: 0 };
+    this.curva = [{ t: 0, r: recompensa(MU0) }];
+    for (const w of this.ws) this.llenar(w);
+  }
+  programar(t, tipo, w) { const e = { t, seq: ++this.seq, tipo, w }; if (w) e.epoca = ++w.epoca; this.ev.push(e); }
+  costo(n) { return COSTO.base + COSTO.porSeq * n; }
+  avanzar(w) {
+    if (!w.act.length || this.now <= w.t0) { w.t0 = Math.max(w.t0, this.now); return; }
+    let it = Math.floor((this.now - w.t0) / w.costo + 1e-9);
+    for (const m of w.act) it = Math.min(it, m.largo - m.hechos);
+    for (const m of w.act) m.hechos += it;
+    w.util += it * w.costo * w.act.length / COSTO.slots;
+    w.t0 = this.now;
+    w.act = w.act.filter(m => {
+      if (m.hechos < m.largo) return true;
+      if (--m.g.faltan === 0) this.listos.push(m.g);
+      return false;
+    });
+  }
+  puedeEmpezar(w) {
+    const B = this.B;
+    if (!this.sep) { if (!this.generar) return false; return this.par ? this.empez - this.consum < 2 * B : Math.floor(this.empez / B) <= this.ver; }
+    if (w.ver !== this.ver || w.drenar) return false;
+    if (this.o.eta < 0) return true;
+    return Math.floor(this.empez / B) <= this.ver + this.o.eta;
+  }
+  empezarGrupo() {
+    const g = { idx: this.empez++, ver: this.ver, ms: [], faltan: this.G };
+    for (let i = 0; i < this.G; i++) { const m = { ...muestrear(this.r, this.mus[this.ver]), g, hechos: 0, ver: this.ver }; g.ms.push(m); this.pend.push(m); }
+  }
+  pausado() { return !this.sep && !this.generar; }
+  llenar(w) {
+    if (this.now < w.pausa) { this.programar(w.pausa, "w", w); return; }
+    const pausado = this.pausado();
+    if (!pausado) { w.t0 = Math.max(w.t0, w.pausa); this.avanzar(w); }
+    if (w.drenar && !w.act.length) { w.drenar = false; w.ver = this.ver; }
+    let otros = false;
+    while (!pausado && w.act.length < COSTO.slots) {
+      if (!this.pend.length) { if (!this.puedeEmpezar(w)) break; this.empezarGrupo(); otros = true; }
+      w.act.push(this.pend.shift());
+    }
+    this.intentarEntrenar();
+    if (!pausado && w.act.length) {
+      w.costo = this.costo(w.act.length); w.t0 = this.now;
+      let k = Infinity; for (const m of w.act) k = Math.min(k, m.largo - m.hechos);
+      this.programar(this.now + k * w.costo, "w", w);
+    } else w.epoca++;
+    if (otros && this.pend.length) for (const o of this.ws) if (o !== w && o.act.length < COSTO.slots && this.now >= o.pausa) this.llenar(o);
+  }
+  intentarEntrenar() {
+    const B = this.B;
+    if (this.ocupado || this.listos.length < B) return;
+    if (!this.sep && !this.par && this.ws.some(w => w.act.length)) return;
+    this.listos.sort((a, b) => a.idx - b.idx);
+    const lote = this.listos.splice(0, B);
+    this.consum += B;
+    let tokens = 0;
+    for (const g of lote) { const st = this.ver - g.ver; for (const m of g.ms) { tokens += m.largo; this.staleSum += st; this.staleMax = Math.max(this.staleMax, st); } }
+    this.muestras += B * this.G;
+    this.mu = actualizar(this.mu, lote.map(g => g.ms), this.lr, this.o.corr);
+    this.ocupado = true;
+    const nE = this.sep ? this.gpus - this.nR : this.gpus;
+    if (!this.sep) { this.generar = false; for (const w of this.ws) this.avanzar(w); }
+    const entr = tokens * COSTO.entrenar / nE;
+    this.entrMS += entr * nE;
+    const sync = this.sep ? COSTO.broadcast : COSTO.transicion;
+    this.tr = { fase: "entrenar", desde: this.now, finEntr: this.now + entr, hasta: this.now + entr + sync, tokens };
+    this.programar(this.now + entr + sync, "pub");
+  }
+  publicar() {
+    this.ver++; this.mus.push(this.mu); this.curva.push({ t: this.now, r: recompensa(this.mu) });
+    this.ocupado = false; this.tr = { fase: "ocioso", desde: this.now, hasta: this.now };
+    if (!this.sep) {
+      let pausa = 0;
+      for (const w of this.ws) pausa = Math.max(pausa, w.act.reduce((a, m) => a + m.hechos, 0) * COSTO.prefill);
+      for (const w of this.ws) w.pausa = this.now + pausa;
+      this.programar(this.now + pausa, "re");
+      return;
+    }
+    for (const w of this.ws) {
+      if (this.now >= w.pausa) this.avanzar(w);
+      if (!w.act.length) w.ver = this.ver;
+      else if (this.o.inter) { const n = w.act.reduce((a, m) => a + m.hechos, 0); w.ver = this.ver; w.pausa = Math.max(w.pausa, this.now) + n * COSTO.prefill; }
+      else w.drenar = true;
+    }
+    for (const w of this.ws) this.llenar(w);
+    this.intentarEntrenar();
+  }
+  reanudar() { this.generar = true; for (const w of this.ws) { w.ver = this.ver; w.t0 = this.now; } for (const w of this.ws) this.llenar(w); }
+  avanzarHasta(T, maxPasos = Infinity) {
+    while (this.ev.size && this.ev.top().t <= T && this.ver < maxPasos) {
+      const e = this.ev.pop(); this.now = e.t;
+      if (e.tipo === "w") { if (e.epoca === e.w.epoca) this.llenar(e.w); }
+      else if (e.tipo === "pub") this.publicar();
+      else this.reanudar();
+    }
+    if (this.ver < maxPasos) this.now = Math.max(this.now, T);
+  }
+  // vista sin mutar: tokens hechos por cada respuesta en el lote ahora
+  hechosAhora(w, m) {
+    if (this.pausado() || this.now < w.pausa || !w.costo) return m.hechos;
+    return Math.min(m.largo, m.hechos + Math.floor((this.now - Math.max(w.t0, w.pausa)) / w.costo));
+  }
+  resumen() {
+    const T = Math.max(this.now, 1);
+    let gen = 0; for (const w of this.ws) gen += w.util;
+    const entr = this.ocupado ? this.entrMS - Math.max(0, this.tr.finEntr - this.now) * (this.sep ? this.gpus - this.nR : this.gpus) : this.entrMS;
+    return { ocio: 1 - (gen + entr) / (this.gpus * T), stale: this.muestras ? this.staleSum / this.muestras : NaN, staleMax: this.staleMax, rew: recompensa(this.mu), med: Math.exp(this.mu) };
+  }
+}
+
+// ---------- Interfaz ----------
+const VELS = [10, 20, 40, 80, 160, 320];
+const st = { modo: "col", eta: 0, inter: true, corr: false };
+let sim, playing = true, last = 0, hist = [];
+const etaLabel = v => v >= 9 ? "∞" : String(v);
+function opts() { return { modo: st.modo, eta: st.modo === "sep" ? (st.eta >= 9 ? -1 : st.eta) : 0, inter: st.inter, corr: st.corr, seed: 1 + Math.floor(Math.random() * 1e6) }; }
+function reset() {
+  sim = new Bucle(opts());
+  hist = [];
+  const tl = $("#tl"); tl.width = tl.clientWidth * (devicePixelRatio || 1); tl.height = 92 * (devicePixelRatio || 1);
+  tl.getContext("2d").clearRect(0, 0, tl.width, tl.height);
+  $("#gpus").innerHTML = sim.ws.map(w => `<div class="gpu" data-w="${w.id}"><div class="lbl"><span>GPU ${w.id + 1}</span><span data-k="v"></span></div>` +
+    Array.from({ length: COSTO.slots }, () => `<div class="slot"><div class="goal"></div><div class="done"></div></div>`).join("") + `</div>`).join("");
+  $("#gpus-h").textContent = sim.sep ? "GPUs de rollout (3)" : "Las 4 GPUs, generando";
+  $("#tr-h").textContent = sim.sep ? "Trainer (GPU 4)" : "Entrenar (las mismas 4 GPUs)";
+  $("#pipe-l").textContent = sim.sep ? "pesos" : "layout";
+  $("#pipe-r").textContent = sim.sep ? "rollout" : "generación";
+  syncControls();
+}
+function syncControls() {
+  const sep = st.modo === "sep";
+  $("#eta").disabled = !sep; $("#inter").disabled = !sep;
+  $("#eta-v").textContent = sep ? etaLabel(st.eta) : st.modo === "par" ? "parcial" : "0";
+}
+function staleColor(d) { return d <= 0 ? "var(--accent)" : d === 1 ? "var(--blue)" : d <= 3 ? "var(--warn)" : "var(--bad)"; }
+
+function render() {
+  const s = sim;
+  for (const w of s.ws) {
+    const el = document.querySelector(`.gpu[data-w="${w.id}"]`); if (!el) continue;
+    const slots = el.querySelectorAll(".slot");
+    const pausa = s.now < w.pausa || s.pausado();
+    el.classList.toggle("pausa", s.now < w.pausa);
+    el.querySelector('[data-k="v"]').textContent = (s.now < w.pausa ? "recalcula KV · " : w.drenar ? "termina lo suyo · " : "") + `pesos v${w.ver}`;
+    slots.forEach((sl, i) => {
+      const m = w.act[i];
+      const goal = sl.firstElementChild, done = sl.lastElementChild;
+      if (!m) { goal.style.width = "0"; done.style.width = "0"; return; }
+      const h = s.hechosAhora(w, m);
+      goal.style.width = (m.largo / TAREA.max * 100) + "%";
+      done.style.width = (h / TAREA.max * 100) + "%";
+      done.style.background = staleColor(s.ver - m.ver);
+      done.style.opacity = pausa ? 0.5 : 1;
+    });
+  }
+  // trainer
+  const tr = s.tr;
+  let estado = "ocioso", frac = 0, sub = `esperando: ${s.listos.length} de ${s.B} problemas completos`, pipeOn = false;
+  if (tr.fase === "entrenar") {
+    if (s.now < tr.finEntr) { estado = `entrenando → v${s.ver + 1}`; frac = (s.now - tr.desde) / Math.max(1, tr.finEntr - tr.desde); sub = `${nf(tr.tokens)} tokens del lote`; }
+    else { estado = s.sep ? "mandando pesos" : "cambiando de layout"; frac = 1; pipeOn = true; sub = s.sep ? "broadcast a las GPUs de rollout" : "del layout de entrenamiento al de generación"; }
+  }
+  if (!s.sep && !s.ocupado && s.ws.some(w => s.now < w.pausa)) { pipeOn = true; sub = "las respuestas a medias recalculan su KV cache"; }
+  if (s.sep && s.ws.some(w => s.now < w.pausa)) pipeOn = true;
+  $("#tr-state").textContent = estado;
+  $("#tr-state").style.color = estado === "ocioso" ? "var(--faint)" : pipeOn ? "var(--warn)" : "var(--blue)";
+  $("#tr-bar").style.width = (frac * 100) + "%";
+  $("#tr-bar").style.background = pipeOn ? "var(--warn)" : "var(--blue)";
+  $("#tr-sub").textContent = sub;
+  $("#pipe").classList.toggle("on", pipeOn);
+  // gauges
+  const r = s.resumen();
+  $("#g-paso").textContent = s.ver;
+  $("#g-t").textContent = s.now < 60000 ? nf(s.now / 1000) + " s" : nf(s.now / 60000, 1) + " min";
+  const go = $("#g-ocio"); go.textContent = s.now > 0 ? Math.round(100 * r.ocio) + "%" : "–"; go.className = r.ocio > 0.6 ? "bad" : r.ocio > 0.3 ? "warn" : "good";
+  $("#g-stale").textContent = isNaN(r.stale) ? "–" : `${nf(r.stale, 1)} · ${r.staleMax}`;
+  const gr = $("#g-rew"); gr.textContent = nf(r.rew, 2); gr.className = r.rew > 0.75 ? "good" : r.rew < 0.3 && s.ver > 5 ? "bad" : "";
+  $("#g-len").textContent = nf(r.med);
+  // curva
+  const W = 320, H = 130, pad = 18, T = Math.max(s.now, 60000);
+  const X = t => pad + (t / T) * (W - pad - 4), Y = v => H - pad - v * (H - pad - 6);
+  const pts = s.curva.map(c => `${X(c.t).toFixed(1)},${Y(c.r).toFixed(1)}`).concat([`${X(s.now).toFixed(1)},${Y(r.rew).toFixed(1)}`]).join(" ");
+  $("#curve").innerHTML = `<line x1="${pad}" x2="${W - 4}" y1="${Y(0.8)}" y2="${Y(0.8)}" stroke="var(--line)" stroke-dasharray="3 3"/>` +
+    `<text x="${W - 4}" y="${Y(0.8) - 4}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="var(--mono)">óptimo 0,80</text>` +
+    `<line x1="${pad}" x2="${pad}" y1="6" y2="${H - pad}" stroke="var(--line)"/><line x1="${pad}" x2="${W - 4}" y1="${H - pad}" y2="${H - pad}" stroke="var(--line)"/>` +
+    `<text x="${pad - 4}" y="${Y(0) + 3}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="var(--mono)">0</text>` +
+    `<text x="${pad - 4}" y="${Y(1) + 8}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="var(--mono)">1</text>` +
+    `<text x="${W - 4}" y="${H - 4}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="var(--mono)">${nf(T / 60000, 1)} min</text>` +
+    `<polyline fill="none" stroke="var(--accent)" stroke-width="2" points="${pts}" vector-effect="non-scaling-stroke"/>`;
+  // nota
+  $("#note").textContent = nota(s, r);
+}
+function nota(s, r) {
+  const vacias = s.ws.reduce((a, w) => a + COSTO.slots - w.act.length, 0), total = s.nR * COSTO.slots;
+  if (s.o.modo === "col") return vacias > total * 0.75 && s.generar && s.ws.some(w => w.act.length)
+    ? `Sincrónico: ${vacias} de ${total} lugares del lote están vacíos, pero el paso no puede terminar hasta que salga la respuesta más larga.`
+    : "Colocado y sincrónico (como verl): las mismas GPUs generan un lote entero, después entrenan, y después cambian de layout para volver a generar.";
+  if (s.o.modo === "par") return "Rollouts parciales (Kimi k1.5): la generación corta cuando hay un lote completo; lo que quedó a medias sigue en la vuelta siguiente, con pesos más nuevos y su KV cache recalculado.";
+  if (s.o.eta === 0) return "Separado y sincrónico: mientras las GPUs de rollout generan, el trainer espera; mientras entrena, ellas esperan.";
+  if (!s.o.corr && r.stale > 1.5) return `Asincrónico con muestras de ${nf(r.stale, 1)} versiones atrás en promedio, sin corrección: el gradiente es el de una política vieja. Mirá si la mediana se pasa del tope y la recompensa se cae.`;
+  return `Asincrónico (como AReaL): las GPUs de rollout nunca esperan al trainer, pero lo que se entrena se generó hasta ${s.o.eta < 0 ? "muchas" : s.o.eta} versiones atrás.` + (s.o.inter ? " Cuando llegan pesos nuevos, cada GPU recalcula el KV cache y sigue." : " Sin interrumpir, cada GPU termina lo que tiene antes de cargar los pesos nuevos.");
+}
+// línea de tiempo: una columna por cuadro
+function tlColumn() {
+  const c = $("#tl"), ctx = c.getContext("2d"), d = devicePixelRatio || 1, W = c.width, H = c.height, s = sim;
+  const step = Math.max(1, Math.round(1.5 * d));
+  ctx.drawImage(c, -step, 0);
+  const rows = s.gpus, rh = H / rows;
+  const C = { gen: css("--accent"), tr: css("--blue"), sync: css("--warn"), idle: css("--cell"), line: css("--line") };
+  for (let i = 0; i < rows; i++) {
+    let col = C.idle, alpha = 1;
+    if (i < s.nR) {
+      const w = s.ws[i];
+      if (s.now < w.pausa) col = C.sync;
+      else if (s.pausado()) col = s.tr.fase === "entrenar" && s.now < s.tr.finEntr ? C.tr : (s.ocupado || s.ws.some(x => s.now < x.pausa)) ? C.sync : C.idle;
+      else if (w.act.length) { col = C.gen; alpha = 0.25 + 0.75 * w.act.length / COSTO.slots; }
+    } else if (s.ocupado) col = s.now < s.tr.finEntr ? C.tr : C.sync;
+    ctx.fillStyle = C.idle; ctx.globalAlpha = 1; ctx.fillRect(W - step, i * rh, step, rh);
+    ctx.fillStyle = col; ctx.globalAlpha = alpha; ctx.fillRect(W - step, i * rh + 1, step, rh - 2);
+  }
+  ctx.globalAlpha = 1;
+}
+let uiAcc = 0, tlAcc = 0;
+function frame(ts) {
+  const dt = Math.min(100, ts - (last || ts)); last = ts;
+  if (playing) {
+    sim.avanzarHasta(sim.now + dt * VELS[+$("#vel").value]);
+    tlAcc += dt;
+    if (tlAcc > 50) { tlAcc = 0; tlColumn(); }
+    if (sim.ver >= 200) reset();
+  }
+  uiAcc += dt;
+  if (uiAcc > 80) { uiAcc = 0; render(); const c = $("#tl"); const span = c.width / Math.max(1, Math.round(1.5 * (devicePixelRatio || 1))) * 50 * VELS[+$("#vel").value] / 1000; $("#tl-a").textContent = "hace " + (span < 120 ? Math.round(span) + " s" : nf(span / 60, 1) + " min"); }
+  requestAnimationFrame(frame);
+}
+
+document.querySelectorAll("#modo button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("#modo button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  st.modo = b.dataset.m; reset();
+}));
+$("#eta").addEventListener("input", e => { st.eta = +e.target.value; reset(); });
+$("#inter").addEventListener("click", e => { st.inter = !st.inter; e.currentTarget.setAttribute("aria-pressed", st.inter); reset(); });
+$("#corr").addEventListener("click", e => { st.corr = !st.corr; e.currentTarget.setAttribute("aria-pressed", st.corr); reset(); });
+$("#vel").addEventListener("input", e => { $("#vel-v").textContent = VELS[+e.target.value] + "×"; });
+$("#play").addEventListener("click", () => { playing = !playing; $("#play").textContent = playing ? "Pausa" : "Seguir"; });
+$("#reset").addEventListener("click", reset);
+addEventListener("resize", () => { const tl = $("#tl"); const w = tl.clientWidth * (devicePixelRatio || 1); if (Math.abs(w - tl.width) > 2) { tl.width = w; tl.height = 92 * (devicePixelRatio || 1); } });
+
+// ---------- Comparación ----------
+const CONFIGS = [
+  ["Colocado, sincrónico (verl)", { modo: "col", eta: 0 }],
+  ["Colocado, rollouts parciales (Kimi)", { modo: "par", eta: 0 }],
+  ["Separado, sincrónico", { modo: "sep", eta: 0, inter: true }],
+  ["Separado, η = 2", { modo: "sep", eta: 2, inter: true, corr: true }],
+  ["Separado, η = 8, sin corrección", { modo: "sep", eta: 8, inter: true, corr: false }],
+  ["Separado, η = 8, con corrección (AReaL)", { modo: "sep", eta: 8, inter: true, corr: true }],
+];
+$("#cmp-run").addEventListener("click", () => {
+  const btn = $("#cmp-run"); btn.disabled = true;
+  const tb = $("#cmp tbody"); tb.innerHTML = ""; $("#cmp").hidden = false;
+  const rows = []; let k = 0;
+  const one = () => {
+    if (k === CONFIGS.length) {
+      const ok = rows.filter(r => r.rew > 0.75), best = ok.length ? ok.reduce((a, r) => r.t < a.t ? r : a) : null;
+      tb.innerHTML = rows.map(r => `<tr class="${r === best ? "best" : ""}"><td>${r.name}</td><td class="n">${nf(r.t / 60, 0)} min</td><td class="n">${Math.round(100 * r.ocio)}%</td><td class="n">${nf(r.stale, 1)}</td><td class="n">${nf(r.rew, 2)}</td></tr>`).join("");
+      $("#cmp-desc").textContent = "En verde, la que llega antes con recompensa de más de 0,75.";
+      btn.disabled = false; return;
+    }
+    const [name, o] = CONFIGS[k++];
+    $("#cmp-desc").textContent = `Corriendo ${k} de ${CONFIGS.length}: ${name}…`;
+    const acc = { t: 0, ocio: 0, stale: 0, rew: 0 }, n = 4;
+    for (let s = 1; s <= n; s++) {
+      const b = new Bucle({ ...o, seed: 100 + s });
+      b.avanzarHasta(Infinity, 30);
+      const r = b.resumen();
+      acc.t += b.now / 1000 / n; acc.ocio += r.ocio / n; acc.stale += r.stale / n; acc.rew += r.rew / n;
+    }
+    rows.push({ name, ...acc });
+    setTimeout(one, 10);
+  };
+  setTimeout(one, 10);
+});
+
+reset();
+requestAnimationFrame(frame);
+</script>
+
+</html>

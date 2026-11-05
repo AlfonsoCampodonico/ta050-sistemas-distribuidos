@@ -1,5 +1,5 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TA050 · Clases 16–19</title>
+<title>TA050 · Clases 16–22</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
 <style>
 body{margin:0;background:#0A0C0F;color:#F2F3EF;font-family:Geist,Arial,sans-serif;line-height:1.5}
@@ -19,7 +19,7 @@ footer a{color:#A8B3BC}
 </style></head><body><main>
 <div class="eyebrow">TA050 · Sistemas Distribuidos</div>
 <h1>Entrenar y servir modelos</h1>
-<p class="lead">Clases 16 a 19: slides, simuladores interactivos y el código de las demos.</p>
+<p class="lead">Clases 16 a 22: slides, simuladores interactivos y el código de las demos.</p>
 
 <h2>Slides</h2>
 <p style="color:#7D8892;font-size:14px;margin:-4px 0 16px">← → para avanzar · N notas · G todas · F pantalla completa</p>
@@ -28,6 +28,9 @@ footer a{color:#A8B3BC}
 <a class="card" href="slides/clase-17/"><div class="n">Clase 17 · 29 slides</div><div class="t">Entrenamiento a escala de frontera</div><div class="d">Llama 3, DeepSeek-V3, DiLoCo</div></a>
 <a class="card" href="slides/clase-18/"><div class="n">Clase 18 · 26 slides</div><div class="t">Cómo se sirve un modelo</div><div class="d">vLLM / PagedAttention (SOSP 2023)</div></a>
 <a class="card" href="slides/clase-19/"><div class="n">Clase 19 · 28 slides</div><div class="t">Del motor al clúster</div><div class="d">Mooncake (FAST 2025)</div></a>
+<a class="card" href="slides/clase-20/"><div class="n">Clase 20 · 28 slides</div><div class="t">Muchos modelos, pocas GPUs</div><div class="d">ServerlessLLM (OSDI 2024), S-LoRA</div></a>
+<a class="card" href="slides/clase-21/"><div class="n">Clase 21 · 26 slides</div><div class="t">Repartir un clúster de GPUs</div><div class="d">Philly (ATC 2019), Tiresias</div></a>
+<a class="card" href="slides/clase-22/"><div class="n">Clase 22 · 27 slides</div><div class="t">Entrenar con lo que se sirve</div><div class="d">HybridFlow (EuroSys 2025)</div></a>
 </div>
 
 <h2>Simuladores</h2>
@@ -35,12 +38,17 @@ footer a{color:#A8B3BC}
 <a class="card" href="simuladores/escala.html"><div class="n">Clase 17</div><div class="t">Entrenamiento a escala</div></a>
 <a class="card" href="simuladores/motor.html"><div class="n">Clase 18</div><div class="t">Motor de inferencia</div></a>
 <a class="card" href="simuladores/cluster.html"><div class="n">Clase 19</div><div class="t">Clúster de inferencia</div></a>
+<a class="card" href="simuladores/flota.html"><div class="n">Clase 20</div><div class="t">Flota de GPUs</div></a>
+<a class="card" href="simuladores/planificador.html"><div class="n">Clase 21</div><div class="t">Planificador de GPUs</div></a>
+<a class="card" href="simuladores/rl.html"><div class="n">Clase 22</div><div class="t">Bucle de RL</div></a>
 </div>
 
 <h2>Código y apuntes</h2>
 <div class="grid">
 <a class="card" href="https://github.com/AlfonsoCampodonico/ta050-sistemas-distribuidos/tree/main/repos/entrenamiento-distribuido"><div class="n">Go · clases 16 y 17</div><div class="t">entrenamiento-distribuido</div></a>
-<a class="card" href="https://github.com/AlfonsoCampodonico/ta050-sistemas-distribuidos/tree/main/repos/servir-tokens"><div class="n">Go · clases 18 y 19</div><div class="t">servir-tokens</div></a>
+<a class="card" href="https://github.com/AlfonsoCampodonico/ta050-sistemas-distribuidos/tree/main/repos/servir-tokens"><div class="n">Go · clases 18, 19 y 20</div><div class="t">servir-tokens</div></a>
+<a class="card" href="https://github.com/AlfonsoCampodonico/ta050-sistemas-distribuidos/tree/main/repos/planificar-gpus"><div class="n">Go · clase 21</div><div class="t">planificar-gpus</div></a>
+<a class="card" href="https://github.com/AlfonsoCampodonico/ta050-sistemas-distribuidos/tree/main/repos/post-entrenamiento"><div class="n">Go · clase 22</div><div class="t">post-entrenamiento</div></a>
 <a class="card" href="https://github.com/AlfonsoCampodonico/ta050-sistemas-distribuidos/tree/main/apuntes"><div class="n">Markdown</div><div class="t">Apuntes de cada clase</div></a>
 </div>
 

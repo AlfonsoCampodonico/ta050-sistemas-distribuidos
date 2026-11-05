@@ -10,6 +10,11 @@
 //	go run ./cmd/sim router        # cómo elige réplica el router, y el caché de prefijos
 //	go run ./cmd/sim desagregado   # prefill y decode juntos, en pedazos o separados
 //	go run ./cmd/sim especulativo  # cuánto acelera la decodificación especulativa
+//
+// Y para la Clase 20, con muchos modelos en pocas GPUs:
+//
+//	go run ./cmd/sim arranque  # arranques en frío, dónde arrancar cada modelo y keep-alive
+//	go run ./cmd/sim lora      # muchos adaptadores LoRA sobre un mismo modelo base
 package main
 
 import (
@@ -41,13 +46,17 @@ func main() {
 		desagregado(args)
 	case "especulativo":
 		especulativo(args)
+	case "arranque":
+		arranque(args)
+	case "lora":
+		lora(args)
 	default:
 		usage()
 	}
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "uso: sim {batching|memoria|cow|router|desagregado|especulativo} [flags]   (-h para ver los flags)")
+	fmt.Fprintln(os.Stderr, "uso: sim {batching|memoria|cow|router|desagregado|especulativo|arranque|lora} [flags]   (-h para ver los flags)")
 	os.Exit(2)
 }
 

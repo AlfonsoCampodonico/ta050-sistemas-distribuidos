@@ -1,0 +1,71 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-04T13:00:00Z"
+  },
+  "lists": "css",
+  "title": "Clase 21 — Repartir un clúster de GPUs",
+  "order": [
+    "cover",
+    "mapa",
+    "philly",
+    "carga",
+    "fallas",
+    "gang",
+    "demogang",
+    "cabeza",
+    "hambre",
+    "localidad",
+    "esperar",
+    "fragmentacion",
+    "consolidar",
+    "demolocalidad",
+    "las",
+    "colas",
+    "preempcion",
+    "tiresias",
+    "demoduraciones",
+    "gandiva",
+    "mlaas",
+    "cuotas",
+    "hoy",
+    "takeaways",
+    "demo",
+    "preguntas"
+  ],
+  "sections": {
+    "s1": {
+      "description": "La carga: quién pide GPUs, cuántas y por cuánto tiempo.",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "Todo o nada: gang scheduling, bloqueo de cabeza de cola y backfill.",
+      "start": "gang"
+    },
+    "s3": {
+      "description": "Localidad: esperar el lugar bueno o arrancar en uno peor, y la fragmentación.",
+      "start": "localidad"
+    },
+    "s4": {
+      "description": "Sin conocer las duraciones: 2D-LAS, preempción y Tiresias.",
+      "start": "las"
+    },
+    "s5": {
+      "description": "Compartir: el tiempo, una GPU, el clúster entre equipos, y hoy.",
+      "start": "gandiva"
+    }
+  },
+  "cover": "cover",
+  "faces": {
+    "geist": {
+      "family": "Geist",
+      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    },
+    "geist-mono": {
+      "family": "Geist Mono",
+      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    }
+  },
+  "designSystems": []
+}

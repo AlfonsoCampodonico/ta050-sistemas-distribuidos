@@ -1,0 +1,72 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-04T13:00:00Z"
+  },
+  "lists": "css",
+  "title": "Clase 22 — Entrenar con lo que se sirve",
+  "order": [
+    "cover",
+    "mapa",
+    "bucle",
+    "r1",
+    "grpo",
+    "modelos",
+    "alargan",
+    "cola",
+    "barrera",
+    "pesa",
+    "ubicaciones",
+    "reshard",
+    "hybridengine",
+    "broadcast",
+    "demoubic",
+    "asinc",
+    "ssp",
+    "areal",
+    "arealtabla",
+    "demoasinc",
+    "demoaprender",
+    "parciales",
+    "fallas",
+    "serie",
+    "takeaways",
+    "demo",
+    "preguntas"
+  ],
+  "sections": {
+    "s1": {
+      "description": "Por qué RL: el bucle, GRPO, y los modelos que intervienen.",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "El rollout domina: la cola larga y la barrera.",
+      "start": "cola"
+    },
+    "s3": {
+      "description": "Dónde va cada trabajo, y cuánto cuesta mover los pesos.",
+      "start": "ubicaciones"
+    },
+    "s4": {
+      "description": "Asincrónico: staleness acotada, rollouts interrumpibles y parciales.",
+      "start": "asinc"
+    },
+    "s5": {
+      "description": "Cerrar la serie.",
+      "start": "fallas"
+    }
+  },
+  "cover": "cover",
+  "faces": {
+    "geist": {
+      "family": "Geist",
+      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    },
+    "geist-mono": {
+      "family": "Geist Mono",
+      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    }
+  },
+  "designSystems": []
+}

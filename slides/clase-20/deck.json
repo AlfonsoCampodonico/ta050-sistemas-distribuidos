@@ -1,0 +1,73 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-04T13:00:00Z"
+  },
+  "lists": "css",
+  "title": "Clase 20 — Muchos modelos, pocas GPUs",
+  "order": [
+    "cover",
+    "mapa",
+    "carga",
+    "serverless",
+    "multiplex",
+    "tamanos",
+    "niveles",
+    "cargar",
+    "formato",
+    "pipeline",
+    "democarga",
+    "estimar",
+    "politicas",
+    "migracion",
+    "pasos",
+    "estado",
+    "demoubica",
+    "resultados",
+    "keepalive",
+    "lora",
+    "mixto",
+    "paginas",
+    "slorares",
+    "demolora",
+    "lente",
+    "takeaways",
+    "demo",
+    "preguntas"
+  ],
+  "sections": {
+    "s1": {
+      "description": "El problema: muchos modelos, carga en ráfagas, y una GPU por modelo no cierra.",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "Anatomía de un arranque en frío: niveles, formato y carga en pipeline.",
+      "start": "tamanos"
+    },
+    "s3": {
+      "description": "Dónde arrancar: localidad, migración en vivo y el estado del scheduler.",
+      "start": "estimar"
+    },
+    "s4": {
+      "description": "Muchos fine-tunes: LoRA, lote mixto y paginación unificada.",
+      "start": "lora"
+    },
+    "s5": {
+      "description": "Cierre: la lente de la materia, el repositorio y preguntas.",
+      "start": "lente"
+    }
+  },
+  "cover": "cover",
+  "faces": {
+    "geist": {
+      "family": "Geist",
+      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    },
+    "geist-mono": {
+      "family": "Geist Mono",
+      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    }
+  },
+  "designSystems": []
+}
