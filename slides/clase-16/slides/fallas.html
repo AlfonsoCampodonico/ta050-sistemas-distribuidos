@@ -1,0 +1,37 @@
+<section id="fallas" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Fallas</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Una GPU que falla detiene a las 3.072</h2>
+</div>
+<div style="display:flex;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:40px">
+<h3 style="font-size:32px;font-weight:600;color:#A8B3BC;letter-spacing:-0.5px">MapReduce</h3>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Se reintenta la tarea que falló; el resto sigue.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:40px">
+<h3 style="font-size:32px;font-weight:600;color:#34D399;letter-spacing:-0.5px">Entrenamiento sincrónico</h3>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Todos vuelven al último checkpoint y rehacen los pasos. Funciona porque cada paso es determinista.</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;gap:40px">
+<div style="flex:1;display:flex;flex-direction:column;gap:4px"><p style="font-size:72px;font-weight:600;color:#34D399">13,8 TB</p><p style="font-size:24px;color:#A8B3BC">un checkpoint del modelo de un billón</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px"><p style="font-size:72px;font-weight:600;color:#34D399">273 GB/s</p><p style="font-size:24px;color:#A8B3BC">al guardar: casi un minuto con todas las GPUs esperando</p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;color:#A8B3BC">Cada cuánto guardar, con costo de checkpoint C y tiempo medio entre fallas F (Young):</p>
+<p style="font-size:44px;font-weight:600;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">T ≈ √(2·C·F)</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/demo train -fail-at 120 · Narayanan et al., §5.10</p>
+<aside>Tiempo: 1:17–1:22 (5 min, con demo).
+Idea clave: en un entrenamiento sincrónico una sola falla detiene a todos; la recuperación es volver al último checkpoint, y funciona porque cada paso es determinista.
+Decir: comparar las dos tarjetas. En MapReduce una falla era barata: se reintentaba la tarea y el resto seguía. Acá cada paso necesita los gradientes de todas las réplicas, cada etapa necesita a la anterior y cada capa partida necesita a sus 8 GPUs. Si una se cae, ningún paso termina.
+La recuperación son checkpoints periódicos: justo la mitigación que el paper de MapReduce describía para el coordinador y decidía no implementar. Con miles de GPUs, las fallas pasan a ser parte de la operación normal.
+Demo: go run ./cmd/demo train -fail-at 120, con checkpoints cada 50. Todos vuelven al paso 100 y rehacen 21 pasos, y los pesos finales son idénticos bit a bit a los de una corrida sin fallas.
+Preguntar a la clase: ¿qué condición hace falta para eso? Que el batch de cada paso dependa sólo del número de paso: determinismo, como los mappers.
+Los números del paper (§5.10): el checkpoint del modelo de un billón ocupa 13,8 TB y se guarda a 273 GB/s, casi un minuto con todas las GPUs esperando. La carga inicial llega a 1 TB/s, el máximo del sistema de archivos: el storage vuelve a ser parte del sistema de cómputo, como GFS en MapReduce. Cada cuánto guardar es un compromiso, y la aproximación de Young da T ≈ √(2·C·F).
+Pasar a la siguiente: la misma lógica de todos o ninguno aparece antes de empezar a entrenar.</aside>
+</section>

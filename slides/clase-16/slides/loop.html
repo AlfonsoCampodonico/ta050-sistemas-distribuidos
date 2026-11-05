@@ -1,0 +1,30 @@
+<section id="loop" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:72px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El loop</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Entrenar es repetir tres pasos millones de veces</h2>
+</div>
+<div style="display:flex;align-items:center;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:40px">
+<h3 style="font-size:44px;font-weight:600;color:#34D399;letter-spacing:-0.5px">Forward</h3>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">El batch atraviesa todas las capas hasta dar una predicción y un error.</p>
+</div>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#4A5560"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #F5A524;border-radius:16px;padding:40px">
+<h3 style="font-size:44px;font-weight:600;color:#F5A524;letter-spacing:-0.5px">Backward</h3>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Las capas se recorren al revés para calcular el gradiente de cada parámetro.</p>
+</div>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#4A5560"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #5A6570;border-radius:16px;padding:40px">
+<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Optimizador</h3>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Cada parámetro se mueve un poco en contra de su gradiente.</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Las activaciones del forward se guardan hasta el backward. Ese detalle va a importar en el pipeline.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido</p>
+<aside>Tiempo: 0:09–0:12 (3 min).
+Idea clave: el loop de entrenamiento tiene tres pasos y una dependencia que importa: las activaciones del forward se usan en el backward.
+Decir: forward, el batch atraviesa las capas y sale una predicción y un error. Backward, se recorren las capas al revés y se obtiene, para cada parámetro, hacia dónde moverlo para reducir el error: el gradiente. Optimizador, cada parámetro se mueve un poco en contra de su gradiente. Y se repite, millones de veces.
+Dos detalles para tener en la cabeza. Uno: el backward tarda más o menos el doble que el forward; la demo usa esa proporción. Dos: lo que cada capa calculó en el forward, sus activaciones, se guarda hasta el backward. Esa memoria va a ser la diferencia entre dos schedules de pipeline más adelante.
+Si preguntan: no hace falta saber cómo se calcula el gradiente. Alcanza con saber que es un vector del mismo tamaño que los parámetros.
+Pasar a la siguiente: la forma más simple de usar muchas GPUs.</aside>
+</section>

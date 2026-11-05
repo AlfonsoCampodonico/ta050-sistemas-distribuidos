@@ -1,0 +1,16 @@
+<section data-transition="fade" id="batching" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:56px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">La consecuencia</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:96px;font-weight:600;line-height:1.05;color:#0E1114;width:1600px;letter-spacing:-2px">El throughput es cuántas secuencias entran en el lote</h2>
+<div style="display:flex;gap:96px">
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-size:72px;font-weight:600;color:#48525C;font-family:'Geist Mono', 'Courier New', monospace">1 → 49</p><p style="font-size:32px;color:#48525C">secuencia · tokens/s</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-size:72px;font-weight:600;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">32 → 1.143</p><p style="font-size:32px;color:#48525C">secuencias · tokens/s</p></div>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#66707A">Modelo de costo del repositorio: cada pasada de decode cuesta 20 ms de leer los pesos más 0,25 ms por secuencia. Números ilustrativos.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<aside>Tiempo: 0:16–0:19 (3 min).
+Idea clave: como lo caro de una pasada de decode es leer los pesos, y se leen una vez por pasada, el throughput crece casi lineal con el tamaño del lote.
+Decir: hacer la cuenta en el pizarrón con el modelo de costo del repositorio. Con una secuencia, cada pasada dura 20,25 ms y produce un token: unos 49 tokens por segundo. Con 32 secuencias, la pasada dura 20 + 0,25·32 = 28 ms y produce 32 tokens: unos 1.143 tokens por segundo. 23 veces más con la misma GPU.
+Los números son ilustrativos, pero la forma es real: es por eso que todo servidor de inferencia intenta meter la mayor cantidad posible de secuencias en cada pasada.
+Preguntar a la clase: entonces, ¿qué limita el tamaño del lote? Dejar que lo piensen; la respuesta es la próxima slide.
+Pasar a la siguiente: lo que limita el lote es la memoria, y en particular una estructura.</aside>
+</section>

@@ -1,0 +1,33 @@
+<section id="gang" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Planificación</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Gang scheduling: el trabajo entero o nada</h2>
+</div>
+<div style="display:flex;gap:64px;align-items:center;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Un orquestador como Kubernetes, por defecto, ubica los pods de a uno.</p>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Si el entrenamiento necesita 512 pods y entran 500, esos 500 ocupan GPUs <b>sin poder dar un solo paso</b>.</p>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">La barrera del all-reduce también vale para planificar: o se asignan todos los recursos o ninguno.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#F5A524;font-family:'Geist Mono', 'Courier New', monospace">De a un pod</p>
+<p style="font-size:72px;font-weight:600;color:#F2F3EF">500 / 512</p>
+<p style="font-size:24px;color:#A8B3BC">GPUs asignadas, 0 pasos de entrenamiento</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Gang scheduling</p>
+<p style="font-size:72px;font-weight:600;color:#F2F3EF">0 / 512</p>
+<p style="font-size:24px;color:#A8B3BC">hasta que entren todos; las GPUs quedan libres para otros trabajos</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido</p>
+<aside>Tiempo: 1:22–1:25 (3 min).
+Idea clave: un trabajo sincrónico es indivisible también para el planificador: o se le asignan todos los recursos o ninguno.
+Decir: un orquestador como Kubernetes, por defecto, ubica los pods de a uno a medida que hay lugar. Si un entrenamiento necesita 512 pods y entran 500, esos 500 quedan ocupando GPUs sin poder dar un solo paso, porque el primer all-reduce espera a los 12 que faltan. Peor: si llegan dos trabajos así a la vez, cada uno puede quedarse con una parte y ninguno avanza nunca. Es un deadlock.
+Gang scheduling: el trabajo se admite entero o se queda en la cola, y mientras tanto las GPUs quedan libres para otros trabajos.
+Ejemplos para mencionar: Kueue y Volcano agregan admisión o planificación por grupo en Kubernetes, y JobSet modela un trabajo de varias réplicas como una unidad.
+Remarcar: es la barrera del all-reduce, aplicada a la asignación de recursos.
+Pasar a la siguiente: repaso con la demo.</aside>
+</section>

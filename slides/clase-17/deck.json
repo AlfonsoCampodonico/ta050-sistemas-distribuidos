@@ -1,0 +1,74 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-04T13:00:00Z"
+  },
+  "lists": "css",
+  "title": "Clase 17 — Entrenamiento a escala de frontera",
+  "order": [
+    "cover",
+    "mapa",
+    "escala",
+    "cuenta",
+    "cuatrod",
+    "configs",
+    "red",
+    "demo4d",
+    "fsdp",
+    "contexto",
+    "pipe",
+    "moe",
+    "ep",
+    "demomoe",
+    "dualpipe",
+    "fp8",
+    "costo",
+    "fallas",
+    "mtbf",
+    "youngdaly",
+    "demofallas",
+    "operar",
+    "multidc",
+    "diloco",
+    "demodiloco",
+    "labs",
+    "takeaways",
+    "demo",
+    "preguntas"
+  ],
+  "sections": {
+    "s1": {
+      "description": "Qué cambió desde Megatron y la escala de un entrenamiento de frontera.",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "Paralelismo 4D en Llama 3: el orden, la red, FSDP, contexto y pipeline.",
+      "start": "cuatrod"
+    },
+    "s3": {
+      "description": "DeepSeek-V3: expertos, DualPipe, FP8 y lo que costó.",
+      "start": "moe"
+    },
+    "s4": {
+      "description": "Fallas a escala: la cuenta, los checkpoints y la operación.",
+      "start": "fallas"
+    },
+    "s5": {
+      "description": "Más allá de un datacenter, los laboratorios y el cierre.",
+      "start": "multidc"
+    }
+  },
+  "cover": "cover",
+  "faces": {
+    "geist": {
+      "family": "Geist",
+      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    },
+    "geist-mono": {
+      "family": "Geist Mono",
+      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    }
+  },
+  "designSystems": []
+}

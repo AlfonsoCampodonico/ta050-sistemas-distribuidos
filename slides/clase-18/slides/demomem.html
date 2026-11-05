@@ -1,0 +1,20 @@
+<section data-transition="fade" id="demomem" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">Demo · memoria</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#0E1114;letter-spacing:-2px">Misma memoria, más del doble de secuencias</h2>
+</div>
+<table style="font-size:32px;color:#0E1114;font-family:Geist, Arial, sans-serif">
+<tr><th style="width:32%"></th><th style="width:17%;text-align:right">tokens/s</th><th style="width:17%;text-align:right">lote prom.</th><th style="width:17%;text-align:right">uso KV</th><th style="width:17%;text-align:right">desalojos</th></tr>
+<tr><td>Contiguo, reserva máx</td><td style="text-align:right">562</td><td style="text-align:right">13,6</td><td style="text-align:right">28%</td><td style="text-align:right">0</td></tr>
+<tr><td>Contiguo, oráculo</td><td style="text-align:right">915</td><td style="text-align:right">25,3</td><td style="text-align:right">70%</td><td style="text-align:right">0</td></tr>
+<tr><td><b>Paginado, bloque 16</b></td><td style="text-align:right"><b>1.079</b></td><td style="text-align:right"><b>32,9</b></td><td style="text-align:right"><b>99%</b></td><td style="text-align:right"><b>234</b></td></tr>
+</table>
+<p style="font-size:32px;line-height:1.4;color:#48525C">El oráculo sabe de antemano cuánto va a generar cada pedido, y aun así pierde contra los bloques.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/sim memoria · y en el simulador, Contigua / Paginada</p>
+<aside>Tiempo: 0:54–0:58 (4 min, con demo).
+Idea clave: con la misma memoria, la paginación mete más del doble de secuencias en el lote, y eso se traduce en throughput.
+Demo: en el simulador, cambiar entre Contigua (reserva 512) y Paginada. Con memoria contigua el mapa queda casi todo pálido: reservado sin usar. El lote no pasa de 4 secuencias, porque 2.048 slots divididos por reservas de 512 son 4. Con paginada el mapa se llena de color, los bloques de cada pedido quedan desparramados y el lote crece.
+La tabla es la salida de go run ./cmd/sim memoria: 400 pedidos a 40 por segundo, un KV cache de 32.768 tokens y batching continuo en los tres casos. La reserva del máximo usa el 28% de lo que asigna. El oráculo, que sabe el largo exacto de cada respuesta, llega al 70%, porque todavía reserva por adelantado y sufre fragmentación externa. Paginado: 99%, más del doble de lote y casi el doble de throughput que la reserva del máximo.
+Remarcar la última columna: con memoria paginada sí hay desalojos, porque se admite más de lo que podría llegar a necesitarse. Es la próxima parte.
+Pasar a la siguiente: lo que habilita tener una tabla en el medio.</aside>
+</section>

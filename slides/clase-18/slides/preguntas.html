@@ -1,0 +1,31 @@
+<section id="preguntas" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Para repasar</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Preguntas y lecturas</h2>
+</div>
+<div style="display:flex;gap:64px">
+<ol style="flex:1.4;font-size:32px;line-height:1.4;color:#F2F3EF">
+<li>¿Por qué el decode está limitado por la memoria y no por el cómputo?</li>
+<li>¿Por qué con batching estático el primer token llega con la respuesta completa?</li>
+<li>¿Cuáles de los tres desperdicios elimina la paginación, y cuál reduce?</li>
+<li>Cuatro muestras de un prompt de 500 tokens: ¿cuántos bloques se copian? ¿Por qué no cuatro?</li>
+<li>¿Qué queda ocupado si el servidor no se entera de que el cliente se fue?</li>
+</ol>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:40px">
+<h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Lecturas</h3>
+<p style="font-size:24px;line-height:1.4;color:#F2F3EF"><b>Paper:</b> Kwon et al., Efficient Memory Management for Large Language Model Serving with PagedAttention. SOSP 2023.</p>
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Yu et al., Orca. OSDI 2022.</p>
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Campodónico, What happens after you hit send. 2026.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<aside>Tiempo: 1:27–1:30 (3 min).
+Idea clave: cerrar con las preguntas de repaso. Las respuestas cortas, para tener a mano:
+1. Cada pasada de decode lee todos los pesos y el KV cache para hacer muy poca cuenta: productos de matriz por vector. La GPU espera datos, no cuentas.
+2. Porque el lote se devuelve entero cuando termina su respuesta más larga; nadie ve nada antes.
+3. Elimina la reserva y la fragmentación externa; reduce la interna a menos de un bloque por secuencia.
+4. 3 bloques: sólo el último bloque del prompt, que está compartido y a medio llenar (500 no es múltiplo de 16). Cuando tres muestras ya copiaron, la cuarta queda sola con el original.
+5. Un lugar en el lote y sus bloques de KV cache, generando tokens que nadie lee.
+Lecturas: el paper de la clase es el de vLLM. Complementarias: Orca y el post "What happens after you hit send". Los apuntes de la clase tienen ocho preguntas más.
+Próxima clase (19): del motor al clúster. Cómo se arma un servicio con muchas réplicas: prefill y decode separados, el KV cache compartido entre pedidos y el router que sabe dónde está cada prefijo. Paper: Mooncake (FAST 2025), el sistema que sirve a Kimi.</aside>
+</section>

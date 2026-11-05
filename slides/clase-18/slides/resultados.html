@@ -1,0 +1,20 @@
+<section data-transition="fade" id="resultados" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">Resultados · §6</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#0E1114;letter-spacing:-2px">2 a 4 veces más throughput con la misma latencia</h2>
+</div>
+<table style="font-size:32px;color:#0E1114;font-family:Geist, Arial, sans-serif">
+<tr><th style="width:30%">Contra</th><th style="width:40%">Qué reserva</th><th style="width:30%;text-align:right">Pedidos/s que sostiene vLLM</th></tr>
+<tr><td>Orca (Max)</td><td>Siempre 2.048 tokens</td><td style="text-align:right">2,7× a 8× más</td></tr>
+<tr><td>Orca (Oracle)</td><td>Lo justo, sabiéndolo antes</td><td style="text-align:right">1,7× a 2,7× más</td></tr>
+<tr><td>FasterTransformer</td><td>Batching por pedido</td><td style="text-align:right">hasta 22× más</td></tr>
+</table>
+<p style="font-size:32px;line-height:1.4;color:#48525C">OPT 13B, 66B y 175B y LLaMA 13B en A100, con cargas de ShareGPT. Ganarle al oráculo muestra que el problema no era sólo la reserva.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">Kwon et al., abstract, §6.1 y §6.2 · ShareGPT</p>
+<aside>Tiempo: 1:09–1:13 (4 min).
+Idea clave: vLLM sostiene entre 2 y 4 veces más pedidos por segundo que los sistemas del estado del arte con la misma latencia, y le gana incluso a un Orca que sabe de antemano el largo de cada respuesta.
+Decir: la evaluación (§6.1) usa OPT de 13B, 66B y 175B y LLaMA de 13B en A100 de Google Cloud: una GPU de 40 GB para 13B, cuatro para 66B y ocho de 80 GB para 175B. Las cargas salen de dos conjuntos de datos: ShareGPT, conversaciones reales que usuarios compartieron de ChatGPT, y Alpaca, instrucciones generadas por un modelo. ShareGPT tiene prompts unas 8,4 veces más largos y respuestas unas 5,8 veces más largas que Alpaca.
+La comparación es contra tres versiones de Orca que difieren en cuánto reservan: Max siempre reserva 2.048; Pow2 hasta el doble de lo necesario; Oracle exactamente lo necesario, algo imposible en la práctica. Con ShareGPT, vLLM sostiene entre 1,7 y 2,7 veces más pedidos por segundo que Orca Oracle, entre 2,7 y 8 veces más que Orca Max, y hasta 22 veces más que FasterTransformer.
+Remarcar: ganarle al oráculo dice que el problema no era sólo no saber el largo, sino también la fragmentación. Coincide con nuestra demo: el oráculo usaba el 70% de lo asignado y los bloques el 99%.
+Pasar a la siguiente: volvemos al principio, a cómo llegan los tokens al usuario.</aside>
+</section>

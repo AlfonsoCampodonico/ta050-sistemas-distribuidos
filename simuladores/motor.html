@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Motor de inferencia</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: banco de pruebas — barra de controles arriba, mapa de memoria de la GPU como pieza central, instrumentos a la derecha, comparación abajo. */
+:root {
+  --bg: #F3F2EE;
+  --panel: #FBFBF8;
+  --ink: #0E1114;
+  --muted: #48525C;
+  --line: #D9DAD4;
+  --cell: #E6E6E0;
+  --accent: #08724F;
+  --accent-ink: #FFFFFF;
+  --warn: #A35F00;
+  --good: #08724F;
+  --q1: #0E8A60; --q2: #B86E00; --q3: #2C56C9; --q4: #C0307F;
+  --q5: #6D4FC4; --q6: #8A7300; --q7: #0E7C99; --q8: #C2410C;
+  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1114; --panel: #161B20; --ink: #F2F3EF; --muted: #A8B3BC; --line: #2A3138; --cell: #232A31;
+    --accent: #34D399; --accent-ink: #0E1114; --warn: #F5A524; --good: #34D399;
+    --q1: #34D399; --q2: #F5A524; --q3: #7AA2FF; --q4: #F472B6; --q5: #A78BFA; --q6: #FACC15; --q7: #22D3EE; --q8: #FB923C;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1114; --panel: #161B20; --ink: #F2F3EF; --muted: #A8B3BC; --line: #2A3138; --cell: #232A31;
+    --accent: #34D399; --accent-ink: #0E1114; --warn: #F5A524; --good: #34D399;
+    --q1: #34D399; --q2: #F5A524; --q3: #7AA2FF; --q4: #F472B6; --q5: #A78BFA; --q6: #FACC15; --q7: #22D3EE; --q8: #FB923C;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 6px; }
+.eyebrow { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); max-width: 70ch; }
+h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.small { font-size: 13px; color: var(--muted); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > span { font: 500 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+input[type=range] { width: 150px; accent-color: var(--accent); }
+.val { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+canvas { display: block; width: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+
+.gauges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; }
+.gauge span { font-size: 12px; color: var(--muted); }
+.gauge b.warn { color: var(--warn); }
+
+.batch { display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow-y: auto; }
+.seq { display: grid; grid-template-columns: 12px 44px 70px minmax(0, 1fr) 76px; gap: 8px; align-items: center; font: 13px var(--mono); font-variant-numeric: tabular-nums; }
+.seq .dot { width: 10px; height: 10px; border-radius: 2px; }
+.seq .bar { height: 8px; background: var(--cell); border-radius: 4px; overflow: hidden; }
+.seq .bar > div { height: 100%; }
+.seq .st { color: var(--muted); }
+.seq .kv { color: var(--muted); text-align: right; }
+.empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font: 500 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+td { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+td:first-child { font-family: var(--sans); }
+tr.best td { color: var(--good); font-weight: 600; }
+tr.best td:first-child { color: var(--ink); }
+.note { font-size: 13px; color: var(--muted); max-width: 80ch; margin: 0; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">TA050 · Clase 18 · Simulador</div>
+    <h1>Motor de inferencia</h1>
+    <p class="lead">Una GPU con lugar para 2.048 tokens de KV cache atiende pedidos que llegan solos. Cambiá cómo arma los lotes y cómo reparte la memoria, y mirá qué pasa con el mapa de memoria, el lote y los tiempos.</p>
+  </header>
+
+  <section class="controls" aria-label="Controles">
+    <div class="field"><span>Batching</span>
+      <div class="seg" role="group" aria-label="Batching">
+        <button id="b-static" aria-pressed="false">Estático</button>
+        <button id="b-cont" aria-pressed="true">Continuo</button>
+      </div>
+    </div>
+    <div class="field"><span>Memoria</span>
+      <div class="seg" role="group" aria-label="Memoria">
+        <button id="m-contig" aria-pressed="false">Contigua (reserva 512)</button>
+        <button id="m-paged" aria-pressed="true">Paginada</button>
+      </div>
+    </div>
+    <label class="field" for="rate"><span>Pedidos por segundo · <b class="val" id="rate-v">6</b></span>
+      <input type="range" id="rate" min="1" max="20" step="1" value="6">
+    </label>
+    <label class="field" for="block"><span>Bloque (tokens)</span>
+      <select id="block" class="btn"><option>4</option><option>8</option><option selected>16</option><option>32</option><option>64</option></select>
+    </label>
+    <label class="field" for="speed"><span>Velocidad</span>
+      <select id="speed" class="btn"><option value="0.1">0,1×</option><option value="0.25" selected>0,25×</option><option value="0.5">0,5×</option><option value="1">1× (tiempo real)</option></select>
+    </label>
+    <div class="actions">
+      <button class="btn primary" id="play">Pausa</button>
+      <button class="btn" id="step">Una iteración</button>
+      <button class="btn" id="reset">Reiniciar</button>
+    </div>
+  </section>
+
+  <div class="main">
+    <section class="panel" aria-labelledby="mem-h">
+      <div class="panel-head">
+        <h2 id="mem-h">KV cache en la GPU</h2>
+        <span class="small" id="mem-sub">2.048 slots · 1 cuadrado = 1 token</span>
+      </div>
+      <canvas id="mem" height="300" role="img" aria-label="Mapa de la memoria del KV cache"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--q1)"></i>token guardado (un color por pedido)</span>
+        <span><i style="background:var(--q1);opacity:.22"></i>reservado sin usar</span>
+        <span><i style="background:var(--cell)"></i>libre</span>
+      </div>
+    </section>
+
+    <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+      <section class="panel" aria-labelledby="ins-h">
+        <div class="panel-head"><h2 id="ins-h">Instrumentos</h2><span class="small val" id="clock">t = 0,0 s</span></div>
+        <div class="gauges">
+          <div class="gauge"><b id="g-tps">0</b><span>tokens/s</span></div>
+          <div class="gauge"><b id="g-ttft">–</b><span>primer token, ms</span></div>
+          <div class="gauge"><b id="g-util">–</b><span>de lo asignado guarda tokens</span></div>
+          <div class="gauge"><b id="g-batch">0</b><span>en el lote</span></div>
+          <div class="gauge"><b id="g-queue">0</b><span>en la cola</span></div>
+          <div class="gauge"><b id="g-pre">0</b><span>desalojos</span></div>
+        </div>
+        <canvas id="hist" height="110" role="img" aria-label="Lote y uso del KV en el tiempo"></canvas>
+        <div class="legend"><span><i style="background:var(--accent)"></i>secuencias en el lote</span><span><i style="background:var(--q2)"></i>% de la memoria asignada con tokens</span></div>
+      </section>
+
+      <section class="panel" aria-labelledby="batch-h">
+        <div class="panel-head"><h2 id="batch-h">El lote</h2><span class="small">progreso de la respuesta · KV usado / asignado</span></div>
+        <div class="batch" id="batch"></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel" aria-labelledby="cmp-h">
+    <div class="panel-head">
+      <h2 id="cmp-h">Las cuatro combinaciones, con la misma carga</h2>
+      <button class="btn" id="cmp-run">Volver a correr</button>
+    </div>
+    <p class="note" id="cmp-desc"></p>
+    <div class="tablewrap">
+      <table id="cmp"><thead><tr><th>Batching · memoria</th><th>tokens/s</th><th>primer token</th><th>respuesta completa</th><th>lote prom.</th><th>uso KV</th><th>desalojos</th></tr></thead><tbody></tbody></table>
+    </div>
+    <p class="note">Tiempos en ms, promedios sobre 300 pedidos. Costo de una iteración: 20 ms de leer los pesos, más 0,25 ms por secuencia y 0,05 ms por token de prefill. Es el mismo modelo del repositorio <code>servir-tokens</code>; los números son ilustrativos.</p>
+  </section>
+</div>
+
+<script>
+"use strict";
+const CAP = 2048, MAX_LEN = 512, MAX_BATCH = 32;
+const COST = { base: 20, perSeq: 0.25, perPrefill: 0.05 };
+const PALETTE = ["--q1","--q2","--q3","--q4","--q5","--q6","--q7","--q8"];
+
+function rng(seed) { // mulberry32
+  return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function normal(r) { return Math.sqrt(-2 * Math.log(r() || 1e-9)) * Math.cos(2 * Math.PI * r()); }
+
+// Generador de pedidos: llegadas de Poisson, largos con cola pesada.
+function arrivals(rate, seed) {
+  const r = rng(seed); let t = 0, id = 0;
+  return () => {
+    t += -Math.log(r() || 1e-9) / rate * 1000;
+    const prompt = Math.min(Math.max(4, Math.round(Math.exp(4.0 + 0.6 * normal(r)))), 200);
+    const output = Math.min(Math.max(2, Math.round(Math.exp(4.1 + 0.9 * normal(r)))), MAX_LEN - prompt);
+    return { id: id++, arrival: t, prompt, output };
+  };
+}
+
+// --- Memoria: los dos administradores del repo, en JS ---
+class Contiguous {
+  constructor(cap) { this.cap = cap; this.free = [{ s: 0, l: cap }]; this.seqs = new Map(); }
+  admit(id, tokens, max) {
+    const need = Math.max(tokens, max);
+    for (let i = 0; i < this.free.length; i++) {
+      const f = this.free[i]; if (f.l < need) continue;
+      this.seqs.set(id, { s: f.s, l: need, used: tokens });
+      if (f.l === need) this.free.splice(i, 1); else this.free[i] = { s: f.s + need, l: f.l - need };
+      return true;
+    }
+    return false;
+  }
+  append(id) { const q = this.seqs.get(id); if (q.used === q.l) return false; q.used++; return true; }
+  release(id) {
+    const q = this.seqs.get(id); if (!q) return; this.seqs.delete(id);
+    this.free.push({ s: q.s, l: q.l }); this.free.sort((a, b) => a.s - b.s);
+    const m = [this.free[0]];
+    for (const f of this.free.slice(1)) { const last = m[m.length - 1]; if (last.s + last.l === f.s) last.l += f.l; else m.push({ ...f }); }
+    this.free = m;
+  }
+  usage(id) { const q = this.seqs.get(id); return q ? [q.used, q.l] : [0, 0]; }
+  stats() { let a = 0, u = 0; for (const q of this.seqs.values()) { a += q.l; u += q.used; } return { alloc: a, used: u }; }
+  cells(out) { for (const [id, q] of this.seqs) for (let k = 0; k < q.l; k++) out[q.s + k] = { id, used: k < q.used }; }
+}
+class Paged {
+  constructor(cap, bs, seed) {
+    this.bs = bs; this.n = cap / bs; this.tables = new Map();
+    const r = rng(seed); this.free = [...Array(this.n).keys()];
+    for (let i = this.free.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [this.free[i], this.free[j]] = [this.free[j], this.free[i]]; }
+  }
+  admit(id, tokens) {
+    const need = Math.ceil(tokens / this.bs); if (need > this.free.length) return false;
+    this.tables.set(id, { blocks: this.free.splice(this.free.length - need, need), tokens }); return true;
+  }
+  append(id) {
+    const t = this.tables.get(id);
+    if (t.tokens % this.bs === 0) { if (!this.free.length) return false; t.blocks.push(this.free.pop()); }
+    t.tokens++; return true;
+  }
+  release(id) { const t = this.tables.get(id); if (!t) return; this.free.push(...t.blocks); this.tables.delete(id); }
+  usage(id) { const t = this.tables.get(id); return t ? [t.tokens, t.blocks.length * this.bs] : [0, 0]; }
+  stats() { let u = 0; for (const t of this.tables.values()) u += t.tokens; return { alloc: (this.n - this.free.length) * this.bs, used: u }; }
+  cells(out) {
+    for (const [id, t] of this.tables) t.blocks.forEach((b, i) => {
+      for (let j = 0; j < this.bs; j++) out[b * this.bs + j] = { id, used: j < t.tokens - i * this.bs };
+    });
+  }
+}
+
+// --- El motor: el mismo algoritmo que engine.Step en Go ---
+class Engine {
+  constructor(mode, kv) { this.mode = mode; this.kv = kv; this.now = 0; this.waiting = []; this.running = [];
+    this.done = []; this.preemptions = 0; this.steps = 0; this.batchSum = 0; this.utilSum = 0; this.tokens = []; }
+  submit(req) { this.waiting.push({ req, gen: 0, prefilled: false, first: 0, finished: false }); }
+  admit() {
+    if (this.mode === "static" && this.running.length) return;
+    while (this.waiting.length && this.running.length < MAX_BATCH) {
+      const s = this.waiting[0]; if (s.req.arrival > this.now) return;
+      if (!this.kv.admit(s.req.id, s.req.prompt + s.gen, MAX_LEN)) return;
+      this.waiting.shift(); s.prefilled = false; this.running.push(s);
+    }
+  }
+  step() {
+    this.admit();
+    if (!this.running.length) return 0;
+    for (let i = 0; i < this.running.length;) {
+      const s = this.running[i];
+      if (s.finished || this.kv.append(s.req.id)) { i++; continue; }
+      const v = this.running.pop(); this.kv.release(v.req.id); this.preemptions++; this.waiting.unshift(v);
+    }
+    let prefill = 0; for (const s of this.running) if (!s.prefilled) prefill += s.req.prompt + s.gen;
+    const dt = COST.base + COST.perSeq * this.running.length + COST.perPrefill * prefill;
+    this.now += dt; this.steps++; this.batchSum += this.running.length;
+    const st = this.kv.stats(); this.utilSum += st.alloc ? st.used / st.alloc : 0;
+    let made = 0;
+    for (const s of this.running) {
+      if (s.finished) continue;
+      s.prefilled = true; s.gen++; made++;
+      if (s.gen === 1) s.first = this.now;
+      s.finished = s.gen === s.req.output;
+    }
+    this.tokens.push([this.now, made]);
+    if (this.mode === "continuous") {
+      this.running = this.running.filter(s => {
+        if (!s.finished) return true;
+        this.kv.release(s.req.id); this.done.push({ ...s.req, first: s.first, end: this.now }); return false;
+      });
+    } else if (this.running.every(s => s.finished)) {
+      for (const s of this.running) { this.kv.release(s.req.id); this.done.push({ ...s.req, first: this.now, end: this.now }); }
+      this.running = [];
+    }
+    return dt;
+  }
+}
+
+function makeKV(mem, block) { return mem === "paged" ? new Paged(CAP, block, 11) : new Contiguous(CAP); }
+
+// --- Comparación sin animación ---
+function runAll(rate, block) {
+  const rows = [];
+  for (const mode of ["static", "continuous"]) for (const mem of ["contig", "paged"]) {
+    const e = new Engine(mode, makeKV(mem, block)); const next = arrivals(rate, 7);
+    const reqs = Array.from({ length: 300 }, next); reqs.forEach(r => e.submit(r));
+    let guard = 0; while ((e.running.length || e.waiting.length) && guard++ < 2e6) {
+      if (!e.running.length && e.waiting.length && e.waiting[0].req.arrival > e.now) e.now = e.waiting[0].req.arrival;
+      e.step();
+    }
+    const d = e.done, n = d.length;
+    const tok = d.reduce((a, r) => a + r.output, 0);
+    const span = (Math.max(...d.map(r => r.end)) - Math.min(...d.map(r => r.arrival))) / 1000;
+    rows.push({ mode, mem, tps: tok / span, ttft: d.reduce((a, r) => a + r.first - r.arrival, 0) / n,
+      lat: d.reduce((a, r) => a + r.end - r.arrival, 0) / n, batch: e.batchSum / e.steps, util: e.utilSum / e.steps, pre: e.preemptions });
+  }
+  return rows;
+}
+const nf = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 0 });
+const nf1 = new Intl.NumberFormat("es-AR", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+function renderComparison() {
+  const rows = runAll(state.rate, state.block);
+  const label = { static: "Estático", continuous: "Continuo", contig: "contigua", paged: `paginada (${state.block})` };
+  const best = rows.reduce((a, r) => r.tps > a.tps ? r : a, rows[0]);
+  document.querySelector("#cmp tbody").innerHTML = rows.map(r => `<tr class="${r === best ? "best" : ""}">
+    <td>${label[r.mode]} · ${label[r.mem]}</td><td>${nf.format(r.tps)}</td><td>${nf.format(r.ttft)}</td><td>${nf.format(r.lat)}</td>
+    <td>${nf1.format(r.batch)}</td><td>${nf.format(100 * r.util)}%</td><td>${nf.format(r.pre)}</td></tr>`).join("");
+  document.getElementById("cmp-desc").textContent =
+    `${state.rate} pedidos por segundo, KV cache de 2.048 tokens, longitud máxima 512. En verde, la de más throughput. ` +
+    `Con batching estático nadie ve tokens hasta que termina el lote, así que el primer token llega con la respuesta completa.`;
+}
+
+// --- Estado de la animación ---
+const state = { mode: "continuous", mem: "paged", rate: 6, block: 16, speed: 0.25, playing: true };
+let eng, nextReq, pending, hist, lastSample;
+function reset() {
+  eng = new Engine(state.mode, makeKV(state.mem, state.block));
+  nextReq = arrivals(state.rate, 3); pending = nextReq(); hist = []; lastSample = 0;
+  draw();
+}
+function advance(target) {
+  let guard = 0;
+  while (eng.now < target && guard++ < 5000) {
+    while (pending.arrival <= eng.now) { eng.submit(pending); pending = nextReq(); }
+    if (!eng.running.length && !eng.waiting.some(s => s.req.arrival <= eng.now)) {
+      eng.now = Math.min(pending.arrival, target); continue;
+    }
+    eng.step();
+  }
+  while (eng.now - lastSample >= 100) {
+    lastSample += 100; const st = eng.kv.stats();
+    hist.push([eng.running.length, st.alloc ? st.used / st.alloc : 0]); if (hist.length > 240) hist.shift();
+  }
+  const cut = eng.now - 3000; while (eng.tokens.length && eng.tokens[0][0] < cut) eng.tokens.shift();
+}
+function oneStep() {
+  while (pending.arrival <= eng.now) { eng.submit(pending); pending = nextReq(); }
+  if (!eng.running.length && !eng.waiting.length) { eng.now = pending.arrival; eng.submit(pending); pending = nextReq(); }
+  eng.step(); draw();
+}
+
+// --- Dibujo ---
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function sizeCanvas(c, h) {
+  const w = c.clientWidth, dpr = window.devicePixelRatio || 1;
+  if (c.width !== Math.round(w * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); c.style.height = h + "px"; }
+  const ctx = c.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return [ctx, w];
+}
+function drawMemory() {
+  const c = document.getElementById("mem"), cols = 64, rows = CAP / cols;
+  const w0 = c.clientWidth, cell = Math.max(3, Math.floor((w0 - 12) / cols));
+  const blockGap = state.mem === "paged" ? Math.max(1, Math.round(cell / 4)) : 0;
+  const per = state.mem === "paged" ? state.block : cols;
+  const width = cols * cell + (cols / per - 1) * blockGap * (per < cols ? 1 : 0);
+  const height = rows * cell + (state.mem === "paged" && state.block > cols ? 0 : 0);
+  const [ctx, w] = sizeCanvas(c, height);
+  ctx.clearRect(0, 0, w, height);
+  const cells = new Array(CAP); eng.kv.cells(cells);
+  const colors = PALETTE.map(css), free = css("--cell");
+  const gapPer = per < cols ? per : cols;
+  for (let i = 0; i < CAP; i++) {
+    const r = Math.floor(i / cols), k = i % cols;
+    const x = k * cell + Math.floor(k / gapPer) * (per < cols ? blockGap : 0), y = r * cell;
+    const v = cells[i];
+    ctx.globalAlpha = 1; ctx.fillStyle = free;
+    if (v) { ctx.fillStyle = colors[v.id % colors.length]; ctx.globalAlpha = v.used ? 1 : 0.22; }
+    ctx.fillRect(x, y, cell - 1, cell - 1);
+  }
+  ctx.globalAlpha = 1;
+  const st = eng.kv.stats();
+  document.getElementById("mem-sub").textContent =
+    `${nf.format(st.used)} tokens guardados · ${nf.format(st.alloc)} asignados · ${nf.format(CAP - st.alloc)} libres` +
+    (state.mem === "paged" ? ` · bloques de ${state.block}` : "");
+}
+function drawHistory() {
+  const c = document.getElementById("hist"), h = 110; const [ctx, w] = sizeCanvas(c, h);
+  ctx.clearRect(0, 0, w, h);
+  const pad = 4, n = 240;
+  ctx.strokeStyle = css("--line"); ctx.lineWidth = 1;
+  for (const f of [0, 0.5, 1]) { const y = pad + (1 - f) * (h - 2 * pad); ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+  const line = (get, scale, color) => {
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+    hist.forEach((p, i) => { const x = (n - hist.length + i) / (n - 1) * w, y = pad + (1 - get(p) / scale) * (h - 2 * pad);
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    ctx.stroke();
+  };
+  line(p => p[0], MAX_BATCH, css("--accent"));
+  line(p => p[1], 1, css("--q2"));
+  ctx.fillStyle = css("--muted"); ctx.font = `11px ${css("--mono")}`;
+  ctx.fillText(`arriba: ${MAX_BATCH} secuencias · 100%`, 6, h - 8);
+}
+function drawBatch() {
+  const el = document.getElementById("batch");
+  if (!eng.running.length) { el.innerHTML = `<div class="empty">Nadie en el lote${eng.waiting.length ? `; ${eng.waiting.length} esperan memoria` : ""}.</div>`; return; }
+  el.innerHTML = eng.running.map(s => {
+    const col = `var(${PALETTE[s.req.id % PALETTE.length]})`;
+    const phase = s.finished ? "espera" : s.prefilled ? "decode" : "prefill";
+    const [u, a] = eng.kv.usage(s.req.id);
+    return `<div class="seq"><span class="dot" style="background:${col}"></span><span>#${s.req.id}</span><span class="st">${phase}</span>
+      <span class="bar" title="${s.gen} de ${s.req.output} tokens"><div style="width:${100 * s.gen / s.req.output}%;background:${col}"></div></span>
+      <span class="kv">${u}/${a}</span></div>`;
+  }).join("");
+}
+function drawGauges() {
+  const made = eng.tokens.reduce((a, t) => a + t[1], 0), win = Math.min(3, eng.now / 1000) || 1;
+  const recent = eng.done.slice(-40), st = eng.kv.stats();
+  document.getElementById("g-tps").textContent = nf.format(made / win);
+  document.getElementById("g-ttft").textContent = recent.length ? nf.format(recent.reduce((a, r) => a + r.first - r.arrival, 0) / recent.length) : "–";
+  const util = st.alloc ? st.used / st.alloc : null;
+  const gu = document.getElementById("g-util"); gu.textContent = util === null ? "–" : nf.format(100 * util) + "%"; gu.className = util !== null && util < 0.5 ? "warn" : "";
+  document.getElementById("g-batch").textContent = eng.running.length;
+  document.getElementById("g-queue").textContent = eng.waiting.filter(s => s.req.arrival <= eng.now).length;
+  document.getElementById("g-pre").textContent = eng.preemptions;
+  document.getElementById("clock").textContent = `t = ${nf1.format(eng.now / 1000)} s`;
+}
+function draw() { drawMemory(); drawHistory(); drawBatch(); drawGauges(); }
+
+// --- Loop ---
+let lastFrame = performance.now();
+function frame(t) {
+  const real = Math.min(100, t - lastFrame); lastFrame = t;
+  if (state.playing) { advance(eng.now + real * state.speed); draw(); }
+  requestAnimationFrame(frame);
+}
+
+// --- Controles ---
+function seg(a, b, key, va, vb, resetAfter = true) {
+  const A = document.getElementById(a), B = document.getElementById(b);
+  const set = v => { state[key] = v; A.setAttribute("aria-pressed", v === va); B.setAttribute("aria-pressed", v === vb); if (resetAfter) reset(); };
+  A.onclick = () => set(va); B.onclick = () => set(vb);
+}
+seg("b-static", "b-cont", "mode", "static", "continuous");
+seg("m-contig", "m-paged", "mem", "contig", "paged");
+const rate = document.getElementById("rate");
+rate.oninput = () => { state.rate = +rate.value; document.getElementById("rate-v").textContent = rate.value; };
+rate.onchange = () => { reset(); renderComparison(); };
+document.getElementById("block").onchange = e => { state.block = +e.target.value; reset(); renderComparison(); };
+document.getElementById("speed").onchange = e => { state.speed = +e.target.value; };
+const play = document.getElementById("play");
+play.onclick = () => { state.playing = !state.playing; play.textContent = state.playing ? "Pausa" : "Seguir"; };
+document.getElementById("step").onclick = () => { state.playing = false; play.textContent = "Seguir"; oneStep(); };
+document.getElementById("reset").onclick = reset;
+document.getElementById("cmp-run").onclick = renderComparison;
+if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) state.speed = 0.1, document.getElementById("speed").value = "0.1";
+new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
+addEventListener("resize", () => { document.getElementById("mem").width = 0; document.getElementById("hist").width = 0; draw(); });
+
+reset();
+advance(4000); // arranca con el sistema ya en régimen
+draw();
+renderComparison();
+requestAnimationFrame(frame);
+</script>
+
+</html>

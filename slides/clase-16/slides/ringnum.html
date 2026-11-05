@@ -1,0 +1,29 @@
+<section id="ringnum" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Medido en la demo</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">El anillo envía casi lo mismo con 2 GPUs que con 32</h2>
+</div>
+<div style="display:flex;gap:64px;align-items:start">
+<table style="width:900px;font-size:32px;color:#F2F3EF;font-family:Geist, Arial, sans-serif">
+<tr><th style="width:24%;text-align:right">GPUs</th><th style="width:38%;text-align:right">Central: rank 0</th><th style="width:38%;text-align:right">Ring: cada rank</th></tr>
+<tr><td style="text-align:right">2</td><td style="text-align:right">1,00 · S</td><td style="text-align:right">1,00 · S</td></tr>
+<tr><td style="text-align:right">4</td><td style="text-align:right">3,00 · S</td><td style="text-align:right">1,50 · S</td></tr>
+<tr><td style="text-align:right">8</td><td style="text-align:right">7,00 · S</td><td style="text-align:right">1,75 · S</td></tr>
+<tr><td style="text-align:right">16</td><td style="text-align:right">15,00 · S</td><td style="text-align:right">1,88 · S</td></tr>
+<tr><td style="text-align:right">32</td><td style="text-align:right">31,00 · S</td><td style="text-align:right">1,94 · S</td></tr>
+</table>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
+<p style="font-size:44px;font-weight:600;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">2·(n−1)/n·S</p>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Tiende a 2·S. Es el mínimo posible para un all-reduce.</p>
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Optimiza ancho de banda, no latencia: son 2(n−1) pasos. Para mensajes chicos conviene un árbol.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/demo allreduce</p>
+<aside>Tiempo: 0:32–0:35 (3 min, con demo).
+Idea clave: en el anillo cada GPU envía 2(n−1)/n·S, que tiende a 2·S sin importar cuántas GPUs haya.
+Demo: go run ./cmd/demo allreduce. La tabla de la slide es su salida. La demo no mide tiempos: cuenta los floats que pasan por cada canal.
+Decir: el central crece lineal; el anillo casi no se mueve. Patarasuk y Yuan (2009) demostraron que es el mínimo posible: en cualquier all-reduce hay un proceso que envía al menos 2(n−1)/n·S. Y en el anillo, además, todos los enlaces se usan en paralelo.
+El anillo no es gratis: optimiza ancho de banda, no latencia. Son 2(n−1) pasos secuenciales y cada uno paga la latencia de un mensaje. Para mensajes chicos conviene un algoritmo en árbol, con 2·log n pasos. Para gradientes de gigabytes, manda el ancho de banda.
+Conexión con el paper (§3.3.1): como el costo escala con (d−1)/d, agregar réplicas casi no aumenta la comunicación por GPU. Por eso el paralelismo de datos escala tan bien, mientras el modelo entre.
+Pasar a la siguiente: el modelo no entra. ¿Por qué?</aside>
+</section>

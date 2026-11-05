@@ -1,0 +1,480 @@
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from slidekit import *
+from cover import cover
+
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out", "clase-17")
+d = Deck(ROOT, 17, "Entrenamiento a escala")
+D, L = DARK, LIGHT
+
+# 1 ─ portada
+d.raw("cover", cover(17, "Entrenamiento a escala de frontera",
+    "Cómo se entrenan hoy los modelos más grandes: decenas de miles de GPUs, cuatro dimensiones de paralelismo, expertos, FP8 y fallas todos los días",
+    "Papers: Grattafiori et al., <i>The Llama 3 Herd of Models</i>, 2024, §3.3 · DeepSeek-AI, <i>DeepSeek-V3 Technical Report</i>, 2024, §3",
+    """Tiempo: 0:00–0:02 (2 min).
+Idea clave: lo de la clase pasada sigue valiendo; hoy vemos qué cambia cuando la escala pasa de miles a decenas de miles de GPUs.
+Decir: la Clase 16 fue Megatron-LM, de 2021: datos, tensores y pipeline sobre 3.072 GPUs. Hoy vamos a ver cómo se entrena en serio en 2024–2026 con dos casos documentados con mucho detalle: Llama 3 de Meta, con 16.384 H100, y DeepSeek-V3, con 2.048 H800 y una arquitectura de expertos. Y cerramos con lo que se sabe de entrenar en más de un datacenter.
+Las tres preguntas de siempre siguen siendo la guía: qué se parte, qué hay que comunicar y por qué enlace, y qué pasa cuando algo falla. La novedad es que la tercera deja de ser un caso borde.
+Lecturas: la sección 3.3 del paper de Llama 3 y la sección 3 del informe de DeepSeek-V3.
+Pasar a la siguiente: qué cambió desde Megatron."""), section="Qué cambió desde Megatron y la escala de un entrenamiento de frontera.")
+
+# 2 ─ mapa
+d.slide("mapa", D, head("Dónde estamos", "De Megatron a hoy: lo mismo, más grande y más roto", D) +
+    table(["", "Megatron-LM (2021)", "Hoy"], [
+        ["GPUs", "3.072 A100", "16.384 H100 (Llama 3)"],
+        ["Paralelismo", "datos, tensores, pipeline", "+ contexto, + expertos"],
+        ["Precisión", "16 bits", "FP8 en las multiplicaciones (DeepSeek-V3)"],
+        ["Fallas", "—", "una cada tres horas (Llama 3)"],
+        ["Dónde", "un clúster", "varios datacenters (Gemini)"],
+    ], D, widths=[22, 34, 44], size=32),
+    """Tiempo: 0:02–0:05 (3 min).
+Idea clave: las ideas de la Clase 16 siguen siendo la base; lo que cambia es la escala y lo que esa escala obliga a hacer.
+Decir: recorrer la tabla fila por fila. Megatron entrenó con 3.072 A100; Llama 3 405B usó 16.384 H100 a la vez. A los tres paralelismos se suman dos: contexto, para secuencias largas, y expertos, para modelos mixture-of-experts. La precisión baja: DeepSeek-V3 hace en FP8 las multiplicaciones grandes. Las fallas pasan a ser rutina: Llama 3 tuvo una interrupción inesperada cada tres horas. Y el entrenamiento empieza a no entrar en un solo edificio: Google dice que Gemini se entrenó en varios datacenters.
+Preguntar a la clase: ¿cuál de estas filas les parece un problema de sistemas distribuidos y cuál de machine learning? (Todas son de sistemas, incluso la de precisión: es cuántos bytes se mueven.)
+Pasar a la siguiente: la escala, en números.""",
+    d.footer("Narayanan et al., 2021 · Grattafiori et al., 2024 · DeepSeek-AI, 2024"))
+
+# 3 ─ escala (claro)
+grid = row(big("16.384", "H100 entrenando a la vez", L), big("3,8·10²⁵", "operaciones de punto flotante en total", L, mono=False), gap=96) + \
+       row(big("400", "TFLOPs por GPU: 38–43% del pico", L, color="blue"), big("16 M", "tokens en cada paso de entrenamiento", L, color="blue"), gap=96)
+d.slide("escala", L, col(eyebrow("Llama 3 405B · §3.3", L), h2("Un solo entrenamiento, la escala de un datacenter", L), gap=16) + col(grid, gap=56),
+    """Tiempo: 0:05–0:08 (3 min).
+Idea clave: el entrenamiento de un modelo de frontera es un solo programa sincrónico corriendo en decenas de miles de GPUs.
+Decir: Llama 3 405B se entrenó con hasta 16.384 H100 a la vez, en un clúster de 24.000. En total fueron 3,8 por 10 a la 25 operaciones de punto flotante. Cada GPU sostuvo entre 380 y 430 TFLOPs en BF16, que es entre 38% y 43% de su pico (tabla 4 del paper). Y cada paso de entrenamiento procesa 16 millones de tokens.
+Remarcar el 40%: más de la mitad de la capacidad de cómputo no se usa. No es un error: es el costo de comunicar, de las burbujas del pipeline y de mover memoria. Toda la clase es sobre cómo hacer que ese número no sea peor.
+Si preguntan por qué no se usan las 24.000: el paper dice que se usaron hasta 16.000 para el pre-entrenamiento.
+Pasar a la siguiente: una cuenta de servilleta con estos números.""",
+    d.footer("Grattafiori et al., 2024, §3.3.1 y tabla 4", L), gap=64)
+
+# 4 ─ cuenta
+d.slide("cuenta", D, head("Cuenta de servilleta", "Más de nueve semanas de cómputo, si nada se rompe", D) +
+    card(p("3,8·10²⁵ FLOPs ÷ (16.384 GPUs × 400·10¹² FLOPs/s) ≈ 5,8·10⁶ s ≈ 67 días", D, size=40, color="ink", weight=600), D, accent=True, width=1580) +
+    row(col(h3("Y algo se rompe", D), p("Con una falla inesperada cada tres horas, en 67 días son más de 500. Cada una frena a las 16.384 GPUs.", D), flex=1),
+        col(h3("El 60% que falta", D), p("Comunicación, burbujas del pipeline, memoria. Cada técnica de hoy recupera un pedazo.", D), flex=1), gap=64),
+    """Tiempo: 0:08–0:11 (3 min).
+Idea clave: con esta escala, cualquier ineficiencia y cualquier falla se miden en días.
+Decir: hacer la cuenta en el pizarrón con los números de la slide anterior. 3,8·10²⁵ operaciones divididas por 16.384 GPUs que hacen 400 billones por segundo cada una: 5,8 millones de segundos, unos 67 días de cómputo continuo. Es una cuenta de servilleta: no todas las corridas usaron las 16.384 GPUs todo el tiempo, pero el orden es ese.
+Ahora, en el paper de Llama 3 hubo una interrupción inesperada cada tres horas. En 67 días, eso es más de 500 veces en que todo el clúster se frena y vuelve al último checkpoint. Lo vamos a cuantificar en la tercera parte.
+Y el 60% del cómputo que no se usa: si se ganan 5 puntos de MFU, se ahorran días de un clúster que cuesta cientos de millones.
+Preguntar a la clase: si el MFU fuera 50% en lugar de 40%, ¿cuántos días se ahorran? (67 × 40/50 ≈ 54: casi dos semanas.)
+Pasar a la siguiente: la primera herramienta, partir en cuatro dimensiones.""",
+    d.footer("H100 BF16 denso: 989 TFLOPs de pico"))
+
+# 5 ─ 4D
+def dimcard(name, what, when, where, t=D, accent=False):
+    return card(label(name, t, color="acc") + h3(what, t, size=32) + p(when, t, size=24) +
+                p(where, t, size=24, color="ink", mono=True), t, accent=accent, pad=32, gap=12)
+d.slide("cuatrod", D, head("Paralelismo 4D · §3.3.2", "Cuatro formas de partir, ordenadas por cuánto se comunican", D) +
+    row(dimcard("TP · tensores", "Cada matriz", "4 all-reduce por capa y por microbatch", "dentro del servidor"),
+        dimcard("CP · contexto", "La secuencia", "all-gather de K y V en cada capa", "dentro del pod"),
+        dimcard("PP · pipeline", "Las capas", "activaciones a la vecina, por microbatch", "dentro del pod"),
+        dimcard("DP · datos", "El batch", "pesos y gradientes, una vez por paso", "entre pods"), gap=24) +
+    p("La GPU de rank r tiene una coordenada por dimensión. La primera del orden varía más rápido, así que queda entre GPUs vecinas.", D, size=32),
+    """Tiempo: 0:11–0:15 (4 min).
+Idea clave: Llama 3 combina cuatro paralelismos y los ordena de más a menos comunicación, para que lo que más habla use los enlaces más rápidos.
+Decir: tres ya los conocen de la Clase 16. Tensores parte cada matriz y hace cuatro all-reduce por capa y por microbatch, en el camino crítico: tiene que quedar adentro del servidor, por NVLink. Pipeline parte el modelo por capas y sólo manda activaciones a la etapa vecina. Datos replica el modelo y sincroniza una vez por paso, así que tolera la red más lenta.
+La nueva es contexto (CP): parte la secuencia entre GPUs, para entrenar con 128.000 tokens. Necesita juntar las keys y values de todos en cada capa, así que va después de tensores.
+El orden importa porque el rank de cada GPU se arma con la primera dimensión variando más rápido: los 8 ranks de un grupo de tensores son 0 a 7, las 8 GPUs de un servidor. El paper lo dice explícitamente: el orden es [TP, CP, PP, DP], y DP va afuera porque tolera más latencia.
+Preguntar a la clase: ¿por qué no poner pipeline adentro y tensores afuera? (Tensores se comunica muchísimo más seguido, y con mensajes en el camino crítico.)
+Pasar a la siguiente: las configuraciones que usaron.""",
+    d.footer("Grattafiori et al., 2024, §3.3.2"), gap=40, section="Paralelismo 4D en Llama 3: el orden, la red, FSDP, contexto y pipeline.")
+
+# 6 ─ configs
+d.slide("configs", D, head("Llama 3 405B · tabla 4", "Para 128K tokens, se cambian datos por contexto", D) +
+    table(["GPUs", "TP", "CP", "PP", "DP", "Secuencia", "TFLOPs/GPU"], [
+        ["8.192", "8", "1", "16", "64", "8.192", "430"],
+        ["16.384", "8", "1", "16", "128", "8.192", "400"],
+        ["16.384", "8", "16", "16", "8", "131.072", "380"],
+    ], D, widths=[18, 9, 9, 9, 12, 21, 22], right=(0, 1, 2, 3, 4, 5, 6), size=32, hi_rows=(2,)) +
+    p("Siempre 16 millones de tokens por paso. Con secuencias 16 veces más largas, entran 16 veces menos secuencias: el grado de datos baja de 128 a 8 y el de contexto sube de 1 a 16.", D),
+    """Tiempo: 0:15–0:18 (3 min).
+Idea clave: el producto TP·CP·PP·DP es la cantidad de GPUs, y cambiar el largo de la secuencia mueve GPUs de una dimensión a otra.
+Decir: verificar el producto en cada fila: 8·1·16·64 = 8.192; 8·1·16·128 = 16.384; 8·16·16·8 = 16.384.
+Tensores siempre en 8: es la cantidad de GPUs de un servidor, igual que en Megatron. Pipeline siempre en 16. La diferencia está en la última fila: para el entrenamiento de contexto largo, con secuencias de 131.072 tokens, el batch de 16 millones de tokens tiene 16 veces menos secuencias. Datos baja de 128 a 8 y contexto sube a 16.
+El costo: el throughput por GPU baja de 430 a 380 TFLOPs. Más comunicación y atención más cara: la atención crece con el cuadrado del largo.
+Preguntar a la clase: al duplicar las GPUs de 8.192 a 16.384, ¿qué dimensión crece y por qué esa? (Datos, la que menos se comunica; y el throughput por GPU baja un poco, de 430 a 400.)
+Pasar a la siguiente: la red sobre la que corre.""",
+    d.footer("Grattafiori et al., 2024, §3.3.2, tabla 4"))
+
+# 7 ─ red
+def tier(name, desc, w, t=D, hi=False):
+    return (f'<div style="display:flex;gap:32px;align-items:center"><div style="width:{w}px;height:56px;border-radius:10px;'
+            f'background:{t["acc"] if hi else t["fill"]};display:flex;align-items:center;padding:0 20px">'
+            f'<p style="font-family:{MONO};font-size:24px;font-weight:600;color:{t["onfill"] if hi else t["ink"]}">{name}</p></div>'
+            f'{p(desc, t, size=24)}</div>')
+d.slide("red", D, head("La red · §3.3.1", "El orden de las dimensiones sale de la red", D) +
+    col(tier("servidor · 8 GPUs", "NVLink: ahí van los tensores", 300, hi=True),
+        tier("rack · 16 GPUs", "RoCE a 400 Gb/s por GPU", 420),
+        tier("pod · 3.072 GPUs", "ancho de banda completo entre todas", 640),
+        tier("clúster · 24.576 GPUs", "8 pods; arriba del pod, 1:7 de sobresuscripción", 900), gap=20) +
+    p("16 flujos por cada par de GPUs, repartidos por varios caminos (E-ECMP), y switches con buffers profundos en lugar de control de congestión.", D, size=28),
+    """Tiempo: 0:18–0:21 (3 min).
+Idea clave: la red es jerárquica, y cada nivel hacia arriba tiene menos ancho de banda por GPU; el orden [TP, CP, PP, DP] pone cada dimensión en el nivel que se puede pagar.
+Decir: el clúster de Llama 3 405B usa RoCE, Ethernet con RDMA, a 400 Gb/s por GPU. Racks de 16 GPUs; 192 racks forman un pod de 3.072 GPUs con ancho de banda completo entre todas. Ocho pods forman el clúster de 24.000. Entre pods, la capa de agregación tiene una sobresuscripción de 1 a 7: si todas las GPUs mandan a la vez fuera de su pod, cada una tiene un séptimo del ancho de banda.
+Por eso datos va afuera: su comunicación es una vez por paso y se puede superponer con el cómputo. Tensores, adentro del servidor.
+Dos detalles de redes que conectan con la materia: como las colectivas generan pocos flujos muy grandes, el ruteo por hash de ECMP los distribuía mal; la librería abre 16 flujos por par de GPUs y E-ECMP los reparte por más caminos. Y en lugar de control de congestión tipo DCQCN, usan switches con buffers profundos en el núcleo.
+Pasar a la siguiente: verlo con la demo.""",
+    d.footer("Grattafiori et al., 2024, §3.3.1"), gap=40)
+
+# 8 ─ demo 4d (claro)
+d.slide("demo4d", L, head("Demo · 4d", "Con el orden al revés, los tensores cruzan pods", L) +
+    table(["Dimensión", "Orden [TP, CP, PP, DP]", "Orden [DP, PP, CP, TP]"], [
+        ["Tensores (8)", "dentro de un servidor", "entre pods"],
+        ["Pipeline (16)", "dentro de un pod", "dentro de un pod"],
+        ["Datos (128)", "entre pods", "dentro de un pod"],
+    ], L, widths=[28, 36, 36], size=32) +
+    p("Los cuatro all-reduce por capa de los tensores pasarían por la capa más lenta de la red, en el camino crítico de cada microbatch.", L),
+    """Tiempo: 0:21–0:23 (2 min, con demo).
+Idea clave: el mismo clúster y los mismos grados de paralelismo, con otro orden, ponen la comunicación más frecuente en el peor enlace.
+Demo: correr go run ./cmd/demo 4d y después go run ./cmd/demo 4d -orden dp,pp,cp,tp. La columna "salto" muestra la distancia en ranks entre dos GPUs del mismo grupo: con el orden de Llama 3, tensores tiene salto 1 (vecinas), pipeline 8 y datos 128. Al revés, tensores tiene salto 2.048: sus 8 GPUs están en servidores distintos de pods distintos.
+Si hay tiempo, mostrar el simulador Entrenamiento a escala, sección "Dónde cae cada dimensión": con un clúster chico de 64 GPUs, cambiar el orden y colorear los grupos de TP. Con el orden bueno, cada servidor es de un solo color.
+Pasar a la siguiente: cómo cambió el paralelismo de datos.""",
+    d.footer("go run ./cmd/demo 4d · simulador Entrenamiento a escala", L, plain=True))
+
+# 9 ─ FSDP
+d.slide("fsdp", D, head("Datos, con el estado partido", "ZeRO en producción: nadie guarda el modelo entero", D) +
+    row(card(label("Clase 16", D) + h3("ZeRO", D, size=44) + p("Partir entre las réplicas el estado del optimizador, los gradientes y los pesos. 120 GB por GPU bajaban a 1,9 GB.", D), D),
+        card(label("Llama 3", D, color="acc") + h3("FSDP", D, size=44) + p("Estado del optimizador y gradientes partidos. Los pesos se juntan para el forward y no se vuelven a partir hasta el backward.", D), D, accent=True),
+        card(label("TorchTitan", D) + h3("FSDP2", D, size=44) + p("Cada parámetro partido por separado, como un tensor distribuido. Unos 7% menos de memoria que FSDP1.", D), D), gap=32) +
+    p("No volver a partir los pesos entre forward y backward gasta más memoria y se ahorra un all-gather por capa: el mismo cambio de memoria por comunicación de ZeRO.", D, size=28),
+    """Tiempo: 0:23–0:26 (3 min).
+Idea clave: el paralelismo de datos de hoy es FSDP, que es ZeRO implementado en PyTorch: las réplicas no guardan el estado completo.
+Decir: en la Clase 16 vimos que cada parámetro cuesta 16 bytes con Adam, y que ZeRO parte ese estado entre las réplicas de datos: primero el optimizador, después los gradientes, después los pesos. FSDP (Fully Sharded Data Parallel) es eso, en PyTorch. Antes de usar una capa se hace un all-gather de sus pesos, y después del backward un reduce-scatter de sus gradientes.
+Llama 3 parte el estado del optimizador y los gradientes, y una decisión explícita del paper: los pesos que se juntaron para el forward no se vuelven a partir hasta el backward. Se usa más memoria a cambio de no repetir el all-gather. Es el mismo compromiso de las etapas de ZeRO.
+TorchTitan, el entrenador de PyTorch para este tipo de modelos (ICLR 2025), reimplementó FSDP partiendo cada parámetro por separado sobre tensores distribuidos (DTensor); el paper reporta un 7% menos de memoria por GPU que la versión anterior.
+Pasar a la siguiente: la dimensión nueva, contexto.""",
+    d.footer("Grattafiori et al., 2024, §3.3.2 · Liang et al., ICLR 2025"))
+
+# 10 ─ contexto
+def chunks(t=D):
+    ranks = [0, 1, 2, 3, 3, 2, 1, 0]
+    cols = [t["acc"], t["warn"], t["blue"], "#F472B6"]
+    out = []
+    for i, r in enumerate(ranks):
+        out.append(f'<div style="flex:1;height:72px;border-radius:8px;background:{cols[r]};display:flex;align-items:center;justify-content:center">'
+                   f'<p style="font-family:{MONO};font-size:24px;font-weight:600;color:{t["onfill"]}">{r}</p></div>')
+    return f'<div style="display:flex;gap:8px">{"".join(out)}</div>'
+d.slide("contexto", D, head("Paralelismo de contexto", "Una secuencia de 128K tokens no entra en una GPU", D) +
+    col(label("La secuencia en 2·CP pedazos, con CP = 4", D), chunks(), p("Cada GPU recibe un pedazo del principio y uno del final: con la máscara causal, los del final tienen más atención para calcular.", D, size=28), gap=16) +
+    row(card(h3("All-gather, no anillo", D) + p("Antes de cada atención se juntan las keys y values de todos. Con grouped-query attention, K y V son mucho más chicos que Q.", D, size=28), D),
+        card(h3("La cuenta", D) + p("La atención cuesta S², el all-gather S. Con secuencias largas, comunicar es la parte chica.", D, size=28), D), gap=32),
+    """Tiempo: 0:26–0:30 (4 min).
+Idea clave: para secuencias muy largas se parte la secuencia misma entre GPUs, y Llama 3 elige la versión más simple de comunicación porque el costo dominante es la atención.
+Decir: con 131.072 tokens, las activaciones de una sola secuencia no entran en una GPU. El paralelismo de contexto la parte: con CP = 16, cada GPU tiene una dieciseisava parte.
+Detalle de balanceo, el dibujo: la secuencia se parte en 2·CP pedazos y cada GPU recibe uno del principio y su simétrico del final. ¿Por qué? Con la máscara causal, el token i atiende a todos los anteriores: los pedazos del final tienen mucha más atención que los del principio. Juntando uno de cada punta, todas las GPUs tienen el mismo trabajo.
+La comunicación: cada GPU necesita las keys y values de toda la secuencia. Hay una versión en anillo (ring attention) que las va pasando mientras calcula; Llama 3 usa un all-gather de K y V antes de cada atención. El paper da dos razones: es más simple con las máscaras por documento, y con grouped-query attention las keys y values son mucho más chicas que las queries. Y la atención cuesta del orden de S² mientras el all-gather cuesta S.
+Preguntar a la clase: ¿por qué no balanceaba repartir la secuencia en CP pedazos contiguos? (Porque la última GPU tendría casi toda la atención.)
+Pasar a la siguiente: el pipeline de Llama 3.""",
+    d.footer("Grattafiori et al., 2024, §3.3.2"), gap=40)
+
+# 11 ─ pipeline
+d.slide("pipe", D, head("Pipeline en Llama 3", "La burbuja de la Clase 16, ajustada a mano", D) +
+    row(col(p("(PP−1)/(V·M)", D, size=72, color="acc", mono=True, lh=1.1, weight=600), p("burbuja del schedule intercalado: V etapas virtuales por GPU, M microbatches", D, size=24), width=620),
+        col(card(p("<b>Microbatches contiguos ajustables.</b> El batch ya no tiene que ser múltiplo de las etapas.", D, size=28), D, pad=28),
+            card(p("<b>Una capa menos en la primera y la última etapa.</b> El embedding y la salida pesan.", D, size=28), D, pad=28),
+            card(p("<b>Mensajes asincrónicos y memoria liberada antes.</b> 8K tokens sin activation checkpointing.", D, size=28), D, pad=28), gap=16, flex=1), gap=64, align="center"),
+    """Tiempo: 0:30–0:32 (2 min).
+Idea clave: el pipeline de Llama 3 es el intercalado de la Clase 16, con ajustes de ingeniería para que la burbuja y la memoria se porten bien a esta escala.
+Decir: la fórmula es la del schedule intercalado que vimos: cada GPU tiene V pedazos del modelo en lugar de uno, y la burbuja baja a (PP−1)/(V·M).
+Tres ajustes del paper. Uno: el schedule de Megatron pedía que la cantidad de microbatches fuera múltiplo de las etapas; Llama 3 hace ajustable cuántos microbatches seguidos corre cada etapa, y eso saca la restricción. Dos: la primera etapa tiene además el embedding y la última la capa de salida y la loss, así que les sacan una capa transformer a cada una para balancear cómputo y memoria. Tres: comunicación punto a punto asincrónica y liberar tensores apenas dejan de hacer falta; con eso entrenaron con secuencias de 8K tokens sin activation checkpointing, es decir, sin recalcular activaciones.
+Pasar a la siguiente: la otra forma de crecer, los expertos.""",
+    d.footer("Grattafiori et al., 2024, §3.3.2 · Narayanan et al., 2021, §2.2.2"), gap=56)
+
+# 12 ─ MoE
+def node(n, picks, t=D):
+    on = picks > 0
+    return (f'<div style="flex:1;display:flex;flex-direction:column;gap:8px;align-items:center;padding:20px 8px;border-radius:12px;'
+            f'background:{t["accbg"] if on else t["card"]};border:{"2px solid " + t["acc"] if on else "1px solid " + t["line"]}">'
+            f'<p style="font-family:{MONO};font-size:24px;color:{t["muted"]}">nodo {n}</p>'
+            f'<p style="font-family:{MONO};font-size:44px;font-weight:600;color:{t["acc"] if on else t["muted"]}">{picks}</p></div>')
+d.slide("moe", D, head("DeepSeek-V3 · mixture of experts", "671 mil millones de parámetros, 37 mil millones por token", D) +
+    col(label("Un token elige 8 de 256 expertos, repartidos en 8 nodos", D), row(*[node(i + 1, n) for i, n in enumerate([2, 0, 1, 3, 0, 1, 1, 0])], gap=12), gap=16) +
+    row(big("671 B", "parámetros en total", D, size=72), big("37 B", "activos por token: 8 expertos ruteados y 1 compartido por capa", D, size=72, color="warn"), gap=120) +
+    p("El cómputo de un modelo de 37B con la capacidad de uno de 671B. El precio: cada token viaja a las GPUs de sus expertos.", D, size=28),
+    """Tiempo: 0:32–0:36 (4 min).
+Idea clave: un modelo mixture-of-experts tiene muchos más parámetros de los que usa por token, y eso convierte el problema en uno de comunicación: los tokens tienen que viajar a donde están sus expertos.
+Decir: en cada capa de DeepSeek-V3, la parte MLP del transformer se reemplaza por 256 expertos chicos, más uno compartido que usan todos. Un router elige, para cada token, los 8 expertos con mejor puntaje. El modelo tiene 671 mil millones de parámetros, pero cada token sólo pasa por 37 mil millones: cuesta calcularlo como un modelo de 37B.
+Los expertos no entran en una GPU, así que se reparten: en el entrenamiento, entre 64 GPUs de 8 nodos. Recorrer el dibujo: este token eligió 2 expertos del nodo 1, 1 del nodo 3, 3 del nodo 4 y así: tiene que viajar a 5 nodos. Eso es un all-to-all: cada GPU le manda tokens a cada otra, en cada capa, en el forward y en el backward.
+Preguntar a la clase: comparado con tensores, que hace all-reduce, ¿qué tiene de distinto este patrón? (Es all-to-all: cada par de GPUs intercambia datos distintos, y la cantidad depende de a dónde rutea el modelo, no es fija.)
+Pasar a la siguiente: cómo se paga esa comunicación.""",
+    d.footer("DeepSeek-AI, 2024, §2.1 y §4.2"), gap=40, section="DeepSeek-V3: expertos, DualPipe, FP8 y lo que costó.")
+
+# 13 ─ EP
+d.slide("ep", D, head("Paralelismo de expertos · §3.2", "Los expertos están repartidos: el token tiene que viajar", D) +
+    row(col(card(label("En el nodo · NVLink", D) + p("160 GB/s", D, size=72, color="acc", mono=True, weight=600, lh=1), D, pad=32),
+            card(label("Entre nodos · InfiniBand", D) + p("50 GB/s", D, size=72, color="warn", mono=True, weight=600, lh=1), D, pad=32), gap=16, width=560),
+        col(p("<b>64 GPUs de expertos en 8 nodos:</b> cada una guarda 4 de los 256 expertos de cada capa.", D, size=28),
+            p("<b>A lo sumo 4 nodos por token.</b> El router elige primero los nodos y después los expertos adentro.", D, size=28),
+            p("<b>Una copia por nodo por la red,</b> y adentro del nodo se reparte por NVLink.", D, size=28),
+            p("<b>20 SMs de la GPU alcanzan para comunicar;</b> el resto calcula.", D, size=28), gap=24, flex=1), gap=64, align="center"),
+    """Tiempo: 0:36–0:39 (3 min).
+Idea clave: el cuello de botella del all-to-all es la red entre nodos, 3,2 veces más lenta que NVLink, y DeepSeek-V3 diseñó el ruteo para cruzarla lo menos posible.
+Decir: en el entrenamiento, DeepSeek-V3 usa paralelismo de expertos de 64 vías repartido en 8 nodos: 256 expertos por capa entre 64 GPUs, 4 por GPU. Adentro de un nodo las GPUs se hablan por NVLink a 160 GB/s; entre nodos, por InfiniBand a 50 GB/s.
+Tres decisiones del informe. Uno: node-limited routing. El router primero elige a qué nodos puede ir el token, a lo sumo 4, y después elige los 8 expertos entre los de esos nodos. Dos: el token se manda una sola vez por la red a cada nodo de destino, aunque vaya a varios expertos de ese nodo; adentro se reparte por NVLink. Tres: escribieron sus propios kernels de comunicación, y 20 SMs (los procesadores de la GPU) alcanzan para saturar InfiniBand y NVLink; el resto de la GPU sigue calculando.
+Algo que no está en la slide pero vale decir: DeepSeek-V3 no usa paralelismo de tensores en el entrenamiento. El informe dice que es caro; con expertos y pipeline les alcanza.
+Pasar a la siguiente: cuánto ahorra limitar los nodos.""",
+    d.footer("DeepSeek-AI, 2024, §2.1.2, §3.2.2 y §4.2"), gap=40)
+
+# 14 ─ demo moe (claro)
+d.slide("demomoe", L, head("Demo · moe", "Limitar los nodos ahorra un cuarto del tráfico entre nodos", L) +
+    table(["Ruteo", "Nodos por token", "Remotos, por la red", "Máximo"], [
+        ["Libre", "5,29", "4,62", "8"],
+        ["A lo sumo 4 nodos (DeepSeek-V3)", "3,95", "3,46", "4"],
+        ["A lo sumo 2 nodos", "2,00", "1,75", "2"],
+    ], L, widths=[40, 20, 24, 16], right=(1, 2, 3), size=32, bold_rows=(1,)) +
+    p("Limitar más ahorra más red, pero le saca opciones al router: el modelo elige expertos peores.", L),
+    """Tiempo: 0:39–0:41 (2 min, con demo).
+Idea clave: con 8 expertos al azar entre 8 nodos, un token toca más de 5 nodos; limitar a 4 baja el tráfico entre nodos un 25%.
+Demo: go run ./cmd/demo moe. Simula 20.000 tokens con afinidades al azar para los 256 expertos. Con ruteo libre, los 8 expertos caen en promedio en 5,29 nodos distintos; sin contar el nodo donde ya está el token, 4,62 envíos por InfiniBand. Con el límite de 4 nodos: 3,46 envíos, un 25% menos.
+La tensión: si se limita a 2 nodos se ahorra mucho más, pero el router ya no puede elegir los mejores expertos para el token, y el modelo pierde calidad. DeepSeek eligió 4.
+Si preguntan por el balanceo: si un experto es muy popular, su GPU recibe muchos más tokens que las demás y el all-to-all espera a la más cargada. DeepSeek-V3 lo resuelve con un sesgo por experto que se ajusta durante el entrenamiento; es el ejercicio 7 del repositorio.
+Pasar a la siguiente: si igual hay que comunicar, que no se note.""",
+    d.footer("go run ./cmd/demo moe", L, plain=True))
+
+# 15 ─ DualPipe
+d.slide("dualpipe", D, head("DualPipe · §3.2.1", "Esconder la comunicación detrás del cómputo", D) +
+    row(col(p("Con expertos entre nodos, comunicar cuesta tanto como calcular: <b>1 a 1</b>.", D, size=32, color="ink"),
+            p("DualPipe mete microbatches por las dos puntas del pipeline y superpone el forward de uno con el backward de otro. Mientras una parte calcula, el all-to-all de la otra viaja.", D, size=28),
+            p("Costo: dos copias de los parámetros en cada GPU.", D, size=28, color="warn"), gap=24, width=720),
+        col(table(["Schedule", "Burbuja"], [
+            ["1F1B", "(PP − 1)(F + B)"],
+            ["ZB1P", "(PP − 1)(F + B − 2W)"],
+            ["DualPipe", "(PP/2 − 1)(F&B + B − 3W)"],
+        ], D, widths=[34, 66], size=28, mono_cols=(1,), bold_rows=(2,)),
+            p("F forward, B backward de la entrada, W backward de los pesos, F&amp;B un forward y un backward superpuestos.", D, size=24), gap=16, flex=1), gap=64, align="center"),
+    """Tiempo: 0:41–0:45 (4 min).
+Idea clave: si la comunicación no se puede achicar más, se la superpone con el cómputo; DualPipe es un schedule de pipeline diseñado para eso.
+Decir: el informe dice que con paralelismo de expertos entre nodos la relación cómputo/comunicación queda en 1 a 1: por cada unidad de tiempo calculando, otra comunicando. Si se hacen una después de la otra, la mitad del tiempo la GPU espera.
+DualPipe hace dos cosas. Mete microbatches desde las dos puntas del pipeline a la vez (de ahí "dual"), y parte cada forward y cada backward en pedazos —atención, dispatch, MLP, combine— para superponer el cálculo de un microbatch con la comunicación de otro. El informe dice que el all-to-all y la comunicación del pipeline quedan completamente escondidos.
+La tabla es la 2 del informe. Recordar que en la Clase 16 la burbuja de 1F1B era proporcional a PP−1; zero-bubble (ZB1P) separa el backward en dos partes, la de la entrada (B) y la de los pesos (W), y usa W para llenar huecos. DualPipe además divide PP por 2 al alimentar desde las dos puntas.
+El precio: cada GPU tiene dos copias de sus parámetros, una por dirección. El informe dice que con un grado de expertos tan grande no pesa mucho.
+Pasar a la siguiente: la otra forma de mover menos bytes, FP8.""",
+    d.footer("DeepSeek-AI, 2024, §3.2.1 y tabla 2"), gap=40)
+
+# 16 ─ FP8
+d.slide("fp8", D, head("FP8 · §3.3", "La mitad de los bits en las multiplicaciones grandes", D) +
+    row(card(label("En FP8", D, color="acc") + p("Las tres multiplicaciones de cada capa lineal: el forward, el gradiente de la entrada y el gradiente de los pesos.", D, size=28), D, accent=True),
+        card(label("En BF16 o FP32", D) + p("Embeddings, cabeza de salida, router de expertos, normalización y atención.", D, size=28), D), gap=32) +
+    row(col(p("1×128 · 128×128", D, size=44, color="ink", mono=True, weight=600), p("un factor de escala por cada pedazo: 1×128 en activaciones, 128×128 en pesos", D, size=24), flex=1),
+        col(p("&lt; 0,25%", D, size=44, color="acc", mono=True, weight=600), p("error relativo de la loss contra entrenar todo en BF16", D, size=24), flex=1), gap=64),
+    """Tiempo: 0:45–0:49 (4 min).
+Idea clave: bajar la precisión es una decisión de sistemas: la mitad de bytes por número es la mitad de memoria y de comunicación, y en las H800 las multiplicaciones en FP8 tienen el doble de throughput que en BF16.
+Decir: DeepSeek-V3 fue de los primeros entrenamientos grandes publicados con FP8. No todo va en FP8: sólo las multiplicaciones de matrices de las capas lineales, que son la mayor parte del cómputo, en sus tres versiones (el forward, el gradiente respecto de la entrada y el gradiente respecto de los pesos). Lo sensible queda en más precisión: embeddings, la capa de salida, el router de los expertos, las normalizaciones y la atención.
+El problema de FP8 es el rango: con 8 bits, un solo valor muy grande arruina la escala de todo el tensor. La solución del informe es escalar por pedazos chicos: un factor por cada 1×128 valores de activaciones y por cada bloque de 128×128 de pesos. Así un valor extremo sólo afecta a su pedazo.
+El resultado que reportan: la loss queda a menos de 0,25% de la de entrenar en BF16.
+Conectar con la materia: el dispatch del all-to-all también va en FP8, así que también se mandan la mitad de bytes por la red.
+Pasar a la siguiente: cuánto costó todo.""",
+    d.footer("DeepSeek-AI, 2024, §3.3"), gap=48)
+
+# 17 ─ costo (claro)
+d.slide("costo", L, col(eyebrow("Lo que costó · tabla 1", L), h2("Un modelo de frontera por 5,6 millones de dólares de cómputo", L), gap=16) +
+    row(big("2,788 M", "horas de GPU H800", L), big("14,8 T", "tokens de entrenamiento", L), big("3,7 días", "por cada billón de tokens, con 2.048 GPUs", L, color="blue"), gap=80) +
+    p("A 2 USD la hora de GPU. Sólo la corrida final: no incluye la investigación ni los experimentos previos. Sin paralelismo de tensores y sin un solo rollback.", L, size=28),
+    """Tiempo: 0:49–0:52 (3 min).
+Idea clave: con estas técnicas, DeepSeek entrenó un modelo de 671B en 2.048 GPUs, un orden de magnitud menos que Llama 3, y publicó exactamente cuánto costó.
+Decir: 2,788 millones de horas de H800 en total; a 2 dólares la hora, 5,576 millones de dólares. Fueron 14,8 billones de tokens, y cada billón tardó 180.000 horas de GPU: 3,7 días en su clúster de 2.048 GPUs.
+Dos aclaraciones del propio informe, que hay que decir siempre que se cita este número: es sólo la corrida final, no la investigación ni los experimentos anteriores, y 2 dólares la hora es un precio de alquiler supuesto, no lo que les costó el clúster.
+Y dos datos de sistemas: no usaron paralelismo de tensores, y el informe dice que no tuvieron ningún pico de loss irrecuperable ni tuvieron que volver atrás a un checkpoint en todo el entrenamiento.
+Preguntar a la clase: comparar con la cuenta de Llama 3 de hace un rato. ¿Qué hizo posible usar menos GPUs? (Un modelo que por token cuesta como uno de 37B, FP8 y comunicación escondida.)
+Pasar a la siguiente: la tercera parte, las fallas.""",
+    d.footer("DeepSeek-AI, 2024, §1 y tabla 1", L), gap=64)
+
+# 18 ─ fallas
+d.slide("fallas", D, head("54 días de Llama 3 · §3.3.4", "466 interrupciones: 419 sin aviso", D) +
+    row(col(big("78%", "de las inesperadas, por hardware", D, color="warn"), big("58,7%", "por problemas de GPU", D, color="warn"), gap=40, width=520),
+        col(p("Las causas más comunes:", D, size=28, color="ink"),
+            p("GPU defectuosa · memoria HBM3 · bugs de software · switches y cables de red · mantenimiento de los servidores", D, size=28),
+            card(p("Y aun así, <b>más del 90% del tiempo se entrenó de verdad.</b>", D, size=32, color="ink"), D, accent=True, pad=32), gap=24, flex=1), gap=64, align="center"),
+    """Tiempo: 0:52–0:55 (3 min).
+Idea clave: a esta escala las fallas no son excepcionales: son el régimen normal de operación.
+Decir: el paper de Llama 3 publica una foto de 54 días del pre-entrenamiento: 466 interrupciones. 47 planeadas, como actualizaciones de firmware o cambios de configuración, y 419 inesperadas. Casi el 78% de las inesperadas fue de hardware, confirmado o sospechado, y el 58,7% fueron problemas de GPU: GPUs defectuosas, errores de su memoria HBM3. Después vienen bugs de software, switches y cables de red y mantenimiento de los servidores.
+El dato que importa: aun con al menos una interrupción por día, más del 90% del tiempo se dedicó a entrenar. Y el paper dice que sólo tres veces hizo falta intervención manual importante; el resto se resolvió con automatización.
+Conectar con la Clase 16: ahí vimos que una falla hace volver a todos al último checkpoint, porque el entrenamiento es sincrónico. Acá eso pasa ocho veces por día.
+Pasar a la siguiente: por qué tantas.""",
+    d.footer("Grattafiori et al., 2024, §3.3.4 y tabla 5"), section="Fallas a escala: la cuenta, los checkpoints y la operación.")
+
+# 19 ─ MTBF
+d.slide("mtbf", D, head("La cuenta", "Con N GPUs, se falla N veces más seguido", D) +
+    row(col(p("MTBF del clúster =<br>MTBF de una GPU ÷ N", D, size=44, color="acc", weight=600, lh=1.2),
+            p("Con los números de Llama 3, cada GPU falla una vez cada ~50.000 horas: casi seis años. Muy confiable, de a una.", D, size=28), gap=24, width=640),
+        col(table(["GPUs", "Una falla cada", "Por día"], [
+            ["1.024", "49,5 h", "0,5"], ["4.096", "12,4 h", "1,9"], ["16.384", "3,1 h", "7,8"],
+            ["65.536", "46 min", "31"], ["131.072", "23 min", "62"],
+        ], D, widths=[34, 40, 26], right=(0, 1, 2), size=28, hi_rows=(2,)), flex=1), gap=64, align="center"),
+    """Tiempo: 0:55–0:58 (3 min).
+Idea clave: el tiempo medio entre fallas del clúster es el de una GPU dividido por la cantidad de GPUs, y con el entrenamiento sincrónico cualquier falla es una falla de todo.
+Decir: de los números de Llama 3 sale la tasa de una GPU: 54 días por 24 horas por 16.384 GPUs, dividido 419 fallas, da unas 50.000 horas por GPU. Una GPU sola falla una vez cada seis años: es hardware muy confiable.
+Pero con fallas independientes, las tasas se suman: con N GPUs, el clúster falla N veces más seguido. Con 16.384, cada 3,1 horas. Si la escala se multiplica por 8, a 131.072 GPUs —la escala de los clústeres que se están armando ahora—, una falla cada 23 minutos.
+Conectar con sistemas distribuidos clásicos: es el mismo razonamiento por el que GFS y MapReduce suponían que las fallas son lo normal (Clases 2 y 4). La diferencia es que acá no se puede reintentar una tarea sola: el estado está acoplado.
+Preguntar a la clase: si un checkpoint tarda 30 minutos en restaurarse, ¿se puede entrenar con 131.072 GPUs? (No: fallaría antes de terminar de recuperarse.)
+Pasar a la siguiente: cada cuánto conviene guardar.""",
+    d.footer("54 × 24 × 16.384 / 419 ≈ 50.700 h · go run ./cmd/demo fallas"))
+
+# 20 ─ Young/Daly
+d.slide("youngdaly", D, head("Cada cuánto guardar", "Muy seguido se pierde guardando; muy espaciado, rehaciendo", D) +
+    row(col(p("τ* ≈ √(2·C·M)", D, size=72, color="acc", mono=True, weight=600, lh=1.1),
+            p("C: lo que frena un checkpoint · M: tiempo medio entre fallas del clúster · Young (1974), Daly (2006)", D, size=24), gap=16, width=600),
+        col(table(["Checkpoint cada", "Tiempo útil"], [
+            ["3 min", "84,9%"], ["14 min (óptimo)", "91,4%"], ["60 min", "82,6%"], ["240 min", "48,0%"], ["asincrónico, 4 min", "96,1%"],
+        ], D, widths=[62, 38], right=(1,), size=28, bold_rows=(1,), hi_rows=(4,)), flex=1), gap=64, align="center") +
+    p("16.384 GPUs, 54 días de cómputo; guardar frena 30 s, reiniciar tarda 3 min (ilustrativo, para que dé el 90% de Llama 3).", D, size=24, color="muted"),
+    """Tiempo: 0:58–1:02 (4 min).
+Idea clave: hay un intervalo de checkpoint óptimo que balancea el tiempo perdido guardando contra el tiempo perdido rehaciendo, y sale de una fórmula de 1974.
+Decir: si se guarda cada τ y cada checkpoint frena C, se pierde una fracción C/τ guardando. Si el clúster falla cada M en promedio, cada falla tira en promedio medio intervalo de trabajo: τ/2 cada M, una fracción τ/(2M). Minimizar la suma da τ* = √(2·C·M): la fórmula de Young (1974), refinada por Daly (2006).
+Con M = 3,1 horas y C = 30 segundos, τ* da unos 14 minutos. La tabla es de la demo: 54 días de cómputo con fallas al azar. Guardando cada 3 minutos se pierde 15% guardando; cada 4 horas, más de la mitad del tiempo se va en rehacer trabajo. En el óptimo, 91%: lo que reporta el paper.
+Los costos son ilustrativos: el paper no dice cuánto tarda un checkpoint, así que se eligieron para que el resultado coincida con el más de 90% de Llama 3.
+La última fila: un checkpoint asincrónico copia el estado y lo escribe mientras el entrenamiento sigue, así que C baja a unos segundos; el óptimo baja a 4 minutos y el tiempo útil sube a 96%. TorchTitan reporta que el checkpoint asincrónico baja el overhead entre 5 y 15 veces.
+Pasar a la siguiente: qué pasa al escalar más.""",
+    d.footer("go run ./cmd/demo fallas · Liang et al., ICLR 2025"), gap=40)
+
+# 21 ─ demo fallas (claro)
+d.slide("demofallas", L, head("Demo · fallas", "Con 131.072 GPUs, una falla cada 23 minutos", L) +
+    table(["GPUs", "Óptimo", "Tiempo útil", "Asincrónico"], [
+        ["16.384", "14 min", "91,4%", "96,1%"],
+        ["65.536", "7 min", "80,8%", "89,6%"],
+        ["131.072", "5 min", "71,4%", "82,9%"],
+    ], L, widths=[25, 25, 25, 25], right=(0, 1, 2, 3), size=32) +
+    p("A esa escala, el reinicio de 3 minutos se come el 13% del tiempo. Hace falta recuperarse más rápido: nodos de repuesto ya cargados, checkpoints en la memoria de otros nodos.", L),
+    """Tiempo: 1:02–1:05 (3 min, con demo).
+Idea clave: al escalar, el tiempo útil cae aun guardando en el intervalo óptimo, y lo que domina pasa a ser el tiempo de reinicio.
+Demo: go run ./cmd/demo fallas -gpus 131072. Y en el simulador Entrenamiento a escala, sección "Fallas y checkpoints": mover el control de GPUs a 131.072, apretar "Ir al óptimo" y después activar el checkpoint asincrónico. La línea de tiempo muestra un día: los segmentos naranjas son trabajo que se tiró, los grises reinicios.
+Leer la tabla: con 8 veces más GPUs, el tiempo útil baja de 91% a 71% con checkpoints normales y de 96% a 83% con asincrónicos. Con una falla cada 23 minutos y 3 minutos de reinicio, el 13% del tiempo se va en reiniciar, sin importar cada cuánto se guarde.
+Cómo se ataca: nodos de repuesto ya inicializados, para no esperar a reprogramar el job; checkpoints en la memoria de otros nodos en lugar de en el almacenamiento distribuido; detectar la falla en segundos en lugar de minutos. Son los ejercicios 5 y 6 del repositorio.
+Pasar a la siguiente: lo que no es una falla pero igual frena.""",
+    d.footer("go run ./cmd/demo fallas -gpus 131072 · simulador Entrenamiento a escala", L, plain=True))
+
+# 22 ─ operar
+def tile(title, text, t=D):
+    return card(h3(title, t, size=32) + p(text, t, size=28), t, pad=32)
+d.slide("operar", D, head("Operar a esta escala · §3.3.4", "Encontrar a la GPU lenta entre dieciséis mil", D) +
+    row(tile("Registro de colectivas", "NCCLX y el flight recorder de PyTorch guardan cada colectiva: cuando algo se cuelga, se sabe quién no llegó."),
+        tile("Stragglers", "Una GPU lenta frena a todas en cada paso. Se buscan las que más tardan y se revisan primero."), gap=32) +
+    row(tile("El clima", "Entre 1% y 2% menos throughput al mediodía: el calor baja la frecuencia de las GPUs."),
+        tile("La red eléctrica", "Miles de GPUs calculan y comunican a la vez: el consumo sube y baja decenas de megawatts en cada paso."), gap=32),
+    """Tiempo: 1:05–1:08 (3 min).
+Idea clave: además de las fallas, a esta escala aparecen problemas que no rompen nada pero frenan todo, y hay que poder encontrarlos.
+Decir: cuatro problemas que describe el paper de Llama 3.
+Uno: cuando el entrenamiento se cuelga, ¿quién tiene la culpa? Meta usa NCCLX, una versión propia de la librería de colectivas de NVIDIA con mejor detección de fallas, y el flight recorder de PyTorch, que guarda el estado de cada colectiva en curso. Así se ve qué rank no llegó a qué all-reduce.
+Dos: los stragglers. Igual que en la Clase 16, un worker lento frena a todos; acá hay 16.384 candidatos. Herramientas que priorizan las comunicaciones sospechosas: revisar los pocos más lentos alcanzaba para encontrarlo.
+Tres: el clima. El paper observa entre 1% y 2% de variación de throughput a lo largo del día, por la temperatura: al mediodía las GPUs bajan su frecuencia.
+Cuatro: la potencia. Todas las GPUs calculan a la vez y después comunican a la vez: el consumo del datacenter oscila decenas de megawatts con cada paso, y eso es un problema para la red eléctrica. Hay un paper de 2025 entero sobre cómo estabilizarlo (arXiv 2508.14318).
+Pasar a la siguiente: cuando el datacenter no alcanza.""",
+    d.footer("Grattafiori et al., 2024, §3.3.4"), gap=32)
+
+# 23 ─ multi-datacenter
+d.slide("multidc", D, head("Más allá de un datacenter", "Cuando el entrenamiento no entra en un edificio", D) +
+    row(card(label("Google", D) + p("Gemini Ultra se entrenó con TPUs en varios datacenters.", D, size=28), D),
+        card(label("OpenAI", D) + p("GPT-4.5 se entrenó en varios clústeres.", D, size=28), D), gap=32) +
+    p("El límite ya no es cuántas GPUs se pueden comprar, sino cuánta energía y cuánto espacio hay en un lugar. Entre datacenters hay mucho menos ancho de banda y mucha más latencia que adentro: un all-reduce en cada paso no se banca.", D),
+    """Tiempo: 1:08–1:11 (3 min).
+Idea clave: los entrenamientos más grandes ya cruzan datacenters, y eso rompe el supuesto de que sincronizar en cada paso es barato.
+Decir: un clúster de 100.000 GPUs consume del orden de cien megawatts o más; conseguir esa energía en un solo lugar es cada vez más difícil. Por eso los laboratorios empezaron a entrenar en varios sitios.
+Lo que está publicado: el informe técnico de Gemini (2023) dice que Gemini Ultra se entrenó con TPUs en varios datacenters, y Google explicó que lo hacía con paralelismo de datos sincrónico entre superpods. OpenAI dijo que GPT-4.5 se entrenó en varios clústeres. Los detalles no están publicados.
+El problema de sistemas: entre datacenters el ancho de banda es decenas o cientos de veces menor y la latencia de milisegundos. Mandar los gradientes de un modelo enorme en cada paso por ese enlace frena todo. La pregunta es si se puede sincronizar menos.
+Pasar a la siguiente: sí, se puede.""",
+    d.footer("Gemini Team, 2023 · OpenAI, 2025"), section="Más allá de un datacenter, los laboratorios y el cierre.")
+
+# 24 ─ DiLoCo
+def lane(t=D):
+    seg = lambda w, c: f'<div style="width:{w}px;height:36px;border-radius:6px;background:{c}"></div>'
+    bar = lambda: (f'<div style="display:flex;gap:6px;align-items:center">' + seg(200, t["acc"]) + seg(10, t["warn"]) +
+                   seg(200, t["acc"]) + seg(10, t["warn"]) + seg(200, t["acc"]) + seg(10, t["warn"]) + '</div>')
+    return col(*[bar() for _ in range(3)], gap=10)
+d.slide("diloco", D, head("DiLoCo · Google DeepMind", "Sincronizar cada cientos de pasos, no en cada uno", D) +
+    row(col(lane(), p("cada réplica da H pasos sola (verde); después se promedian los cambios (naranja)", D, size=24), gap=16, width=700),
+        col(card(label("DiLoCo · 2023", D) + p("8 réplicas, 500 veces menos comunicación, el mismo resultado que sincrónico.", D, size=28), D, pad=32),
+            card(label("Decoupled DiLoCo · 2026", D, color="acc") + p("8 datacenters simulados: de 198 a 0,84 Gb/s. Con fallas, 88% de tiempo útil contra 27%.", D, size=28), D, accent=True, pad=32), gap=16, flex=1), gap=56, align="center"),
+    """Tiempo: 1:11–1:15 (4 min).
+Idea clave: si cada réplica avanza muchos pasos sola y recién después se sincroniza, la comunicación baja en proporción, y para LLMs eso funciona.
+Decir: DiLoCo (Douillard et al., 2023) es la idea de local SGD aplicada a LLMs. Cada réplica da H pasos con su optimizador de siempre (AdamW), sin hablar con nadie. Después se calcula cuánto se movió cada réplica desde los pesos compartidos, se promedian esos cambios y se aplican con un optimizador externo con momento de Nesterov. Con 8 réplicas, reportan el mismo rendimiento que el entrenamiento sincrónico comunicando 500 veces menos.
+Decoupled DiLoCo, publicado por DeepMind en abril de 2026, lo lleva más lejos: las réplicas son islas que se sincronizan de forma asincrónica, sobre Pathways. En una simulación con 8 datacenters, el ancho de banda necesario bajó de 198 Gb/s con paralelismo de datos a 0,84 Gb/s. Y como una falla sólo afecta a su isla, con muchas fallas inyectadas el tiempo útil fue 88% contra 27%. Entrenaron modelos Gemma 4 así, con resultados casi iguales (64,1% contra 64,4% en sus benchmarks).
+Conectar con la tercera parte: la resistencia a fallas es tan importante como el ancho de banda.
+Pasar a la siguiente: la demo.""",
+    d.footer("Douillard et al., 2023 · Google DeepMind, abril de 2026"), gap=48)
+
+# 25 ─ demo diloco (claro)
+d.slide("demodiloco", L, head("Demo · diloco", "200 veces menos rondas, la misma loss (en el mejor caso)", L) +
+    table(["Sincronizar cada", "Rondas", "Floats enviados", "Loss"], [
+        ["1 paso (datos común)", "400", "25.600", "1,00·10⁻⁴"],
+        ["10 pasos", "40", "2.560", "1,00·10⁻⁴"],
+        ["50 pasos", "8", "512", "1,00·10⁻⁴"],
+        ["200 pasos", "2", "128", "1,00·10⁻⁴"],
+    ], L, widths=[40, 18, 24, 18], right=(1, 2, 3), size=32) +
+    p("Ojo: es una regresión lineal, convexa, con datos parecidos en todas las réplicas. Con un LLM no sale gratis: por eso DiLoCo necesita el optimizador externo con momento.", L, size=28),
+    """Tiempo: 1:15–1:17 (2 min, con demo).
+Idea clave: sincronizar cada H pasos manda H veces menos datos; en un problema fácil no se pierde nada, y en uno difícil hace falta más cuidado.
+Demo: go run ./cmd/demo diloco. Ocho réplicas de la regresión lineal de la Clase 16, cada una con su pedazo del dataset, 400 pasos locales cada una. Sincronizando en cada paso es paralelismo de datos común: 400 rondas. Cada 200 pasos: 2 rondas, 200 veces menos comunicación, y la misma loss.
+La advertencia honesta: este es el mejor caso posible. La regresión lineal es convexa y todas las réplicas tienen datos de la misma distribución, así que todas van hacia el mismo óptimo. En un LLM las réplicas se separan; por eso DiLoCo usa un optimizador externo y por eso su resultado es noticia.
+Pasar a la siguiente: qué hacen los laboratorios, según lo que publicaron.""",
+    d.footer("go run ./cmd/demo diloco", L, plain=True))
+
+# 26 ─ labs
+d.slide("labs", D, head("¿Y los laboratorios?", "Lo que está publicado, y lo que no", D) +
+    table(["Laboratorio", "Qué publicó", "Qué se sabe"], [
+        ["Meta", "el paper de Llama 3", "16K H100, paralelismo 4D, RoCE, fallas"],
+        ["DeepSeek", "el informe de V3", "MoE, FP8, DualPipe, 2.048 H800, costo"],
+        ["Google", "Gemini, DiLoCo", "TPUs, varios datacenters, sincronizar menos"],
+        ["OpenAI", "casi nada", "GPT-4.5 en varios clústeres"],
+        ["Anthropic", "acuerdos de cómputo", "Trainium2 (Project Rainier) y TPUs de Google"],
+    ], D, widths=[20, 30, 50], size=28),
+    """Tiempo: 1:17–1:21 (4 min).
+Idea clave: lo que sabemos con detalle viene de los laboratorios que publicaron; de los demás sólo hay pistas, y hay que decirlo así.
+Decir: recorrer la tabla. Meta y DeepSeek publicaron sus sistemas con un detalle enorme, y por eso son el material de esta clase. Google publicó la arquitectura de Gemini a alto nivel y la línea de trabajo de DiLoCo. OpenAI publica muy poco de su infraestructura de entrenamiento; dijo que GPT-4.5 se entrenó en varios clústeres. Anthropic tampoco publicó cómo entrena; lo público son sus acuerdos de cómputo: Project Rainier de AWS, con cerca de medio millón de chips Trainium2, y un acuerdo con Google por hasta un millón de TPUs, anunciado en octubre de 2025.
+Remarcar: que no esté publicado no quiere decir que hagan algo distinto. Las restricciones físicas son las mismas para todos: la red jerárquica, la tasa de fallas del hardware, la energía. Es razonable esperar que las soluciones se parezcan, pero no lo sabemos.
+Preguntar a la clase: ¿qué cambia en todo lo que vimos si el hardware no es una GPU de NVIDIA sino una TPU o un Trainium? (Cambian los enlaces y sus velocidades, y con eso el orden de las dimensiones; las tres preguntas siguen siendo las mismas.)
+Pasar a la siguiente: lo que hay que llevarse.""",
+    d.footer("fuentes en las notas"), gap=40)
+
+# 27 ─ takeaways
+d.slide("takeaways", D, head("Para llevarse", "Las mismas tres preguntas, a otra escala", D) +
+    row(card(label("Qué se parte", D, color="acc") + p("En cuatro o cinco dimensiones a la vez, y el orden sale de la red: lo que más habla, adentro.", D, size=28), D),
+        card(label("Qué se comunica", D, color="acc") + p("Se esconde detrás del cómputo (DualPipe), se achica (FP8, ruteo limitado) o se hace menos seguido (DiLoCo).", D, size=28), D),
+        card(label("Qué pasa si falla", D, color="acc") + p("Siempre algo. Se mide en tiempo útil, se elige cada cuánto guardar y se diseña la recuperación.", D, size=28), D), gap=32),
+    """Tiempo: 1:21–1:24 (3 min).
+Idea clave: cerrar volviendo a las tres preguntas de la Clase 16; todo lo de hoy es responderlas a una escala donde cada respuesta tiene más matices.
+Decir: qué se parte: ya no una o dos dimensiones sino cuatro en Llama 3 y otra más con expertos en DeepSeek, y la asignación a la red no es un detalle: decide qué comunicación va por NVLink y cuál por la capa sobresuscripta.
+Qué se comunica: cuando ya no se puede comunicar menos, se superpone con el cómputo (DualPipe), se mandan menos bytes por número (FP8) o a menos destinos (ruteo limitado por nodos), o directamente se sincroniza cada cientos de pasos (DiLoCo).
+Qué pasa cuando falla: con decenas de miles de GPUs falla algo cada pocas horas o minutos. La métrica es el tiempo útil; las palancas son el intervalo de checkpoint, el checkpoint asincrónico y el tiempo de recuperación.
+Pasar a la siguiente: el repositorio.""",
+    d.footer())
+
+# 28 ─ demo
+cmds = [("go run ./cmd/demo 4d", "dónde cae cada dimensión"), ("go run ./cmd/demo moe", "nodos por token con expertos"),
+        ("go run ./cmd/demo fallas", "fallas, checkpoints, tiempo útil"), ("go run ./cmd/demo diloco", "sincronizar cada H pasos")]
+lines = "".join(f'<div style="display:flex;gap:48px">{p(c, D, size=32, color="ink", mono=True, width=700)}{p(w, D, size=32, color="muted")}</div>' for c, w in cmds)
+d.slide("demo", D, head("El repositorio", "entrenamiento-distribuido, cuatro demos nuevas", D) +
+    f'<div style="display:flex;flex-direction:column;gap:20px;background:#0A0C0F;border:1px solid {D["line"]};border-radius:16px;padding:48px">{lines}</div>' +
+    p("Las mismas de la Clase 16 siguen ahí: allreduce, train y pipeline. Y el simulador Entrenamiento a escala, para las fallas y el 4D.", D, size=28),
+    """Tiempo: 1:24–1:27 (3 min).
+Idea clave: todo lo cuantitativo de la clase sale de cuatro demos chicas del repositorio, que se pueden modificar.
+Decir: recorrer los cuatro comandos. 4d calcula dónde cae cada grupo con la red de Llama 3; moe simula el ruteo de tokens a expertos; fallas simula 54 días de entrenamiento con la tasa de fallas de Llama 3; diloco entrena la regresión lineal sincronizando cada H pasos.
+Los ejercicios nuevos del README: repuestos en caliente y checkpoints en memoria para el simulador de fallas, y el balanceo de expertos con el sesgo de DeepSeek-V3 para el de MoE. Siguen los de la Clase 16, como el schedule intercalado, que es el que usa Llama 3.
+Todos los tests corren con go test ./..., y verifican lo que dijimos: el orden de Llama 3 deja tensores en el servidor, limitar nodos baja el tráfico, el intervalo de Young/Daly le gana a los demás, y sincronizar cada 10 pasos converge igual.
+Pasar a la siguiente: preguntas.""",
+    d.footer("go test ./..."))
+
+# 29 ─ preguntas
+qs = ["¿Por qué el orden es [TP, CP, PP, DP] y no al revés?",
+      "Con secuencias de 128K, ¿qué dimensión crece y cuál baja? ¿Por qué el producto no cambia?",
+      "¿Por qué con expertos la comunicación es all-to-all y no all-reduce? ¿Qué ahorra limitar los nodos?",
+      "Con 65.536 GPUs y checkpoints de 30 s, ¿cada cuánto conviene guardar?",
+      "¿Por qué DiLoCo aguanta mejor las fallas que el paralelismo de datos?"]
+d.slide("preguntas", D, head("Para repasar", "Preguntas y lecturas", D) +
+    row(f'<ol style="flex:1.4;font-size:28px;line-height:1.4;color:{D["ink"]}">' + "".join(f"<li>{q}</li>" for q in qs) + "</ol>",
+        card(h3("Lecturas", D) + p("<b>Grattafiori et al.</b>, The Llama 3 Herd of Models, 2024, §3.3.", D, size=24, color="ink") +
+             p("<b>DeepSeek-AI</b>, DeepSeek-V3 Technical Report, 2024, §3.", D, size=24, color="ink") +
+             p("Douillard et al., DiLoCo, 2023. Liang et al., TorchTitan, ICLR 2025.", D, size=24), D, flex=1, pad=40, gap=20), gap=64),
+    """Tiempo: 1:27–1:30 (3 min).
+Idea clave: cerrar con las preguntas de repaso. Las respuestas cortas, para tener a mano:
+1. Tensores se comunica en cada capa y microbatch, en el camino crítico: tiene que ir por NVLink, adentro del servidor. Datos sincroniza una vez por paso y tolera la red sobresuscripta entre pods.
+2. Crece contexto (de 1 a 16) y baja datos (de 128 a 8): con secuencias 16 veces más largas entran 16 veces menos secuencias en los 16M tokens del paso, y la cantidad de GPUs es la misma.
+3. Cada token va a expertos distintos en GPUs distintas: cada par de GPUs intercambia datos distintos. Limitar a 4 nodos baja los envíos por la red de 4,6 a 3,5 por token, un 25%.
+4. M = 50.700/65.536 ≈ 0,77 h; τ* = √(2 · 30 s · 0,77 h) ≈ 7 minutos.
+5. Porque una falla sólo detiene a su isla, que se reincorpora cuando vuelve; con paralelismo de datos sincrónico una falla detiene a todos.
+Lecturas: la sección 3.3 del paper de Llama 3 y la sección 3 del informe de DeepSeek-V3. Complementarias: DiLoCo y TorchTitan.
+Próxima clase (18): pasamos de entrenar a servir. Cómo se sirve un modelo, con el paper de vLLM.""",
+    d.footer())
+
+d.write_index("Clase 17 — Entrenamiento a escala de frontera")
+print(len(d.order), "slides")

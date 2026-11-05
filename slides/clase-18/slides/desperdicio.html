@@ -1,0 +1,25 @@
+<section id="desperdicio" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El problema de la memoria</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Reservar el máximo contiguo desperdicia de tres formas</h2>
+</div>
+<div style="display:flex;height:72px;gap:0">
+<div style="width:320px;background:#34D399;border-radius:10px 0 0 10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#0E1114">tokens</p></div>
+<div style="width:200px;background:#1F7A5C;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#F2F3EF">1 · reserva</p></div>
+<div style="width:520px;background:#173B2F;border-radius:0 10px 10px 0;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#F2F3EF">2 · fragmentación interna</p></div>
+<div style="width:180px;border:3px dashed #F5A524;border-radius:10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#F5A524">3 · externa</p></div>
+<div style="width:440px;background:#F5A524;border-radius:10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#0E1114">otro pedido</p></div>
+</div>
+<div style="display:flex;gap:40px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">1 · Reserva</h3><p style="font-size:24px;line-height:1.4;color:#A8B3BC">Lugar para tokens que todavía no se generaron. Se va a usar, pero mientras tanto nadie más puede.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">2 · Fragmentación interna</h3><p style="font-size:24px;line-height:1.4;color:#A8B3BC">Lugar que nunca se va a usar, porque la respuesta terminó antes del máximo. Se sabe recién al final.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:32px;font-weight:600;color:#F5A524;letter-spacing:-0.5px">3 · Fragmentación externa</h3><p style="font-size:24px;line-height:1.4;color:#A8B3BC">Huecos entre tramos: suman mucho, pero por separado no le sirven a un pedido nuevo.</p></div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §3.1</p>
+<aside>Tiempo: 0:37–0:41 (4 min).
+Idea clave: guardar el KV cache de cada pedido en un tramo contiguo del tamaño máximo produce tres desperdicios.
+Decir: los sistemas previos guardaban el KV cache de cada pedido en un tramo contiguo, porque los kernels de atención esperaban los datos uno al lado del otro. Cuando llega un pedido nadie sabe cuánto va a generar, así que la única opción segura es reservar el máximo, por ejemplo 2.048 tokens.
+Recorrer la barra de izquierda a derecha. Azul fuerte: los tokens que ya tiene. Azul medio: reserva, lugar que la respuesta va a usar pero todavía no. Azul pálido: fragmentación interna, lugar que nunca se va a usar porque la respuesta va a terminar antes del máximo; se descubre recién al final. El hueco punteado: fragmentación externa, memoria libre entre dos tramos que es demasiado chica para un pedido nuevo.
+Preguntar a la clase: ¿dónde vieron estos tres nombres antes? en Sistemas Operativos, en la asignación de memoria contigua antes de la paginación: first-fit, huecos que no sirven, memoria que sobra en total pero no en un solo lugar.
+Pasar a la siguiente: cuánto suman.</aside>
+</section>

@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Clúster de inferencia</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<style>
+/* Clase 19 · un clúster de cuatro réplicas en vivo: router a la izquierda, réplicas al centro, instrumentos a la derecha, comparación abajo. */
+:root {
+  --bg: #0E1114; --panel: #161B20; --panel2: #1A2027; --ink: #F2F3EF; --muted: #A8B3BC; --faint: #7D8892;
+  --line: #2A3138; --cell: #232A31; --accent: #34D399; --accent-ink: #0E1114; --accent-soft: #132A22;
+  --warn: #F5A524; --bad: #FF7A6B;
+  --c0: #34D399; --c1: #F5A524; --c2: #7AA2FF; --c3: #F472B6; --c4: #A78BFA; --c5: #FACC15; --c6: #22D3EE; --c7: #FB923C;
+  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
+    --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
+    --warn: #A35F00; --bad: #C2362B;
+    --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
+  --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
+  --warn: #A35F00; --bad: #C2362B;
+  --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 8px; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
+.lead { margin: 0; color: var(--muted); max-width: 72ch; }
+h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.small { font-size: 13px; color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > span { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 11px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg button:disabled { color: var(--faint); cursor: not-allowed; }
+.seg button[aria-pressed="true"]:disabled { color: var(--accent-ink); opacity: .55; }
+.toggles { display: flex; flex-wrap: wrap; gap: 8px; }
+.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 13px; cursor: pointer; background: transparent; color: var(--ink); font-family: var(--sans); }
+.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); }
+.tog[aria-pressed="true"] i { background: var(--accent); border-color: var(--accent); }
+input[type=range] { width: 140px; accent-color: var(--accent); }
+.val { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+
+.stage { display: flex; flex-direction: column; gap: 14px; }
+.group { display: flex; flex-direction: column; gap: 8px; }
+.group-h { display: flex; justify-content: space-between; gap: 8px; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.reps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 520px) { .reps { grid-template-columns: minmax(0, 1fr); } }
+.rep { border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--panel2); min-width: 0; }
+.rep-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.rep-h b { font-size: 14px; font-weight: 600; }
+.badge { font: 500 11px/1 var(--mono); padding: 4px 6px; border-radius: 5px; border: 1px solid var(--line); color: var(--muted); }
+.badge.p { color: var(--warn); border-color: var(--warn); }
+.badge.d { color: var(--accent); border-color: var(--accent); }
+.meter { height: 8px; border-radius: 4px; background: var(--cell); overflow: hidden; }
+.meter > div { height: 100%; background: var(--accent); width: 0; transition: width .15s linear; }
+.meter.q > div { background: var(--warn); }
+.kv { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+.kv span:last-child { font-family: var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; min-height: 18px; }
+.chip { width: 14px; height: 14px; border-radius: 50%; }
+.chip.app { border-radius: 3px; width: 18px; font: 600 9px/14px var(--mono); text-align: center; color: var(--bg); }
+.dots { display: flex; gap: 3px; min-height: 10px; }
+.dots i { width: 8px; height: 8px; border-radius: 2px; }
+.lbl { font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.wire { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
+.wire::before, .wire::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+.gauges { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.gauge span { font-size: 12px; color: var(--muted); }
+.gauge b.warn { color: var(--warn); }
+.gauge b.bad { color: var(--bad); }
+.spark { width: 100%; height: 64px; display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 2px; vertical-align: 3px; margin-right: 6px; }
+.note { font-size: 13px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 10px; margin: 0; }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 620px; }
+th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+td { font-variant-numeric: tabular-nums; font-family: var(--mono); }
+td:first-child { font-family: var(--sans); }
+tr.best td { color: var(--accent); }
+.foot { font-size: 12px; color: var(--faint); }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">TA050 · Clase 19 · Del motor al clúster</span>
+    <h1>Clúster de inferencia</h1>
+    <p class="lead">Cuatro réplicas de un modelo atienden conversaciones de varios turnos. Cada turno manda la conversación entera, así que casi todo el prompt ya se vio antes. Probá cómo elige réplica el router, qué aporta el caché de prefijos y qué pasa al separar el prefill del decode.</p>
+  </header>
+
+  <section class="controls" aria-label="Controles">
+    <div class="field"><span>Arquitectura</span>
+      <div class="seg" id="arch">
+        <button data-v="colo" aria-pressed="true">Colocado</button>
+        <button data-v="disagg" aria-pressed="false">Prefill / decode separados</button>
+      </div>
+    </div>
+    <div class="field"><span>Router</span>
+      <div class="seg" id="router">
+        <button data-v="rr" aria-pressed="false">En ronda</button>
+        <button data-v="least" aria-pressed="false">Menor carga</button>
+        <button data-v="sticky" aria-pressed="false">Por sesión</button>
+        <button data-v="prefix" aria-pressed="true">Consciente del prefijo</button>
+      </div>
+    </div>
+    <div class="field"><span>Opciones</span>
+      <div class="toggles">
+        <button class="tog" id="t-cache" aria-pressed="true"><i></i>Caché de prefijos</button>
+        <button class="tog" id="t-pool" aria-pressed="false"><i></i>Pool compartido</button>
+        <button class="tog" id="t-chunk" aria-pressed="false"><i></i>Prefill en pedazos</button>
+      </div>
+    </div>
+    <div class="field"><span>Conversaciones nuevas por segundo · <b class="val" id="rate-v">5</b></span>
+      <input type="range" id="rate" min="1" max="10" step="1" value="5" aria-label="Conversaciones nuevas por segundo">
+    </div>
+    <div class="field" id="pd-field" hidden><span>Réplicas de prefill · <b class="val" id="pd-v">2</b> de 4</span>
+      <input type="range" id="pd" min="1" max="3" step="1" value="2" aria-label="Réplicas de prefill">
+    </div>
+    <div class="field"><span>Velocidad · <b class="val" id="speed-v">4×</b></span>
+      <input type="range" id="speed" min="0" max="4" step="1" value="2" aria-label="Velocidad de la simulación">
+    </div>
+    <div class="actions">
+      <button class="btn" id="play">Pausa</button>
+      <button class="btn" id="reset">Reiniciar</button>
+    </div>
+  </section>
+
+  <div class="main">
+    <section class="panel" aria-labelledby="stage-h">
+      <div class="panel-head">
+        <h2 id="stage-h">Las réplicas</h2>
+        <span class="small mono" id="clock">t = 0 s</span>
+      </div>
+      <div class="stage" id="stage"></div>
+      <p class="small">Cada color es una conversación; los cuadrados con número son los prompts de sistema de las cuatro apps. <b>Llegadas</b>: los últimos pedidos que el router mandó a esa réplica. <b>Caché</b>: las conversaciones que tienen al menos dos bloques guardados ahí, de la usada más recientemente a la menos.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="inst-h">
+      <div class="panel-head"><h2 id="inst-h">Instrumentos</h2><span class="small">últimos 300 pedidos</span></div>
+      <div class="gauges">
+        <div class="gauge"><b id="g-hit">–</b><span>del prompt salió del caché</span></div>
+        <div class="gauge"><b id="g-slo">–</b><span>cumplió el SLO</span></div>
+        <div class="gauge"><b id="g-ttft50">–</b><span>TTFT mediano</span></div>
+        <div class="gauge"><b id="g-ttft99">–</b><span>TTFT p99</span></div>
+        <div class="gauge"><b id="g-tbt">–</b><span>TBT p99, entre tokens</span></div>
+        <div class="gauge"><b id="g-tps">–</b><span>tokens generados por segundo</span></div>
+      </div>
+      <svg class="spark" id="spark" viewBox="0 0 300 64" preserveAspectRatio="none" aria-label="TTFT p99 y TBT p99 en el tiempo"></svg>
+      <div class="legend"><span><i style="background:var(--warn)"></i>TTFT p99</span><span><i style="background:var(--accent)"></i>TBT p99 × 10</span><span>escala hasta 2 s</span></div>
+      <p class="note" id="explain"></p>
+      <p class="small">SLO: primer token en menos de 2 s y nunca más de 100 ms entre dos tokens seguidos. Modelo de costo ilustrativo, del orden de un modelo de 70B: leer los pesos 20 ms por iteración, 0,05 ms por token de prefill, 0,005 ms por token traído del pool.</p>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="cmp-h">
+    <div class="panel-head">
+      <h2 id="cmp-h">Todas las configuraciones, con la misma carga</h2>
+      <button class="btn primary" id="cmp-run">Comparar</button>
+    </div>
+    <p class="small" id="cmp-desc">Corre 1.000 conversaciones a la tasa elegida en cada configuración, sin animación. Tarda unos segundos.</p>
+    <div class="tablewrap">
+      <table id="cmp" hidden>
+        <thead><tr><th>Configuración</th><th>caché</th><th>TTFT p50</th><th>TTFT p99</th><th>TBT p99</th><th>SLO</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="foot">El mismo motor y la misma carga que <span class="mono">go run ./cmd/sim router</span> y <span class="mono">go run ./cmd/sim desagregado</span> del repositorio servir-tokens, con menos conversaciones.</p>
+  </section>
+</div>
+
+<script>
+// ---------- Modelo ----------
+const COST = { base: 20, perSeq: 0.25, perPrefill: 0.05, perLoad: 0.005 };
+const BLOCK = 64, SYS = 2000, APPS = 4, MAXBATCH = 128, CACHE = 1024, POOL = 65536, CHUNK = 512, TRANSFER = 0.003, N = 4, KVCAP = 262144;
+const SLO = { ttft: 2000, gap: 100 };
+
+function rng(seed) { // mulberry32
+  let a = seed >>> 0;
+  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function chat(sessions, rate, seed) {
+  const r = rng(seed);
+  const exp = () => -Math.log(1 - r());
+  const normal = () => Math.sqrt(-2 * Math.log(1 - r())) * Math.cos(2 * Math.PI * r());
+  const logn = mean => { const s = 0.6, mu = Math.log(mean) - s * s / 2; return Math.max(1, Math.floor(Math.exp(mu + s * normal()))); };
+  const reqs = [];
+  let start = 0;
+  for (let s = 0; s < sessions; s++) {
+    start += exp() / rate * 1000;
+    const app = Math.floor(r() * APPS);
+    const turns = 1 + Math.floor(exp() * 4);
+    let history = SYS, t = start;
+    for (let k = 0; k < turns; k++) {
+      const prompt = history + logn(300), output = logn(180);
+      if (prompt + output > 32768) break;
+      const keys = [];
+      for (let i = 0; i < Math.floor(prompt / BLOCK); i++) keys.push((i + 1) * BLOCK <= SYS ? "a" + app + ":" + i : "s" + s + ":" + i);
+      reqs.push({ arrival: t, prompt, output, session: s, app, keys });
+      history = prompt + output;
+      t += exp() * 15000;
+    }
+  }
+  reqs.sort((a, b) => a.arrival - b.arrival);
+  reqs.forEach((q, i) => q.id = i);
+  return reqs;
+}
+
+class LRU {
+  constructor(cap) { this.cap = cap; this.m = new Map(); }
+  peek(keys, from = 0, to = keys.length) { let n = 0; for (let i = from; i < to; i++) { if (!this.m.has(keys[i])) break; n++; } return n; }
+  match(keys, from, to) { const n = this.peek(keys, from, to); for (let i = from; i < from + n; i++) { const v = this.m.get(keys[i]); this.m.delete(keys[i]); this.m.set(keys[i], v); } return n; }
+  insert(keys, owner) {
+    for (const k of keys) { this.m.delete(k); this.m.set(k, k[0] === "a" ? "a" + k.slice(1, k.indexOf(":")) : owner); }
+    while (this.m.size > this.cap) this.m.delete(this.m.keys().next().value);
+  }
+}
+
+class Replica {
+  constructor(role, opt, pool) {
+    this.role = role; this.now = 0; this.waiting = []; this.running = []; this.qEst = 0; this.kv = 0; this.preempted = 0;
+    this.cache = opt.cache && role !== "D" ? new LRU(CACHE) : null;
+    this.pool = role !== "D" ? pool : null; this.chunk = opt.chunk && role !== "D";
+    this.recent = []; this.st = { prompt: 0, reused: 0, computed: 0 };
+  }
+  usable(r) { return Math.min(r.keys.length, Math.floor((r.prompt - 1) / BLOCK)); }
+  peekCached(r) { return this.cache && !r.kvReady ? this.cache.peek(r.keys, 0, this.usable(r)) * BLOCK : 0; }
+  submit(r) { const s = { r, gen: 0, pending: 0, loading: 0, chunk: 0, est: r.prompt - this.peekCached(r), admitted: false }; this.qEst += s.est; this.waiting.push(s); if (!r.kvReady) { this.recent.push(r.session); if (this.recent.length > 14) this.recent.shift(); } }
+  queued() { let n = this.qEst; for (const s of this.running) n += s.pending + s.loading; return n; }
+  busy() { return this.running.length + this.waiting.length > 0; }
+  admit() {
+    while (this.waiting.length && this.running.length < MAXBATCH && this.waiting[0].r.arrival <= this.now) {
+      const s = this.waiting[0], need = s.r.prompt + s.gen;
+      if (this.kv + need > KVCAP) return; // FCFS: si la primera no entra, no pasa ninguna
+      this.waiting.shift(); this.qEst -= s.est; s.kv = need; this.kv += need; this.plan(s); this.running.push(s);
+    }
+  }
+  plan(s) {
+    const r = s.r, first = !s.admitted; s.admitted = true;
+    if (first) this.st.prompt += r.prompt;
+    if (r.kvReady && first) { s.pending = 0; s.loading = 0; return; }
+    const u = this.usable(r);
+    const local = this.cache ? this.cache.match(r.keys, 0, u) : 0;
+    const pooled = this.pool ? this.pool.match(r.keys, local, u) : 0;
+    s.loading = pooled * BLOCK; s.pending = r.prompt + s.gen - local * BLOCK - s.loading;
+    this.st.reused += (local + pooled) * BLOCK;
+    (r.orig || r).hit = (local + pooled) * BLOCK / r.prompt;
+  }
+  step(emit) {
+    this.admit();
+    if (!this.running.length) { if (this.waiting.length) this.now = Math.max(this.now, this.waiting[0].r.arrival); return; }
+    let budget = this.chunk ? CHUNK : Infinity, prefill = 0, load = 0;
+    for (let i = 0; i < this.running.length;) {
+      const s = this.running[i];
+      s.chunk = Math.min(s.pending, budget); budget -= s.chunk; s.produces = s.chunk === s.pending;
+      if (!s.produces || this.kv + 1 <= KVCAP) { if (s.produces) { this.kv++; s.kv++; } i++; continue; }
+      budget += s.chunk; this.preemptLast(); // sin lugar para el próximo token: sale la última admitida, entera
+    }
+    if (!this.running.length) return;
+    for (const s of this.running) { prefill += s.chunk; load += s.loading; }
+    this.now += COST.base + COST.perSeq * this.running.length + COST.perPrefill * prefill + COST.perLoad * load;
+    this.st.computed += prefill;
+    const kept = [];
+    for (const s of this.running) {
+      if (s.loading > 0 || (s.chunk > 0 && s.chunk === s.pending)) {
+        const keys = s.r.keys.slice(0, this.usable(s.r));
+        if (this.cache) this.cache.insert(keys, s.r.session);
+        if (this.pool) this.pool.insert(keys, s.r.session);
+      }
+      s.loading = 0; s.pending -= s.chunk; s.chunk = 0;
+      if (s.produces) { s.gen++; emit(s.r, this.now, s.gen === s.r.output); }
+      if (s.gen < s.r.output) kept.push(s); else { this.kv -= s.kv; this.done && this.done(s.r, this.now); }
+    }
+    this.running = kept;
+  }
+}
+
+Replica.prototype.preemptLast = function () {
+  const s = this.running.pop();
+  this.kv -= s.kv; s.kv = 0; s.pending = 0; s.loading = 0; s.chunk = 0;
+  s.est = s.r.prompt + s.gen; this.qEst += s.est; this.preempted++;
+  this.waiting.unshift(s);
+};
+
+const ROUTERS = {
+  rr: { name: "En ronda", next: 0, pick(r, reps) { this.next = (this.next + 1) % reps.length; return this.next; } },
+  least: { name: "Menor carga", pick(r, reps) { return argmin(reps, x => x.queued() + 50 * (x.running.length + x.waiting.length)); } },
+  sticky: { name: "Por sesión", pick(r, reps) { return (Math.imul(r.session + 1, 2654435761) >>> 0) % reps.length; } },
+  prefix: { name: "Consciente del prefijo", pick(r, reps) { return argmin(reps, x => COST.perPrefill * (x.queued() + r.prompt - x.peekCached(r)) + COST.perSeq * x.running.length); } },
+};
+function argmin(xs, f) { let b = 0, bv = Infinity; xs.forEach((x, i) => { const v = f(x); if (v < bv) { b = i; bv = v; } }); return b; }
+
+class Cluster {
+  constructor(opt, reqs) {
+    this.opt = opt; this.reqs = reqs; this.i = 0; this.transfers = []; this.state = new Map(); this.done = []; this.gaps = []; this.tokens = 0;
+    const pool = opt.pool ? new LRU(POOL) : null;
+    const nP = opt.arch === "disagg" ? opt.nP : N;
+    this.pre = Array.from({ length: nP }, () => new Replica(opt.arch === "disagg" ? "P" : "PD", opt, pool));
+    this.dec = opt.arch === "disagg" ? Array.from({ length: N - nP }, () => new Replica("D", opt, null)) : [];
+    this.all = [...this.pre, ...this.dec];
+    this.router = Object.assign(Object.create(ROUTERS[opt.router]), { next: 0 });
+    if (opt.arch === "disagg") this.router = Object.assign(Object.create(ROUTERS.prefix), {});
+    for (const p of this.pre) if (opt.arch === "disagg") p.done = (r, t) => {
+      const o = this.reqs[r.id];
+      if (o.output > 1) this.insertTransfer({ ...o, arrival: t + TRANSFER * o.prompt, prompt: o.prompt + 1, output: o.output - 1, kvReady: true, keys: [] });
+    };
+    this.emit = (r, t, last) => {
+      let s = this.state.get(r.id);
+      if (!s) { s = { arrival: this.reqs[r.id].arrival, first: t, last: t, gap: 0, hit: this.reqs[r.id].hit || 0 }; this.state.set(r.id, s); }
+      else { const g = t - s.last; s.gap = Math.max(s.gap, g); s.last = t; this.gaps.push(g); if (this.opt.live && this.gaps.length > 6000) this.gaps.splice(0, 3000); }
+      this.tokens++;
+      const full = this.reqs[r.id];
+      const isLast = this.opt.arch === "disagg" ? (r.kvReady ? last : full.output === 1) : last;
+      if (isLast) { this.done.push({ ttft: s.first - s.arrival, gap: s.gap, hit: this.reqs[r.id].hit || 0, t }); this.state.delete(r.id); if (this.opt.live && this.done.length > 4000) this.done.splice(0, 2000); }
+    };
+  }
+  insertTransfer(r) { let k = this.transfers.length; while (k > 0 && this.transfers[k - 1].arrival > r.arrival) k--; this.transfers.splice(k, 0, r); }
+  minClock() { let m = Infinity; for (const x of this.all) if (x.busy()) m = Math.min(m, x.now); return m; }
+  // Avanza el clúster hasta el tiempo virtual t (Infinity = hasta terminar).
+  advance(t) {
+    for (;;) {
+      const tA = this.i < this.reqs.length ? this.reqs[this.i].arrival : Infinity;
+      const tR = this.transfers.length ? this.transfers[0].arrival : Infinity;
+      const tS = this.minClock();
+      const next = Math.min(tA, tR, tS);
+      if (next === Infinity || next > t) return;
+      if (tR <= tA && tR <= tS) {
+        const r = this.transfers.shift();
+        this.dec[argmin(this.dec, x => x.running.length + x.waiting.length)].submit(r);
+      } else if (tA <= tS) {
+        const r = this.reqs[this.i++];
+        const first = this.opt.arch === "disagg" ? { ...r, output: 1, orig: r } : r;
+        this.pre[this.router.pick(r, this.pre)].submit(first);
+      } else {
+        let b = null; for (const x of this.all) if (x.busy() && (!b || x.now < b.now)) b = x;
+        b.step(this.emit);
+      }
+    }
+  }
+  summary(window) {
+    const d = window ? this.done.slice(-window) : this.done;
+    const pct = (xs, p) => { if (!xs.length) return NaN; const s = [...xs].sort((a, b) => a - b); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
+    let prompt = 0, reused = 0; for (const x of this.pre) { prompt += x.st.prompt; reused += x.st.reused; }
+    return {
+      n: d.length, ttft50: pct(d.map(x => x.ttft), 0.5), ttft99: pct(d.map(x => x.ttft), 0.99),
+      tbt99: pct(window ? this.gaps.slice(-3000) : this.gaps, 0.99),
+      slo: d.length ? d.filter(x => x.ttft <= SLO.ttft && x.gap <= SLO.gap).length / d.length : NaN,
+      hit: window ? (d.length ? d.reduce((a, x) => a + x.hit, 0) / d.length : NaN) : (prompt ? reused / prompt : 0),
+    };
+  }
+}
+
+// ---------- Interfaz ----------
+const $ = s => document.querySelector(s);
+const opt = { arch: "colo", router: "prefix", cache: true, pool: false, chunk: false, nP: 2, rate: 5 };
+const SPEEDS = [1, 2, 4, 10, 25];
+let speed = 4, playing = true, cl, last = 0, vt = 0, history = [], lastSample = 0, lastTokens = 0, tps = 0;
+
+function seg(id, key, cb) {
+  const root = $(id);
+  root.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b || b.disabled) return;
+    opt[key] = b.dataset.v; root.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); cb && cb(); reset();
+  });
+}
+function tog(id, key) { const b = $(id); b.addEventListener("click", () => { opt[key] = !opt[key]; b.setAttribute("aria-pressed", String(opt[key])); reset(); }); }
+seg("#arch", "arch", () => { $("#pd-field").hidden = opt.arch !== "disagg"; $("#router").querySelectorAll("button").forEach(b => b.disabled = opt.arch === "disagg"); });
+seg("#router", "router");
+tog("#t-cache", "cache"); tog("#t-pool", "pool"); tog("#t-chunk", "chunk");
+$("#rate").addEventListener("input", e => { opt.rate = +e.target.value; $("#rate-v").textContent = opt.rate; reset(); });
+$("#pd").addEventListener("input", e => { opt.nP = +e.target.value; $("#pd-v").textContent = opt.nP; reset(); });
+$("#speed").addEventListener("input", e => { speed = SPEEDS[+e.target.value]; $("#speed-v").textContent = speed + "×"; });
+$("#play").addEventListener("click", () => { playing = !playing; $("#play").textContent = playing ? "Pausa" : "Seguir"; });
+$("#reset").addEventListener("click", reset);
+
+const COLORS = 8;
+const col = k => `var(--c${((k % COLORS) + COLORS) % COLORS})`;
+function buildStage() {
+  const st = $("#stage"); st.innerHTML = "";
+  const group = (title, reps, sub) => {
+    const g = document.createElement("div"); g.className = "group";
+    g.innerHTML = `<div class="group-h"><span>${title}</span><span>${sub}</span></div><div class="reps"></div>`;
+    reps.forEach((r, i) => {
+      const el = document.createElement("div"); el.className = "rep";
+      const badge = r.role === "P" ? `<span class="badge p">prefill</span>` : r.role === "D" ? `<span class="badge d">decode</span>` : `<span class="badge">prefill + decode</span>`;
+      el.innerHTML = `<div class="rep-h"><b>Réplica ${r.idx + 1}</b>${badge}</div>
+        <div class="kv"><span>Lote</span><span data-k="batch">0 / ${MAXBATCH}</span></div><div class="meter"><div data-k="bm"></div></div>
+        <div class="kv"><span>KV cache</span><span data-k="kv">0%</span></div><div class="meter"><div data-k="km"></div></div>
+        <div class="kv"><span>Prefill por delante</span><span data-k="queue">0</span></div><div class="meter q"><div data-k="qm"></div></div>
+        ${r.role === "D" ? "" : `<span class="lbl">Llegadas</span><div class="dots" data-k="dots"></div><span class="lbl">Caché</span><div class="chips" data-k="chips"></div>`}`;
+      r.el = el; g.querySelector(".reps").appendChild(el);
+    });
+    st.appendChild(g);
+  };
+  cl.all.forEach((r, i) => r.idx = i);
+  if (opt.arch === "disagg") {
+    group("Prefill", cl.pre, "calcula el prompt y el primer token");
+    const w = document.createElement("div"); w.className = "wire"; w.innerHTML = `<span>KV cache por la red · <b class="mono" id="inflight">0</b> en viaje</span>`; st.appendChild(w);
+    group("Decode", cl.dec, "genera el resto, un token por iteración");
+  } else group("Réplicas", cl.pre, "cada una hace prefill y decode");
+}
+function explain() {
+  const t = {
+    rr: "En ronda: cada turno de una conversación cae en otra réplica, así que sólo se aprovecha el prompt de sistema.",
+    least: "Menor carga: balancea bien, pero no sabe dónde está cada conversación.",
+    sticky: "Por sesión: cada conversación vuelve siempre a la misma réplica. Aprovecha el caché, pero no mira la carga.",
+    prefix: "Consciente del prefijo: estima el tiempo al primer token en cada réplica, descontando lo que ya tiene en caché (el Conductor de Mooncake).",
+  };
+  let s = opt.arch === "disagg" ? `Separados: ${opt.nP} réplicas hacen sólo prefill y ${N - opt.nP} sólo decode; el KV cache viaja entre ellas. El decode nunca espera un prefill, pero si el ratio no acompaña a la carga, un lado se satura.` : t[opt.router];
+  if (!opt.cache) s += " Sin caché de prefijos: cada turno recalcula la conversación entera.";
+  if (opt.pool) s += " El pool compartido deja que cualquier réplica traiga un prefijo calculado en otra.";
+  if (opt.chunk && opt.arch !== "disagg") s += " Con el prefill en pedazos de 512 tokens, un prompt largo ya no frena el decode de su lote.";
+  $("#explain").textContent = s;
+}
+function reset() {
+  cl = new Cluster({ ...opt, live: true }, chat(Math.round(opt.rate * 900), opt.rate, 7));
+  vt = 0; history = []; lastSample = 0; lastTokens = 0; tps = 0;
+  buildStage(); explain(); render();
+}
+const fmtMs = v => isNaN(v) ? "–" : v >= 10000 ? (v / 1000).toFixed(0) + " s" : v >= 1000 ? (v / 1000).toFixed(1).replace(".", ",") + " s" : Math.round(v) + " ms";
+const pctf = v => isNaN(v) ? "–" : Math.round(100 * v) + "%";
+function render() {
+  $("#clock").textContent = `t = ${Math.floor(vt / 1000)} s`;
+  for (const r of cl.all) {
+    const q = r.queued();
+    r.el.querySelector('[data-k="batch"]').textContent = `${r.running.length} / ${MAXBATCH}`;
+    r.el.querySelector('[data-k="bm"]').style.width = (100 * r.running.length / MAXBATCH) + "%";
+    r.el.querySelector('[data-k="kv"]').textContent = Math.round(100 * r.kv / KVCAP) + "%" + (r.preempted ? ` · ${r.preempted} desalojos` : "");
+    r.el.querySelector('[data-k="km"]').style.width = (100 * r.kv / KVCAP) + "%";
+    r.el.querySelector('[data-k="queue"]').textContent = q >= 1000 ? (q / 1000).toFixed(1).replace(".", ",") + " k tokens" : q + " tokens";
+    r.el.querySelector('[data-k="qm"]').style.width = Math.min(100, q / 400) + "%";
+    if (r.role !== "D") {
+      r.el.querySelector('[data-k="dots"]').innerHTML = r.recent.map(s => `<i style="background:${col(s)}"></i>`).join("");
+      const cnt = new Map();
+      const src = r.cache || r.pool;
+      if (src) for (const v of src.m.values()) cnt.set(v, (cnt.get(v) || 0) + 1);
+      const order = src ? [...cnt.keys()].reverse() : [];
+      const apps = order.filter(k => typeof k === "string").sort();
+      const sess = order.filter(k => typeof k === "number" && cnt.get(k) >= 2).slice(0, 22);
+      r.el.querySelector('[data-k="chips"]').innerHTML = apps.map(a => `<span class="chip app" style="background:var(--faint)" title="prompt de sistema">${+a.slice(1) + 1}</span>`).join("") +
+        sess.map(s => `<span class="chip" style="background:${col(s)}" title="conversación ${s}: ${cnt.get(s)} bloques"></span>`).join("") || `<span class="small">vacío</span>`;
+    }
+  }
+  const inf = $("#inflight"); if (inf) inf.textContent = cl.transfers.length;
+  const s = cl.summary(300);
+  const set = (id, txt, cls) => { const e = $(id); e.textContent = txt; e.className = cls || ""; };
+  set("#g-hit", pctf(s.hit)); set("#g-slo", pctf(s.slo), s.slo < 0.5 ? "bad" : s.slo < 0.9 ? "warn" : "");
+  set("#g-ttft50", fmtMs(s.ttft50)); set("#g-ttft99", fmtMs(s.ttft99), s.ttft99 > SLO.ttft ? "bad" : "");
+  set("#g-tbt", fmtMs(s.tbt99), s.tbt99 > SLO.gap ? "bad" : ""); set("#g-tps", isNaN(tps) ? "–" : Math.round(tps).toLocaleString("es-AR"));
+  const W = 300, H = 64, n = Math.max(history.length, 30), sc = v => H - 2 - Math.min(1, (isNaN(v) ? 0 : v) / 2000) * (H - 4);
+  const line = (key, mul) => history.map((h, i) => `${(i / (n - 1) * W).toFixed(1)},${sc(h[key] * mul).toFixed(1)}`).join(" ");
+  const cs = getComputedStyle(document.documentElement);
+  $("#spark").innerHTML = `<line x1="0" x2="${W}" y1="${sc(SLO.ttft)}" y2="${sc(SLO.ttft)}" stroke="${cs.getPropertyValue("--line")}" stroke-dasharray="3 3"/>` +
+    `<polyline fill="none" stroke="${cs.getPropertyValue("--warn")}" stroke-width="1.6" points="${line("ttft99", 1)}" vector-effect="non-scaling-stroke"/>` +
+    `<polyline fill="none" stroke="${cs.getPropertyValue("--accent")}" stroke-width="1.6" points="${line("tbt99", 10)}" vector-effect="non-scaling-stroke"/>`;
+}
+let uiAcc = 0;
+function frame(ts) {
+  const dt = Math.min(100, ts - (last || ts)); last = ts;
+  if (playing) {
+    vt += dt * speed;
+    cl.advance(vt);
+    if (vt - lastSample >= 1000) {
+      const s = cl.summary(300);
+      tps = (cl.tokens - lastTokens) / ((vt - lastSample) / 1000); lastTokens = cl.tokens; lastSample = vt;
+      history.push({ ttft99: s.ttft99, tbt99: s.tbt99 }); if (history.length > 120) history.shift();
+    }
+    if (cl.i >= cl.reqs.length && cl.minClock() === Infinity && !cl.transfers.length) { reset(); }
+  }
+  uiAcc += dt;
+  if (uiAcc > 120) { uiAcc = 0; render(); }
+  requestAnimationFrame(frame);
+}
+
+// ---------- Comparación ----------
+const CONFIGS = [
+  ["Colocado · en ronda · sin caché", { arch: "colo", router: "rr", cache: false }],
+  ["Colocado · en ronda", { arch: "colo", router: "rr", cache: true }],
+  ["Colocado · por sesión", { arch: "colo", router: "sticky", cache: true }],
+  ["Colocado · consciente del prefijo", { arch: "colo", router: "prefix", cache: true }],
+  ["… + pool compartido", { arch: "colo", router: "prefix", cache: true, pool: true }],
+  ["… + prefill en pedazos", { arch: "colo", router: "prefix", cache: true, chunk: true }],
+  ["Separados · 1 prefill + 3 decode", { arch: "disagg", nP: 1, cache: true }],
+  ["Separados · 2 prefill + 2 decode", { arch: "disagg", nP: 2, cache: true }],
+  ["Separados · 3 prefill + 1 decode", { arch: "disagg", nP: 3, cache: true }],
+];
+$("#cmp-run").addEventListener("click", () => {
+  const btn = $("#cmp-run"); btn.disabled = true;
+  const reqs = chat(1000, opt.rate, 11), rows = [];
+  const tb = $("#cmp tbody"); tb.innerHTML = ""; $("#cmp").hidden = false;
+  let k = 0;
+  const one = () => {
+    if (k === CONFIGS.length) {
+      const best = rows.reduce((a, r) => r.s.slo > a.s.slo ? r : a, rows[0]);
+      tb.innerHTML = rows.map(r => `<tr class="${r === best ? "best" : ""}"><td>${r.name}</td><td>${pctf(r.s.hit)}</td><td>${fmtMs(r.s.ttft50)}</td><td>${fmtMs(r.s.ttft99)}</td><td>${fmtMs(r.s.tbt99)}</td><td>${pctf(r.s.slo)}</td></tr>`).join("");
+      $("#cmp-desc").textContent = `${reqs.length} pedidos de 1.000 conversaciones a ${opt.rate} por segundo, en cuatro réplicas. En verde, la que más pedidos hizo cumplir el SLO.`;
+      btn.disabled = false; return;
+    }
+    const [name, o] = CONFIGS[k++];
+    $("#cmp-desc").textContent = `Corriendo ${k} de ${CONFIGS.length}: ${name}…`;
+    const c = new Cluster({ pool: false, chunk: false, nP: 2, router: "prefix", ...o }, reqs.map(r => ({ ...r })));
+    c.advance(Infinity);
+    rows.push({ name, s: c.summary(0) });
+    setTimeout(one, 10);
+  };
+  setTimeout(one, 10);
+});
+
+reset();
+requestAnimationFrame(frame);
+</script>
+
+</html>

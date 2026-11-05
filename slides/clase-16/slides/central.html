@@ -1,0 +1,31 @@
+<section id="central" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">All-reduce ingenuo</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Con un coordinador, su enlace es el cuello de botella</h2>
+</div>
+<div style="display:flex;gap:80px;align-items:center;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:32px">
+<p style="font-size:96px;font-weight:600;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">(n − 1) · S</p>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">es lo que recibe y vuelve a enviar el rank 0 en cada all-reduce, con S el tamaño del gradiente.</p>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Con 32 GPUs, 31 gradientes completos pasan por un solo enlace. Es el master de MapReduce, ahora en la red.</p>
+</div>
+<div style="position:relative;width:720px;height:520px">
+<x-connector head="both" style="color:#7D8892;border-width:3px" x1="240" x2="300" y1="100" y2="220"></x-connector>
+<x-connector head="both" style="color:#7D8892;border-width:3px" x1="480" x2="420" y1="100" y2="220"></x-connector>
+<x-connector head="both" style="color:#7D8892;border-width:3px" x1="240" x2="300" y1="420" y2="300"></x-connector>
+<x-connector head="both" style="color:#7D8892;border-width:3px" x1="480" x2="420" y1="420" y2="300"></x-connector>
+<div style="position:absolute;left:40px;top:40px;width:200px;height:80px;background:#161B20;border:2px solid #3A434C;border-radius:12px;display:flex;align-items:center;justify-content:center"><p style="font-size:32px;color:#F2F3EF">Rank 1</p></div>
+<div style="position:absolute;left:480px;top:40px;width:200px;height:80px;background:#161B20;border:2px solid #3A434C;border-radius:12px;display:flex;align-items:center;justify-content:center"><p style="font-size:32px;color:#F2F3EF">Rank 2</p></div>
+<div style="position:absolute;left:260px;top:220px;width:200px;height:80px;background:#34D399;border:2px solid #34D399;border-radius:12px;display:flex;align-items:center;justify-content:center"><p style="font-size:32px;font-weight:600;color:#0E1114">Rank 0</p></div>
+<div style="position:absolute;left:40px;top:400px;width:200px;height:80px;background:#161B20;border:2px solid #3A434C;border-radius:12px;display:flex;align-items:center;justify-content:center"><p style="font-size:32px;color:#F2F3EF">Rank 3</p></div>
+<div style="position:absolute;left:480px;top:400px;width:200px;height:80px;background:#161B20;border:2px solid #3A434C;border-radius:12px;display:flex;align-items:center;justify-content:center"><p style="font-size:32px;color:#F2F3EF">Rank 4</p></div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido</p>
+<aside>Tiempo: 0:23–0:26 (3 min).
+Idea clave: el all-reduce con un coordinador funciona, pero su enlace se vuelve el cuello de botella.
+Decir: la forma obvia es un parameter server. Todos le mandan su gradiente al rank 0, que suma y le devuelve el resultado a cada uno. Es correcto.
+Preguntar a la clase: si el gradiente tiene S datos y hay n GPUs, ¿cuánto envía cada uno de los ranks 1 a n−1? (S, una sola vez.) ¿Y el rank 0? Recibe (n−1)·S y vuelve a enviar otro (n−1)·S.
+Con 32 GPUs, 31 gradientes completos pasan por un solo enlace mientras los demás enlaces están casi quietos. Es el mismo problema que el master de MapReduce, ahora en la red: un nodo central por el que pasa todo.
+Pasar a la siguiente: ¿se puede hacer sin coordinador y sin que ningún enlace cargue con todo?</aside>
+</section>

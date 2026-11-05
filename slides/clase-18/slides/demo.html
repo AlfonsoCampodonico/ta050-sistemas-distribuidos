@@ -1,0 +1,22 @@
+<section data-transition="fade" id="demo" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">El repositorio</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#0E1114;letter-spacing:-2px">Un servidor de inferencia sin modelo</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px;background:#0E1114;border:1px solid #2A3138;border-radius:16px;padding:48px">
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/sim batching</p><p style="font-size:32px;color:#7D8892">estático vs continuo</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/sim memoria</p><p style="font-size:32px;color:#7D8892">contiguo vs bloques</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/sim cow</p><p style="font-size:32px;color:#7D8892">copy-on-write</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/servidor</p><p style="font-size:32px;color:#7D8892">HTTP + SSE de verdad</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/proxy -buffer</p><p style="font-size:32px;color:#7D8892">el bug de streaming</p></div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#48525C">El mismo motor corre en tiempo virtual (sim) y en tiempo real (servidor). Go 1.24, sin dependencias.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">servir-tokens · go test ./...</p>
+<aside>Tiempo: 1:24–1:27 (3 min).
+Idea clave: todo lo de la clase se puede reproducir y modificar con el repositorio.
+Decir: el modelo no existe: cada iteración cuesta un tiempo que sale de un modelo de costo, 20 ms de leer los pesos más un poco por secuencia y por token de prefill. Todo lo demás es lo que hace un servidor real: admisión por orden de llegada, batching continuo, tabla de bloques, copy-on-write, desalojo con recomputación y streaming con cancelación.
+El mismo motor se usa en tiempo virtual en cmd/sim, para las tablas, y en tiempo real detrás de HTTP en cmd/servidor, para la demo con curl.
+El README tiene cinco ejercicios: chunked prefill (Sarathi-Serve), swapping, prefix caching, rate limiting por tokens y el estudio del tamaño de bloque.
+Los tests verifican lo que dijimos: menos de un bloque de desperdicio por secuencia, que copy-on-write copia sólo el bloque compartido, que con reserva contigua la utilización queda por debajo del 40%, que el batching continuo le gana al estático, y que al desconectarse el cliente se libera el KV cache.
+Pasar a la siguiente: preguntas.</aside>
+</section>

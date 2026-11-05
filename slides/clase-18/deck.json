@@ -1,0 +1,75 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-04T01:10:00Z"
+  },
+  "lists": "css",
+  "title": "Clase 18 — Cómo se sirve un modelo",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "mapa",
+    "viaje",
+    "loop",
+    "fases",
+    "batching",
+    "kvcache",
+    "kvnumeros",
+    "estatico",
+    "orca",
+    "demobatch",
+    "desperdicio",
+    "medicion",
+    "analogia",
+    "tabla",
+    "propiedades",
+    "demomem",
+    "cow",
+    "desalojo",
+    "distribuido",
+    "resultados",
+    "sse",
+    "desconexion",
+    "tiempos",
+    "demo",
+    "preguntas"
+  ],
+  "sections": {
+    "s1": {
+      "description": "Qué pasa con un pedido desde que sale del navegador hasta el loop de la GPU.",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "El KV cache y por qué el lote decide el throughput.",
+      "start": "kvcache"
+    },
+    "s3": {
+      "description": "Orca: batching por iteración.",
+      "start": "estatico"
+    },
+    "s4": {
+      "description": "PagedAttention: el KV cache como memoria virtual.",
+      "start": "desperdicio"
+    },
+    "s5": {
+      "description": "Compartir, desalojar, distribuir y resultados.",
+      "start": "cow"
+    },
+    "s6": {
+      "description": "El stream de vuelta, los tiempos y la demo.",
+      "start": "sse"
+    }
+  },
+  "faces": {
+    "geist": {
+      "family": "Geist",
+      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    },
+    "geist-mono": {
+      "family": "Geist Mono",
+      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    }
+  },
+  "designSystems": []
+}

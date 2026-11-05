@@ -1,0 +1,30 @@
+<section id="nodo" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El hardware decide</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Los tensores se quedan dentro del servidor</h2>
+</div>
+<div style="display:flex;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Dentro de un DGX A100</p>
+<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">8 GPUs por NVLink y NVSwitch</h3>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El enlace más rápido del clúster. Ahí van los all-reduce de cada capa.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#A8B3BC;font-family:'Geist Mono', 'Courier New', monospace">Entre servidores</p>
+<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">8 placas InfiniBand de 200 Gb/s</h3>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Bastante más lento. Con t = 16, cada all-reduce cruzaría la red entre nodos.</p>
+</div>
+</div>
+<div style="display:flex;gap:32px;align-items:center;background:#1A2027;border-radius:16px;padding:40px 48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#F5A524;white-space:nowrap;font-family:'Geist Mono', 'Courier New', monospace">Takeaway #1</p>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Tensores hasta la cantidad de GPUs de un servidor; más allá, pipeline. Partir de más también hace matrices chicas que la GPU usa mal.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Narayanan et al., §3.2, §3.3.2 y §5</p>
+<aside>Tiempo: 0:49–0:52 (3 min).
+Idea clave: el paralelismo de tensores sólo funciona sobre el enlace más rápido, dentro del servidor.
+Decir: el clúster del paper, Selene, tiene nodos DGX A100: 8 GPUs de 80 GB conectadas por NVLink y NVSwitch. Entre nodos, cada servidor tiene 8 placas InfiniBand HDR de 200 Gb/s, en un fat-tree de tres niveles: bastante más lento.
+Con t = 8, todos los all-reduce de cada capa quedan dentro del nodo. Con t = 16, el grupo ocupa dos nodos y cada uno de esos all-reduce tiene que cruzar la red entre ellos, en el camino crítico de cada capa.
+Hay un segundo problema (§3.3.2): con t grande, cada GPU multiplica matrices cada vez más chicas, y las GPUs no alcanzan su pico con matrices chicas. Partir de más desperdicia hardware aunque la red fuera infinita.
+De ahí el Takeaway #1 del paper: tensores hasta la cantidad de GPUs de un servidor. En sus experimentos (figura 13), el rendimiento máximo está justo en t = 8.
+Pasar a la siguiente: ¿y para escalar más allá de un servidor?</aside>
+</section>

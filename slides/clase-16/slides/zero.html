@@ -1,0 +1,39 @@
+<section id="zero" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">ZeRO = sharding del estado</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Partir lo redundante baja la memoria de 120 GB a 1,9 GB</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;align-items:center;gap:32px">
+<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#F2F3EF">Paralelismo de datos</p><p style="font-size:24px;color:#A8B3BC">nada se parte</p></div>
+<div style="width:960px;height:56px;background:#4A5560;border-radius:8px"></div>
+<p style="font-size:32px;font-weight:600;color:#F2F3EF;white-space:nowrap">120 GB</p>
+</div>
+<div style="display:flex;align-items:center;gap:32px">
+<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#F2F3EF">ZeRO-1</p><p style="font-size:24px;color:#A8B3BC">+ estado del optimizador</p></div>
+<div style="width:251px;height:56px;background:#34D399;border-radius:8px"></div>
+<p style="font-size:32px;font-weight:600;color:#F2F3EF;white-space:nowrap">31,4 GB</p>
+</div>
+<div style="display:flex;align-items:center;gap:32px">
+<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#F2F3EF">ZeRO-2</p><p style="font-size:24px;color:#A8B3BC">+ gradientes</p></div>
+<div style="width:133px;height:56px;background:#34D399;border-radius:8px"></div>
+<p style="font-size:32px;font-weight:600;color:#F2F3EF;white-space:nowrap">16,6 GB</p>
+</div>
+<div style="display:flex;align-items:center;gap:32px">
+<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#F2F3EF">ZeRO-3</p><p style="font-size:24px;color:#A8B3BC">+ pesos</p></div>
+<div style="width:16px;height:56px;background:#34D399;border-radius:8px"></div>
+<p style="font-size:32px;font-weight:600;color:#F2F3EF;white-space:nowrap">1,9 GB</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Memoria por GPU para 7.500 millones de parámetros con d = 64. Las etapas 1 y 2 no agregan comunicación; la 3 trae los pesos por la red en cada capa.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Rajbhandari et al., 2020, figura 1</p>
+<aside>Tiempo: 0:39–0:44 (5 min).
+Idea clave: ZeRO aplica sharding al estado del entrenamiento: si las d réplicas guardan lo mismo, cada una se queda con 1/d.
+Decir: el ejemplo es la figura 1 del paper de ZeRO: 7.500 millones de parámetros y 64 réplicas. Sin ZeRO, 120 GB por GPU. Cada etapa parte algo más.
+ZeRO-1 parte el estado del optimizador: 31,4 GB. Después de reducir los gradientes, cada worker actualiza sólo su pedazo de pesos y después se hace un all-gather.
+ZeRO-2 parte también los gradientes: 16,6 GB. En lugar de un all-reduce alcanza con un reduce-scatter.
+ZeRO-3 parte también los pesos: 1,9 GB. La memoria cae linealmente con d.
+El costo: las etapas 1 y 2 no agregan comunicación respecto del paralelismo de datos. La 3 sí, porque ningún worker tiene los pesos completos: antes de cada capa los pide a los demás y los descarta al terminar.
+Si preguntan: en PyTorch, ZeRO-3 se llama FSDP. Narayanan et al. compararon contra ZeRO-3 (§5.2): al duplicar las GPUs, su enfoque rinde un 70% más porque trae menos datos entre nodos. No compiten: se combinan.
+Pasar a la siguiente: la otra forma de ahorrar memoria es partir el cómputo de cada capa.</aside>
+</section>

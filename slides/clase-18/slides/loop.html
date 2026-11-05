@@ -1,0 +1,30 @@
+<section id="loop" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:64px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El loop</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Una pasada del modelo, un token</h2>
+</div>
+<div style="display:flex;align-items:center;gap:32px">
+<div style="flex:1.4;display:flex;flex-direction:column;gap:12px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#A8B3BC;font-family:'Geist Mono', 'Courier New', monospace">Secuencia</p>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">¿Por qué el cielo es azul? La luz del</p>
+</div>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#4A5560"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Modelo</p>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Todas las capas, una vez</p>
+</div>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#4A5560"></x-shape>
+<div style="flex:0.8;display:flex;flex-direction:column;gap:12px;background:#161B20;border:2px solid #F5A524;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#F5A524;font-family:'Geist Mono', 'Courier New', monospace">Token</p>
+<p style="font-size:44px;font-weight:600;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">sol</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El token se agrega al final de la secuencia y se vuelve a correr el modelo, hasta un token de fin o un límite de largo. Cada vuelta depende de la anterior: una respuesta no se puede paralelizar en el tiempo.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<aside>Tiempo: 0:08–0:11 (3 min).
+Idea clave: generar texto es un loop secuencial: una pasada completa del modelo por cada token.
+Decir: el texto se parte en tokens, cada token es un número de un vocabulario fijo y cada número se convierte en un vector. El modelo recibe la secuencia, la pasa por todas sus capas y al final da una distribución sobre el vocabulario; se elige un token, por ejemplo "sol". Ese token se agrega al final y se vuelve a correr.
+Remarcar: no hay forma de calcular el token 50 antes del 49, porque el 50 depende de todos los anteriores. Una respuesta de 300 tokens son 300 pasadas, una detrás de otra. Lo único que se puede paralelizar es entre pedidos distintos: eso va a ser el batching.
+Si preguntan por cómo se elige el token: temperatura y top-p cambian la distribución antes de muestrear; no hace falta para la clase.
+Pasar a la siguiente: la primera pasada y las siguientes son trabajos muy distintos.</aside>
+</section>

@@ -1,0 +1,20 @@
+<section id="cover" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399">TA050 · Sistemas Distribuidos I</p>
+<p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#7D8892">Clase 17</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:40px">
+<h1 style="font-size:120px;font-weight:600;line-height:1.05;letter-spacing:-4px;color:#F2F3EF">Entrenamiento a escala de frontera</h1>
+<p style="width:1400px;font-size:44px;line-height:1.3;color:#A8B3BC">Cómo se entrenan hoy los modelos más grandes: decenas de miles de GPUs, cuatro dimensiones de paralelismo, expertos, FP8 y fallas todos los días</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Papers: Grattafiori et al., <i>The Llama 3 Herd of Models</i>, 2024, §3.3 · DeepSeek-AI, <i>DeepSeek-V3 Technical Report</i>, 2024, §3</p>
+<div style="display:flex;gap:16px"><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #2A3138;background:#0E1114"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#7D8892">16</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC">Fundamentos del entrenamiento</p></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #34D399;background:#132A22"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#34D399">17</p><p style="font-size:24px;line-height:1.3;color:#F2F3EF">Entrenamiento a escala de frontera</p></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #2A3138;background:#0E1114"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#7D8892">18</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC">Cómo se sirve un modelo</p></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #2A3138;background:#0E1114"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#7D8892">19</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC">Del motor al clúster</p></div></div>
+</div>
+<aside>Tiempo: 0:00–0:02 (2 min).
+Idea clave: lo de la clase pasada sigue valiendo; hoy vemos qué cambia cuando la escala pasa de miles a decenas de miles de GPUs.
+Decir: la Clase 16 fue Megatron-LM, de 2021: datos, tensores y pipeline sobre 3.072 GPUs. Hoy vamos a ver cómo se entrena en serio en 2024–2026 con dos casos documentados con mucho detalle: Llama 3 de Meta, con 16.384 H100, y DeepSeek-V3, con 2.048 H800 y una arquitectura de expertos. Y cerramos con lo que se sabe de entrenar en más de un datacenter.
+Las tres preguntas de siempre siguen siendo la guía: qué se parte, qué hay que comunicar y por qué enlace, y qué pasa cuando algo falla. La novedad es que la tercera deja de ser un caso borde.
+Lecturas: la sección 3.3 del paper de Llama 3 y la sección 3 del informe de DeepSeek-V3.
+Pasar a la siguiente: qué cambió desde Megatron.</aside>
+</section>

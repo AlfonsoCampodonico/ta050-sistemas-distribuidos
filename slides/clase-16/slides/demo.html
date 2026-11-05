@@ -1,0 +1,20 @@
+<section data-transition="fade" id="demo" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">Demo en vivo</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#0E1114;letter-spacing:-2px">Goroutines como GPUs, canales como enlaces</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px;background:#0E1114;border:1px solid #2A3138;border-radius:16px;padding:48px">
+<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/demo allreduce</p><p style="font-size:32px;color:#7D8892">central vs anillo</p></div>
+<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/demo train -straggler 2ms</p><p style="font-size:32px;color:#7D8892">la barrera</p></div>
+<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/demo train -fail-at 120</p><p style="font-size:32px;color:#7D8892">checkpoint y reintento</p></div>
+<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/demo pipeline -p 4 -m 32</p><p style="font-size:32px;color:#7D8892">la burbuja se achica</p></div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#48525C">Repositorio <b>entrenamiento-distribuido</b>: Go 1.24, sin dependencias. Los tests verifican el 2(n−1)/n·S y la fórmula (p−1)/m.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">go test ./...</p>
+<aside>Tiempo: 1:25–1:27 (2 min).
+Idea clave: todo lo de la clase se puede reproducir con el repositorio.
+Decir: si alguna demo no se corrió durante la clase, éste es el momento. Si ya se corrieron todas, mostrar sólo la última, go run ./cmd/demo pipeline -p 4 -m 32, para ver la burbuja achicarse a cerca del 9%.
+El repositorio es Go 1.24 sin dependencias: cada GPU es una goroutine y cada enlace un canal. Los tests verifican los números de la clase: que el anillo envía exactamente 2(n−1)/n·S, que la burbuja es (p−1)/m, que 4 workers dan el mismo modelo que 1 y que volver a un checkpoint da pesos idénticos.
+El README tiene cinco ejercicios: un all-reduce en árbol, uno jerárquico, el schedule intercalado, el intervalo de checkpoints y ZeRO etapa 1 sobre el trainer.
+Pasar a la siguiente: preguntas.</aside>
+</section>

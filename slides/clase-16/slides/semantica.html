@@ -1,0 +1,20 @@
+<section data-transition="fade" id="semantica" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:56px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">Semántica estricta</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:96px;font-weight:600;line-height:1.05;color:#0E1114;width:1500px;letter-spacing:-2px">d workers producen el mismo modelo que uno solo</h2>
+<div style="display:flex;gap:96px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px">
+<p style="font-size:72px;font-weight:600;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">2,2 × 10⁻¹⁶</p>
+<p style="font-size:32px;line-height:1.4;color:#48525C">Diferencia máxima entre los pesos entrenados con 1 y con 4 workers en la demo. Puro redondeo: la suma se hace en otro orden.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;justify-content:end">
+<p style="font-size:32px;line-height:1.4;color:#48525C">Es la garantía de MapReduce con mappers deterministas: la ejecución distribuida es indistinguible de una secuencial.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/demo train</p>
+<aside>Tiempo: 0:16–0:19 (3 min, con demo).
+Idea clave: con all-reduce, el paralelismo de datos tiene semántica estricta: el resultado es el mismo que con un solo worker.
+Decir: el paper lo llama strict optimizer semantics. Con el mismo batch global, 4 workers hacen exactamente la misma cuenta que uno solo, repartida. Es la misma clase de garantía que daba MapReduce con mappers deterministas: lo distribuido es indistinguible de lo secuencial.
+Demo: correr go run ./cmd/demo train. Muestra la loss y la diferencia máxima entre los pesos de 1 y de 4 workers, del orden de 10 a la −16. No es cero porque la suma de punto flotante no es asociativa y el all-reduce suma en otro orden. Además, el código verifica en cada paso que las 4 réplicas sean idénticas bit a bit.
+Remarcar: esta garantía es una decisión de diseño. Más adelante el pipeline va a pagar tiempo ocioso para no perderla.
+Pasar a la siguiente: la garantía tiene un precio.</aside>
+</section>

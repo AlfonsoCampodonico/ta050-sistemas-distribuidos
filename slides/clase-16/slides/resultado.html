@@ -1,0 +1,20 @@
+<section data-transition="fade" id="resultado" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:64px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">El resultado</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#0E1114;letter-spacing:-2px">Un billón de parámetros al 52% del pico</h2>
+</div>
+<div style="display:flex;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px"><p style="font-size:96px;font-weight:600;line-height:1;color:#08724F">3.072</p><p style="font-size:32px;color:#48525C">GPUs A100, 384 nodos</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px"><p style="font-size:96px;font-weight:600;line-height:1;color:#08724F">502</p><p style="font-size:32px;color:#48525C">petaFLOP/s en total</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px"><p style="font-size:96px;font-weight:600;line-height:1;color:#08724F">163</p><p style="font-size:32px;color:#48525C">teraFLOP/s por GPU, de 312 de pico</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px"><p style="font-size:96px;font-weight:600;line-height:1;color:#08724F">84</p><p style="font-size:32px;color:#48525C">días estimados para 450 mil millones de tokens</p></div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#48525C;width:1500px">El número incluye comunicación, carga de datos y el optimizador. Con combinaciones subóptimas de tensores y pipeline, el mismo hardware rinde hasta la mitad.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">Narayanan et al., §1, §5.1 y §5.9</p>
+<aside>Tiempo: 1:14–1:17 (3 min).
+Idea clave: con PTD-P el paper entrena un modelo de un billón de parámetros al 52% del pico de cada GPU.
+Decir: 3.072 GPUs A100 en 384 nodos. 502 petaFLOP/s en total, 163 teraFLOP/s por GPU sobre un pico teórico de 312: el 52%. Ese número es de punta a punta: incluye comunicación, carga de datos y el optimizador. Estiman que el entrenamiento completo, con 450 mil millones de tokens, llevaría unos 84 días.
+Para comparar: DeepSpeed, que también combinaba las tres dimensiones, llegaba al 36% del pico, en parte por usar GPUs V100.
+El dato más de sistemas distribuidos está en §5.9: el pipeline usó un ancho de banda de bisección efectivo de 892 GB/s, y el paralelismo de datos, 12,9 TB/s. El paper insiste en que el resultado es de software y hardware juntos: con combinaciones subóptimas de tensores y pipeline, el mismo hardware rinde hasta la mitad.
+Pasar a la siguiente: 3.072 GPUs durante 84 días. ¿Qué pasa cuando una falla?</aside>
+</section>

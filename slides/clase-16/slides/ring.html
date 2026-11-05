@@ -1,0 +1,60 @@
+<section id="ring" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">4 GPUs en anillo, gradiente en 4 pedazos</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Ring all-reduce en dos fases</h2>
+</div>
+<div style="display:flex;gap:32px;align-items:center;justify-content:center">
+<div style="display:flex;flex-direction:column;gap:8px;align-items:end">
+<p style="font-size:32px;font-weight:600;color:#F2F3EF"> </p>
+<p style="font-size:24px;color:#F2F3EF"> </p>
+<div style="height:72px;display:flex;align-items:center"><p style="font-size:24px;color:#A8B3BC">GPU 0</p></div>
+<div style="height:72px;display:flex;align-items:center"><p style="font-size:24px;color:#A8B3BC">GPU 1</p></div>
+<div style="height:72px;display:flex;align-items:center"><p style="font-size:24px;color:#A8B3BC">GPU 2</p></div>
+<div style="height:72px;display:flex;align-items:center"><p style="font-size:24px;color:#A8B3BC">GPU 3</p></div>
+<p style="font-size:24px;line-height:1.4;color:#F2F3EF"> <br/> </p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;width:392px">
+<p style="font-size:32px;font-weight:600;color:#F2F3EF;text-align:center">Inicio</p>
+<div style="display:flex;gap:8px"><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">A</p><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">B</p><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">C</p><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">D</p></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#161B20;border:2px solid #3A434C;border-radius:8px"></div></div>
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC;text-align:center">cada GPU tiene<br/>su propio gradiente</p>
+</div>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#4A5560"></x-shape>
+<div style="display:flex;flex-direction:column;gap:8px;width:392px">
+<p style="font-size:32px;font-weight:600;color:#F2F3EF;text-align:center">Reduce-scatter</p>
+<div style="display:flex;gap:8px"><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">A</p><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">B</p><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">C</p><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">D</p></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div><div style="width:88px;height:68px;background:#232A31;border:2px solid #3A434C;border-radius:8px"></div></div>
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC;text-align:center">3 pasos: cada GPU tiene<br/>un pedazo completo</p>
+</div>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#4A5560"></x-shape>
+<div style="display:flex;flex-direction:column;gap:8px;width:392px">
+<p style="font-size:32px;font-weight:600;color:#F2F3EF;text-align:center">All-gather</p>
+<div style="display:flex;gap:8px"><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">A</p><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">B</p><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">C</p><p style="width:92px;font-size:24px;color:#A8B3BC;text-align:center">D</p></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px"><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:68px;background:#34D399;border:2px solid #34D399;border-radius:8px"></div></div>
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC;text-align:center">3 pasos más: todas<br/>tienen la suma completa</p>
+</div>
+</div>
+<div style="display:flex;gap:48px;justify-content:center;align-items:center">
+<div style="display:flex;gap:16px;align-items:center"><div style="width:32px;height:28px;background:#161B20;border:2px solid #3A434C;border-radius:6px"></div><p style="font-size:24px;color:#A8B3BC">sólo el gradiente propio</p></div>
+<div style="display:flex;gap:16px;align-items:center"><div style="width:32px;height:28px;background:#232A31;border:2px solid #3A434C;border-radius:6px"></div><p style="font-size:24px;color:#A8B3BC">suma parcial</p></div>
+<div style="display:flex;gap:16px;align-items:center"><div style="width:32px;height:28px;background:#34D399;border:2px solid #34D399;border-radius:6px"></div><p style="font-size:24px;color:#A8B3BC">suma de las 4 GPUs</p></div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Patarasuk y Yuan, 2009</p>
+<aside>Tiempo: 0:26–0:32 (6 min). Es la slide más importante de la primera mitad.
+Idea clave: el ring all-reduce reparte el trabajo de modo que todos los enlaces trabajen a la vez y nadie envíe más que 2·S.
+Antes de mostrar la slide: dibujarlo en el pizarrón con 4 GPUs en anillo, cada una con su vector partido en 4 pedazos, A, B, C y D.
+Fase 1, reduce-scatter (3 pasos): en el paso s, la GPU r le pasa a su vecina de la derecha el pedazo r − s, y la vecina lo suma al suyo. Cada pedazo va acumulando contribuciones a medida que gira. Después de n − 1 pasos, la GPU r tiene completo el pedazo r + 1: la GPU 0 tiene B, la 1 tiene C, la 2 tiene D y la 3 tiene A. Es lo que muestra la grilla del medio.
+Fase 2, all-gather (3 pasos más): cada GPU hace circular su pedazo terminado y cada vecina lo copia. Al final, todas tienen todos los pedazos sumados.
+Preguntar a la clase: ¿cuánto envía cada GPU en cada paso? S/n. ¿Cuántos pasos hay? 2(n − 1). Dejar que lleguen ellos a la fórmula de la slide siguiente.
+Si preguntan por el código: collective/allreduce.go, función Ring, una docena de líneas.
+Pasar a la siguiente: los números.</aside>
+</section>

@@ -1,0 +1,32 @@
+<section id="barrera" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El precio</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">El all-reduce es una barrera, y la memoria no se reparte</h2>
+</div>
+<div style="display:flex;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
+<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">La barrera</h3>
+<ul style="font-size:32px;line-height:1.4;color:#F2F3EF">
+<li>Cada paso dura lo que tarda el worker más lento.</li>
+<li>Con miles de GPUs siempre hay un straggler.</li>
+<li>No hay backup tasks: copiar un worker es copiar su memoria y su estado.</li>
+</ul>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
+<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Los límites</h3>
+<ul style="font-size:32px;line-height:1.4;color:#F2F3EF">
+<li>Con muchas réplicas, el batch por GPU queda chico y la GPU se usa mal.</li>
+<li>Máximo de GPUs = tamaño del batch: GPT-3 usó 1536, y hacían falta unas 10.000.</li>
+<li>Cada réplica tiene que entrar en una GPU.</li>
+</ul>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Narayanan et al., §1 y §5.4.3</p>
+<aside>Tiempo: 0:19–0:23 (4 min, con demo).
+Idea clave: el all-reduce es una barrera, y el paralelismo de datos no resuelve la memoria.
+Decir, columna izquierda: nadie puede dar el paso siguiente hasta que llegaron los gradientes de todos, así que cada paso dura lo que tarda el worker más lento. Con miles de GPUs, siempre hay una más lenta.
+Demo: go run ./cmd/demo train -straggler 2ms. El worker 0 tarda 2 ms extra por paso y el tiempo total sube para todos.
+Preguntar a la clase: en MapReduce, ¿cómo resolvíamos un worker lento? Con backup tasks. ¿Por qué acá no sirven? Porque el worker lento no tiene una tarea independiente: tiene una réplica completa y está acoplado a los demás por la barrera. Lanzar una copia es duplicar la réplica entera.
+Decir, columna derecha (§1 y §5.4.3 del paper): con muchas réplicas, el batch por GPU queda tan chico que la GPU se usa mal. La cantidad máxima de GPUs es el tamaño del batch: GPT-3 usó un batch de 1536 y hacían falta unas 10.000 GPUs. Y el límite que motiva el resto de la clase: cada réplica tiene que entrar en una GPU.
+Pasar a la siguiente: antes de partir el modelo, veamos cómo se hace el all-reduce.</aside>
+</section>

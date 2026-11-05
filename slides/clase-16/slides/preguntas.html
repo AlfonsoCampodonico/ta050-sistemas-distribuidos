@@ -1,0 +1,31 @@
+<section id="preguntas" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Para repasar</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Preguntas y lecturas</h2>
+</div>
+<div style="display:flex;gap:64px">
+<ol style="flex:1.4;font-size:32px;line-height:1.4;color:#F2F3EF">
+<li>¿Por qué más réplicas no permiten entrenar un modelo que no entra en una GPU?</li>
+<li>Con 8 GPUs, ¿cuánto envía el rank más cargado en un all-reduce central y en uno en anillo?</li>
+<li>¿Por qué los tensores van dentro del nodo y el pipeline entre nodos?</li>
+<li>Con p = 8, ¿cuántos microbatches hacen falta para una burbuja menor al 10%?</li>
+<li>¿Por qué no sirven las backup tasks de MapReduce en un entrenamiento sincrónico?</li>
+</ol>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:40px">
+<h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Lecturas</h3>
+<p style="font-size:24px;line-height:1.4;color:#F2F3EF"><b>Paper:</b> Narayanan et al., Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM. SC 2021.</p>
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Rajbhandari et al., ZeRO. SC 2020.</p>
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Patarasuk y Yuan, Bandwidth Optimal All-reduce Algorithms. JPDC 2009.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido</p>
+<aside>Tiempo: 1:27–1:30 (3 min).
+Idea clave: cerrar con las preguntas de repaso. Las respuestas cortas, para tener a mano:
+1. Cada réplica guarda los 16 bytes por parámetro completos: agregar réplicas no reduce la memoria por GPU.
+2. Central: el rank 0 envía 7·S. Anillo: cada GPU envía 2·7/8·S = 1,75·S.
+3. Los tensores hacen 4 all-reduce por capa y por microbatch, en el camino crítico; el pipeline sólo envía b·s·h punto a punto entre vecinas.
+4. (8 − 1)/m &lt; 0,1, o sea m &gt; 70: al menos 71 microbatches.
+5. El worker lento no tiene una tarea independiente: tiene una réplica completa y la barrera lo acopla a todos. Duplicarlo es duplicar la réplica.
+Lecturas: el paper de la clase es Narayanan et al. (SC 2021). Complementarias: ZeRO (Rajbhandari et al., SC 2020) y Patarasuk y Yuan (JPDC 2009). Los apuntes de la clase tienen ocho preguntas más.
+Próxima clase (17): cómo se entrena hoy a escala de frontera. Llama 3 con 16.000 GPUs y paralelismo 4D, DeepSeek-V3 con MoE, FP8 y DualPipe, y qué hacer cuando con miles de GPUs algo falla todos los días.</aside>
+</section>

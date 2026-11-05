@@ -1,0 +1,31 @@
+<section id="pipeline" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Paralelismo de pipeline</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Partir el modelo por capas, una etapa por GPU</h2>
+</div>
+<div style="display:flex;align-items:center;gap:24px">
+<div style="flex:1;background:#161B20;border:2px solid #3A434C;border-radius:12px;padding:32px"><p style="font-size:32px;font-weight:600;color:#F2F3EF;text-align:center">Etapa 1</p><p style="font-size:24px;color:#A8B3BC;text-align:center">primeras capas</p></div>
+<div style="display:flex;flex-direction:column;gap:12px"><x-shape kind="arrow-right" style="width:64px;height:28px;background:#34D399"></x-shape><x-shape kind="arrow-left" style="width:64px;height:28px;background:#F5A524"></x-shape></div>
+<div style="flex:1;background:#161B20;border:2px solid #3A434C;border-radius:12px;padding:32px"><p style="font-size:32px;font-weight:600;color:#F2F3EF;text-align:center">Etapa 2</p><p style="font-size:24px;color:#A8B3BC;text-align:center">capas siguientes</p></div>
+<div style="display:flex;flex-direction:column;gap:12px"><x-shape kind="arrow-right" style="width:64px;height:28px;background:#34D399"></x-shape><x-shape kind="arrow-left" style="width:64px;height:28px;background:#F5A524"></x-shape></div>
+<div style="flex:1;background:#161B20;border:2px solid #3A434C;border-radius:12px;padding:32px"><p style="font-size:32px;font-weight:600;color:#F2F3EF;text-align:center">Etapa 3</p><p style="font-size:24px;color:#A8B3BC;text-align:center">capas siguientes</p></div>
+<div style="display:flex;flex-direction:column;gap:12px"><x-shape kind="arrow-right" style="width:64px;height:28px;background:#34D399"></x-shape><x-shape kind="arrow-left" style="width:64px;height:28px;background:#F5A524"></x-shape></div>
+<div style="flex:1;background:#161B20;border:2px solid #3A434C;border-radius:12px;padding:32px"><p style="font-size:32px;font-weight:600;color:#F2F3EF;text-align:center">Etapa 4</p><p style="font-size:24px;color:#A8B3BC;text-align:center">últimas capas</p></div>
+</div>
+<div style="display:flex;gap:48px">
+<div style="display:flex;gap:16px;align-items:center"><x-shape kind="arrow-right" style="width:48px;height:24px;background:#34D399"></x-shape><p style="font-size:24px;color:#A8B3BC">activaciones en el forward</p></div>
+<div style="display:flex;gap:16px;align-items:center"><x-shape kind="arrow-left" style="width:48px;height:24px;background:#F5A524"></x-shape><p style="font-size:24px;color:#A8B3BC">gradientes en el backward</p></div>
+</div>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Comunica poco</h3><p style="font-size:24px;line-height:1.4;color:#A8B3BC">b·s·h datos por microbatch, punto a punto, sólo entre vecinas.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Cruza servidores</h3><p style="font-size:24px;line-height:1.4;color:#A8B3BC">Por eso va entre nodos, por InfiniBand.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:32px;font-weight:600;color:#F5A524;letter-spacing:-0.5px">Pero espera</h3><p style="font-size:24px;line-height:1.4;color:#A8B3BC">Con un batch entero, mientras una etapa trabaja las demás no hacen nada.</p></div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Narayanan et al., §2.2 y §3.2</p>
+<aside>Tiempo: 0:52–0:55 (3 min).
+Idea clave: el paralelismo de pipeline parte el modelo por capas y sólo comunica activaciones entre etapas vecinas.
+Decir: cada GPU tiene un bloque contiguo de capas. En el forward, la etapa 1 le pasa a la 2 la salida de su última capa; en el backward, el gradiente vuelve en sentido contrario. Es comunicación punto a punto y chica: b·s·h datos por microbatch, contra los 4 all-reduce por capa del paralelismo de tensores. Por eso el pipeline puede cruzar nodos por InfiniBand.
+Preguntar a la clase: con el batch entero, ¿qué hace la GPU de la etapa 4 mientras la de la etapa 1 calcula su forward? Nada. Y en el backward, la etapa 1 espera a las otras tres.
+La solución es la de cualquier línea de montaje: partir el batch en m microbatches y hacerlos fluir uno detrás de otro.
+Pasar a la siguiente: aun así, al principio y al final de cada batch queda tiempo ocioso. ¿Cuánto?</aside>
+</section>

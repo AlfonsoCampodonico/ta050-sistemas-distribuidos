@@ -1,0 +1,25 @@
+<section id="desconexion" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El cliente que se va</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Si nadie lee, hay que dejar de generar</h2>
+</div>
+<div style="display:flex;gap:48px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
+<h3 style="font-size:44px;font-weight:600;color:#F5A524;letter-spacing:-0.5px">Sin cancelar</h3>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El pedido sigue en el lote, ocupa bloques de KV cache y genera tokens que nadie va a leer.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:48px">
+<h3 style="font-size:44px;font-weight:600;color:#34D399;letter-spacing:-0.5px">Cancelando</h3>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El handler ve que la conexión se cerró, saca el pedido del lote y libera sus bloques.</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">case &lt;-r.Context().Done(): engine.Cancel(id)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">server/server.go · curl localhost:8080/estado después de cortar el curl</p>
+<aside>Tiempo: 1:18–1:21 (3 min, con demo).
+Idea clave: el servidor tiene que enterarse cuando el cliente se va y liberar lo que ocupaba; si no, regala lugar en el lote y KV cache a nadie.
+Decir: si el usuario cierra la pestaña a la mitad de una respuesta larga, la conexión se corta. Un servidor que no se entera sigue generando tokens que nadie va a leer, y mientras tanto ese pedido ocupa un lugar en el lote y bloques de KV cache que otro pedido podría usar. Con lo que vimos hoy, es directamente throughput perdido.
+En Go, el handler de cada pedido mira el contexto de la request: cuando r.Context().Done() se cierra, el handler le avisa al motor, que saca el pedido del lote y libera sus bloques.
+Demo: con el servidor corriendo, lanzar un curl con una respuesta larga, cortarlo con Ctrl-C y pedir /estado: en_el_lote vuelve a 0, los slots asignados vuelven a 0 y cancelados sube a 1. El test TestDisconnectFreesTheKVCache verifica exactamente eso.
+Conectar con el gateway: los tokens se cobran a medida que salen. Los límites y el cobro se cuentan en tokens, no en pedidos, porque un pedido puede costar 10 tokens o 10.000.
+Pasar a la siguiente: dónde se va el tiempo de un pedido.</aside>
+</section>

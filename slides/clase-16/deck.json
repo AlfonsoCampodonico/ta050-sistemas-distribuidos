@@ -1,0 +1,74 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-04T00:15:00Z"
+  },
+  "lists": "css",
+  "title": "Clase 16 — Entrenamiento distribuido",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "mapa",
+    "paredes",
+    "loop",
+    "datos",
+    "semantica",
+    "barrera",
+    "central",
+    "ring",
+    "ringnum",
+    "memoria",
+    "zero",
+    "tensores",
+    "nodo",
+    "pipeline",
+    "burbuja",
+    "schedules",
+    "intercalado",
+    "ptdp",
+    "takeaways",
+    "resultado",
+    "fallas",
+    "gang",
+    "demo",
+    "preguntas"
+  ],
+  "sections": {
+    "s1": {
+      "description": "Por qué entrenar un modelo grande es un problema de sistemas distribuidos.",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "Paralelismo de datos y all-reduce: réplicas, barrera y el anillo.",
+      "start": "datos"
+    },
+    "s3": {
+      "description": "Dónde se va la memoria y cómo ZeRO la reparte.",
+      "start": "memoria"
+    },
+    "s4": {
+      "description": "Partir el modelo: tensores dentro del nodo, pipeline entre nodos.",
+      "start": "tensores"
+    },
+    "s5": {
+      "description": "PTD-P: cómo se combinan las tres dimensiones y qué logra el paper.",
+      "start": "ptdp"
+    },
+    "s6": {
+      "description": "Fallas, checkpoints, planificación y demo.",
+      "start": "fallas"
+    }
+  },
+  "faces": {
+    "geist": {
+      "family": "Geist",
+      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    },
+    "geist-mono": {
+      "family": "Geist Mono",
+      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    }
+  },
+  "designSystems": []
+}

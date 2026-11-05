@@ -1,0 +1,30 @@
+<section id="takeaways" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Cómo configurarlo</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Tres reglas para elegir p, t y d</h2>
+</div>
+<div style="display:flex;gap:40px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
+<p style="font-size:72px;font-weight:600;color:#34D399">1</p>
+<h3 style="font-size:44px;font-weight:600;line-height:1.2;color:#F2F3EF;letter-spacing:-0.5px">Tensores hasta llenar un servidor</h3>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">t = cantidad de GPUs del nodo (8). Para escalar entre nodos, pipeline.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
+<p style="font-size:72px;font-weight:600;color:#34D399">2</p>
+<h3 style="font-size:44px;font-weight:600;line-height:1.2;color:#F2F3EF;letter-spacing:-0.5px">Modelo paralelo mínimo, datos para el resto</h3>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">t·p lo justo para que el modelo entre en memoria. El paralelismo de datos es el que menos comunica por cómputo.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
+<p style="font-size:72px;font-weight:600;color:#34D399">3</p>
+<h3 style="font-size:44px;font-weight:600;line-height:1.2;color:#F2F3EF;letter-spacing:-0.5px">El microbatch depende del modelo</h3>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Más grande usa mejor la GPU, pero deja menos microbatches y agranda la burbuja.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Narayanan et al., §3, Takeaways #1 a #3</p>
+<aside>Tiempo: 1:11–1:14 (3 min).
+Idea clave: las tres reglas prácticas del paper (§3) para elegir p, t y d.
+Decir: regla 1, tensores hasta la cantidad de GPUs de un servidor, y pipeline para escalar entre servidores. Ya vimos por qué.
+Regla 2, usar el mínimo de paralelismo de modelo, t·p, que haga entrar el modelo en memoria, y escalar todo lo demás con paralelismo de datos. Es el que menos comunica por cómputo hecho: un solo all-reduce por batch.
+Regla 3, el tamaño de microbatch óptimo depende del modelo. Un microbatch más grande usa mejor la GPU, pero deja menos microbatches por batch y agranda la burbuja: las dos fuerzas se oponen. No hay fórmula cerrada; el paper da un modelo analítico, (b'/b + p − 1)·(tf(b) + tb(b)), para estimarlo, y en sus experimentos elegirlo bien da hasta un 15% más de rendimiento.
+Pasar a la siguiente: ¿a dónde llegan con esto?</aside>
+</section>

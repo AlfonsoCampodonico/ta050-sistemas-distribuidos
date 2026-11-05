@@ -1,0 +1,30 @@
+<section id="intercalado" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">La contribución del paper</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Schedule intercalado: menos burbuja a cambio de más mensajes</h2>
+</div>
+<div style="display:flex;gap:64px;align-items:center">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px">
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Cada GPU tiene v pedazos chicos del modelo en lugar de un bloque contiguo.</p>
+<table style="font-size:32px;color:#F2F3EF;font-family:Geist, Arial, sans-serif">
+<tr><th style="width:40%">GPU</th><th style="width:60%">Capas (v = 2)</th></tr>
+<tr><td>GPU 1</td><td>1, 2, 9, 10</td></tr>
+<tr><td>GPU 2</td><td>3, 4, 11, 12</td></tr>
+</table>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:48px">
+<p style="font-size:24px;color:#A8B3BC">Burbuja</p>
+<p style="font-size:72px;font-weight:600;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">(p−1)/(v·m)</p>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">La comunicación punto a punto se multiplica por v.</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Con la optimización scatter/gather, que reparte cada envío entre las 8 placas InfiniBand del nodo, el resultado neto es al menos un 10% más de rendimiento.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Narayanan et al., §2.2.2 y §4.1</p>
+<aside>Tiempo: 1:04–1:07 (3 min).
+Idea clave: el schedule intercalado reduce la burbuja a (p−1)/(v·m) a cambio de multiplicar por v la comunicación punto a punto.
+Decir: en lugar de un bloque contiguo de capas, cada GPU tiene v pedazos chicos. El ejemplo del paper (§2.2.2): antes la GPU 1 tenía las capas 1 a 4; con v = 2 tiene la 1, 2, 9 y 10, y la GPU 2 tiene la 3, 4, 11 y 12. Cada pedazo tarda v veces menos, así que el pipeline se llena y se vacía v veces más rápido.
+El costo: cada microbatch cruza más fronteras entre GPUs, así que la comunicación punto a punto se multiplica por v. Además requiere que m sea múltiplo de p.
+Lo que lo hace rendir es la optimización scatter/gather (§4.1): como las 8 GPUs de un nodo tienen la misma activación, cada una envía sólo 1/8 por su propia placa InfiniBand y del otro lado se reconstruye por NVLink. Con eso, el schedule intercalado da al menos un 10% más de rendimiento. Sin esa optimización, con batches grandes gana el schedule por defecto.
+Si preguntan: implementarlo en el simulador es el ejercicio 3 del repo.
+Pasar a la siguiente: ya tenemos las tres dimensiones. ¿Cómo se combinan?</aside>
+</section>

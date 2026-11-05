@@ -1,0 +1,27 @@
+<section id="paredes" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El problema</p>
+<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Dos paredes: el cómputo y la memoria</h2>
+</div>
+<div style="display:flex;gap:48px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:56px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#A8B3BC;font-family:'Geist Mono', 'Courier New', monospace">Cómputo</p>
+<p style="font-size:120px;font-weight:600;line-height:1;color:#34D399">288 años</p>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">para entrenar GPT-3, con 175 mil millones de parámetros, en una sola GPU V100.</p>
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Se resuelve con más copias trabajando en paralelo.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:56px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#A8B3BC;font-family:'Geist Mono', 'Courier New', monospace">Memoria</p>
+<p style="font-size:120px;font-weight:600;line-height:1;color:#34D399">16 bytes</p>
+<p style="font-size:32px;line-height:1.4;color:#F2F3EF">por parámetro al entrenar: 175 mil millones necesitan unos 2,8 TB. La GPU más grande del paper tiene 80 GB.</p>
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Se resuelve partiendo el modelo.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Narayanan et al., §1</p>
+<aside>Tiempo: 0:05–0:09 (4 min).
+Idea clave: hay dos paredes y cada una pide una solución distinta.
+Decir: la pared del cómputo. Según el paper (§1), entrenar GPT-3, con 175 mil millones de parámetros, llevaría unos 288 años en una sola V100. La solución es poner más máquinas a trabajar en paralelo.
+La pared de la memoria. Entrenar no es sólo guardar los pesos: también hay que guardar los gradientes y el estado del optimizador, y eso suma 16 bytes por parámetro (lo desarmamos en la parte de ZeRO). 175 mil millones por 16 bytes son unos 2,8 TB, y la GPU más grande del paper tiene 80 GB. Acá más copias no ayudan: si una copia no entra, cien copias tampoco. Hay que partir el modelo.
+Preguntar a la clase: ¿cuántas GPUs de 80 GB harían falta sólo para guardar esos 2,8 TB? (Unas 35, sin contar las activaciones.)
+Pasar a la siguiente: un minuto de ML, lo mínimo para entender qué se comunica.</aside>
+</section>

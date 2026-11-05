@@ -1,0 +1,20 @@
+<section id="cover" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399">TA050 · Sistemas Distribuidos I</p>
+<p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#7D8892">Clase 19</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:40px">
+<h1 style="font-size:120px;font-weight:600;line-height:1.05;letter-spacing:-4px;color:#F2F3EF">Del motor al clúster</h1>
+<p style="width:1400px;font-size:44px;line-height:1.3;color:#A8B3BC">Cómo se sirve un modelo hoy: el KV cache compartido entre pedidos, un router que sabe dónde está cada prefijo, y el prefill separado del decode</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Paper: Qin et al., <i>Mooncake: Trading More Storage for Less Computation — A KVCache-centric Architecture for Serving LLM Chatbot</i>, FAST 2025</p>
+<div style="display:flex;gap:16px"><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #2A3138;background:#0E1114"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#7D8892">16</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC">Fundamentos del entrenamiento</p></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #2A3138;background:#0E1114"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#7D8892">17</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC">Entrenamiento a escala de frontera</p></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #2A3138;background:#0E1114"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#7D8892">18</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC">Cómo se sirve un modelo</p></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #34D399;background:#132A22"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#34D399">19</p><p style="font-size:24px;line-height:1.3;color:#F2F3EF">Del motor al clúster</p></div></div>
+</div>
+<aside>Tiempo: 0:00–0:02 (2 min).
+Idea clave: la clase pasada fue una réplica por dentro; hoy es un servicio con muchas réplicas, y el KV cache pasa de ser un detalle de cada réplica al centro del diseño.
+Decir: en la Clase 18 vimos vLLM: cómo una GPU arma lotes y administra el KV cache de los pedidos en curso. Desde 2024 casi todo lo nuevo en serving pasa afuera de esa réplica: guardar el KV cache entre pedidos para no recalcular, rutear cada pedido a donde ya está su prefijo, y separar el prefill del decode en máquinas distintas.
+El paper de hoy es Mooncake, el sistema que sirve a Kimi, el chatbot de Moonshot AI. Ganó el premio al mejor paper en FAST 2025, una conferencia de almacenamiento: la idea central es cambiar cómputo por almacenamiento.
+Es la última de las cuatro clases: 16 y 17 sobre entrenar, 18 y 19 sobre servir.
+Pasar a la siguiente: qué cambia entre una réplica y un servicio.</aside>
+</section>

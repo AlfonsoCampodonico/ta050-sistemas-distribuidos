@@ -1,0 +1,13 @@
+<section data-transition="fade" id="medicion" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">Lo que midió el paper</p>
+<p style="font-size:160px;font-weight:600;line-height:1;color:#08724F">20,4% – 38,2%</p>
+<p style="font-size:44px;line-height:1.3;color:#0E1114;width:1500px">de la memoria del KV cache guardaba tokens de verdad en los sistemas existentes. El resto se desperdiciaba.</p>
+<p style="font-size:32px;line-height:1.4;color:#48525C">En el repositorio, la reserva del máximo da 28%.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">Kwon et al., §1 y §3 · go run ./cmd/sim memoria</p>
+<aside>Tiempo: 0:41–0:43 (2 min).
+Idea clave: entre el 60% y el 80% de la memoria que limita el throughput se desperdiciaba.
+Decir: el paper midió cuánto de la memoria del KV cache guardaba tokens de verdad en los sistemas existentes: entre 20,4% y 38,2%. Dicho al revés: entre el 60% y el 80% de la memoria más valiosa de la GPU estaba reservada para nada.
+El simulador del repositorio, con una carga de largos de cola pesada, da 28% para la reserva del máximo: cae dentro del rango del paper.
+Pausa. Dejar que el número pese antes de seguir: si se pudiera usar toda esa memoria, entrarían tres o cuatro veces más secuencias en el lote, y ya vimos que el throughput es el tamaño del lote.
+Pasar a la siguiente: la solución ya la conocen.</aside>
+</section>
