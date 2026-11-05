@@ -11,7 +11,8 @@
 
 - `repos/entrenamiento-distribuido`: clases 16 y 17 (Go, sin dependencias). `go test ./...`, `go run ./cmd/demo <allreduce|train|pipeline|4d|moe|fallas|diloco>`.
 - `repos/servir-tokens`: clases 18 y 19 (Go, sin dependencias). `go test ./...`, `go run ./cmd/sim <batching|memoria|cow|router|desagregado|especulativo>`, `go run ./cmd/servidor`, `go run ./cmd/proxy -buffer`.
-- `slides/clase-NN/`: cada deck en el formato de Claude Slides (`deck.json` + `slides/*.html`, una `<section>` por slide, notas del presentador en `<aside>`). `index.html` es un visor local: abrilo en el navegador y tildá "notas" para ver las notas.
+- `slides/clase-NN/`: cada deck en el formato de Claude Slides (`deck.json` + `slides/*.html`, una `<section>` por slide, notas del presentador en `<aside>`). `index.html` es el visor: muestra una slide por vez (← → o deslizar para avanzar, N notas, G todas, F pantalla completa) y guarda la slide actual en la URL (`#5`). El modo presentación está en `slides/present.js`.
+- Sitio: https://alfonsocampodonico.github.io/ta050-sistemas-distribuidos/
 - `simuladores/`: Motor de inferencia (Clase 18), Clúster de inferencia (Clase 19) y Entrenamiento a escala (Clase 17). HTML autocontenido; sólo carga las fuentes de Google Fonts.
 - `apuntes/`: las notas de cada clase en Markdown, exportadas de los docs.
 - `herramientas/`: los generadores de los decks.

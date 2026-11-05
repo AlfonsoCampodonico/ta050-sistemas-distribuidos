@@ -2,3 +2,4 @@
 .remember/
 __pycache__/
 herramientas/out/
+.claude/
