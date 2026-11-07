@@ -10,16 +10,16 @@
 
   const css = document.createElement('style');
   css.textContent = `
-body.present{overflow:hidden;background:#000}
+body.present{overflow:hidden;background:#0B0F11}
 body.present header,body.present .frame:not(.cur),body.present .note{display:none}
 body.present .frame.cur{position:fixed;left:0;right:0;margin:0 auto;border:0;border-radius:0;aspect-ratio:auto}
-body.present.notes .note.cur{display:block;position:fixed;left:0;right:0;bottom:0;width:auto;margin:0;padding:20px max(16px,calc((100vw - 1100px)/2)) ${BAR + 16}px;overflow:auto;background:#03181A;border-top:1px solid #0B2E33;color:#DEE2E6;font-size:17px;font-family:Rubik,sans-serif;font-weight:300}
-.pbar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:6px;background:rgba(1,1,1,.9);border:1px solid #0B2E33;border-radius:10px;font:500 14px 'IBM Plex Mono',monospace;color:#ADB5BD;z-index:10;transition:opacity .3s;user-select:none}
+body.present.notes .note.cur{display:block;position:fixed;left:0;right:0;bottom:0;width:auto;margin:0;padding:20px max(16px,calc((100vw - 1100px)/2)) ${BAR + 16}px;overflow:auto;background:#0F1416;border-top:1px solid #263034;color:#B4BEC3;font-size:17px;font-family:Rubik,sans-serif}
+.pbar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:6px;background:rgba(15,20,22,.94);border:1px solid #263034;border-radius:10px;font:500 14px 'IBM Plex Mono',monospace;color:#B4BEC3;z-index:10;transition:opacity .3s;user-select:none}
 body:not(.present) .pbar{position:fixed}
 body.present.idle .pbar{opacity:0}
 .pbar button{background:none;border:0;color:inherit;font:inherit;padding:8px 12px;border-radius:6px;cursor:pointer;min-width:40px}
-.pbar button:hover{background:#046B7D;color:#FFFFFF}
-.pbar button.on{color:#25F6FE}
+.pbar button:hover{background:#1C2428;color:#E8ECEE}
+.pbar button.on{color:#3AA6B9}
 .pbar .count{padding:0 8px;min-width:64px;text-align:center}
 .pbar a{color:inherit;text-decoration:none;padding:8px 12px}
 body:not(.present) .frame{cursor:pointer}

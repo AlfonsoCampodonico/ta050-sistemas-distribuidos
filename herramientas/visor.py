@@ -14,24 +14,24 @@ FACES = {"chakra-petch": {"family": "Chakra Petch", "href": "https://fonts.googl
          "ibm-plex-mono": {"family": "IBM Plex Mono", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"}}
 FONTS = "".join(f'<link rel="stylesheet" href="{f["href"]}">' for f in FACES.values())
 STYLE = """<style>
-body{margin:0;background:linear-gradient(180deg,#010101,#03181A) fixed;color:#F3F4F5;font-family:Rubik,Arial,sans-serif;font-weight:300}
-header{padding:24px 32px;font-family:'IBM Plex Mono',monospace;color:#ADB5BD}
-header b{font-family:'Chakra Petch',sans-serif;font-weight:700;color:#FFFFFF;text-transform:uppercase;letter-spacing:.02em;text-shadow:0 0 .6em rgba(37,246,254,.5)}
-header a{color:#25F6FE}
-.frame{width:min(1280px,96vw);aspect-ratio:16/9;margin:0 auto 24px;position:relative;overflow:hidden;border:1px solid #0B2E33;border-radius:8px;box-shadow:0 0 24px rgba(37,246,254,.08)}
+body{margin:0;background:#0B0F11;color:#E8ECEE;font-family:Rubik,Arial,sans-serif}
+header{padding:24px 32px;font-family:'IBM Plex Mono',monospace;color:#7F8B91}
+header b{font-family:'Chakra Petch',sans-serif;font-weight:600;color:#E8ECEE}
+header a{color:#3AA6B9}
+.frame{width:min(1280px,96vw);aspect-ratio:16/9;margin:0 auto 24px;position:relative;overflow:hidden;border:1px solid #263034;border-radius:6px}
 .stage{width:1920px;height:1080px;transform-origin:0 0;position:absolute}
 .stage section{width:1920px;height:1080px;box-sizing:border-box;position:relative}
 .stage *{margin:0;box-sizing:border-box}.stage aside{display:none}
 .stage x-shape{display:block;clip-path:polygon(0 30%,70% 30%,70% 0,100% 50%,70% 100%,70% 70%,0 70%)}
-.stage b,.stage strong{font-weight:500}
-.stage ol li::marker{color:#046B7D;font-family:'IBM Plex Mono',monospace;font-weight:500}
+.stage b,.stage strong{font-weight:600}
+.stage ol li::marker{color:#3AA6B9;font-family:'IBM Plex Mono',monospace;font-weight:500}
 .stage ul{list-style:none;padding-left:0}
 .stage ul li{position:relative;padding-left:1.1em}
-.stage ul li::before{content:"";position:absolute;left:0;top:.55em;width:.32em;height:.32em;background:#046B7D}
-table{border-collapse:collapse;width:100%} th,td{padding:12px 16px;border-bottom:1px solid #DEE2E6;text-align:left}
-th{font-weight:500;color:#046B7D;font-family:'IBM Plex Mono',monospace;font-size:.8em;text-transform:uppercase;letter-spacing:.04em}
+.stage ul li::before{content:"";position:absolute;left:0;top:.55em;width:.32em;height:.32em;background:#3AA6B9}
+table{border-collapse:collapse;width:100%} th,td{padding:12px 16px;border-bottom:1px solid #263034;text-align:left}
+th{font-weight:500;color:#3AA6B9;font-family:'IBM Plex Mono',monospace;font-size:.8em;text-transform:uppercase;letter-spacing:.04em}
 body.notes .frame::after{content:none}
-.note{width:min(1280px,96vw);margin:-12px auto 32px;white-space:pre-wrap;color:#ADB5BD;font-size:15px;line-height:1.5;display:none}
+.note{width:min(1280px,96vw);margin:-12px auto 32px;white-space:pre-wrap;color:#B4BEC3;font-size:15px;line-height:1.5;display:none}
 body.notes .note{display:block}
 </style>"""
 TAIL = """<script>

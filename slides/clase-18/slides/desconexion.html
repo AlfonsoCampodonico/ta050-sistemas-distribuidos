@@ -1,21 +1,21 @@
-<section data-estilo="curso" id="desconexion" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" id="desconexion" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El cliente que se va</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Si nadie lee, hay que dejar de generar</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">El cliente que se va</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Si nadie lee, hay que dejar de generar</h2>
 </div>
 <div style="display:flex;gap:48px">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:48px">
-<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#B45309;">Sin cancelar</h3>
-<p style="font-size:32px;line-height:1.4;color:#33393E">El pedido sigue en el lote, ocupa bloques de KV cache y genera tokens que nadie va a leer.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161D20;border:1px solid #263034;border-radius:16px;padding:48px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:600;color:#E0A050;;letter-spacing:-0.5px">Sin cancelar</h3>
+<p style="font-size:32px;line-height:1.4;color:#B4BEC3">El pedido sigue en el lote, ocupa bloques de KV cache y genera tokens que nadie va a leer.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:48px">
-<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#046B7D;">Cancelando</h3>
-<p style="font-size:32px;line-height:1.4;color:#33393E">El handler ve que la conexión se cerró, saca el pedido del lote y libera sus bloques.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161D20;border:2px solid #3AA6B9;border-radius:16px;padding:48px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:600;color:#3AA6B9;;letter-spacing:-0.5px">Cancelando</h3>
+<p style="font-size:32px;line-height:1.4;color:#B4BEC3">El handler ve que la conexión se cerró, saca el pedido del lote y libera sus bloques.</p>
 </div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">case &lt;-r.Context().Done(): engine.Cancel(id)</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">server/server.go · curl localhost:8080/estado después de cortar el curl</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">28</p>
+<p style="font-size:32px;line-height:1.4;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">case &lt;-r.Context().Done(): engine.Cancel(id)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">server/server.go · curl localhost:8080/estado después de cortar el curl</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">28</p>
 <aside>Tiempo: 1:18–1:21 (3 min, con demo).
 Idea clave: el servidor tiene que enterarse cuando el cliente se va y liberar lo que ocupaba; si no, regala lugar en el lote y KV cache a nadie.
 Decir: si el usuario cierra la pestaña a la mitad de una respuesta larga, la conexión se corta. Un servidor que no se entera sigue generando tokens que nadie va a leer, y mientras tanto ese pedido ocupa un lugar en el lote y bloques de KV cache que otro pedido podría usar. Con lo que vimos hoy, es directamente throughput perdido.

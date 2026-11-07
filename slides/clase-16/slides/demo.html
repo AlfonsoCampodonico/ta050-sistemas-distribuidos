@@ -1,17 +1,17 @@
-<section data-estilo="curso" data-transition="fade" id="demo" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" data-transition="fade" id="demo" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Demo en vivo</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Goroutines como GPUs, canales como enlaces</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">Demo en vivo</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Goroutines como GPUs, canales como enlaces</h2>
 </div>
-<div style="display:flex;flex-direction:column;gap:20px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:48px">
-<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/demo allreduce</p><p style="font-size:32px;color:#6C757D">central vs anillo</p></div>
-<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/demo train -straggler 2ms</p><p style="font-size:32px;color:#6C757D">la barrera</p></div>
-<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/demo train -fail-at 120</p><p style="font-size:32px;color:#6C757D">checkpoint y reintento</p></div>
-<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/demo pipeline -p 4 -m 32</p><p style="font-size:32px;color:#6C757D">la burbuja se achica</p></div>
+<div style="display:flex;flex-direction:column;gap:20px;background:#0B0F11;border:1px solid #263034;border-radius:16px;padding:48px">
+<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">go run ./cmd/demo allreduce</p><p style="font-size:32px;color:#7F8B91">central vs anillo</p></div>
+<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">go run ./cmd/demo train -straggler 2ms</p><p style="font-size:32px;color:#7F8B91">la barrera</p></div>
+<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">go run ./cmd/demo train -fail-at 120</p><p style="font-size:32px;color:#7F8B91">checkpoint y reintento</p></div>
+<div style="display:flex;gap:48px"><p style="width:860px;font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">go run ./cmd/demo pipeline -p 4 -m 32</p><p style="font-size:32px;color:#7F8B91">la burbuja se achica</p></div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#33393E">Repositorio <b>entrenamiento-distribuido</b>: Go 1.24, sin dependencias. Los tests verifican el 2(n−1)/n·S y la fórmula (p−1)/m.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">go test ./...</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">29</p>
+<p style="font-size:32px;line-height:1.4;color:#B4BEC3">Repositorio <b>entrenamiento-distribuido</b>: Go 1.24, sin dependencias. Los tests verifican el 2(n−1)/n·S y la fórmula (p−1)/m.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">go test ./...</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">29</p>
 <aside>Tiempo: 1:25–1:27 (2 min).
 Idea clave: todo lo de la clase se puede reproducir con el repositorio.
 Decir: si alguna demo no se corrió durante la clase, éste es el momento. Si ya se corrieron todas, mostrar sólo la última, go run ./cmd/demo pipeline -p 4 -m 32, para ver la burbuja achicarse a cerca del 9%.

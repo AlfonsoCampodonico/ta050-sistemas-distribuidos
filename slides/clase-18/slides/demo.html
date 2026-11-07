@@ -1,18 +1,18 @@
-<section data-estilo="curso" data-transition="fade" id="demo" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" data-transition="fade" id="demo" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El repositorio</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Un servidor de inferencia sin modelo</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">El repositorio</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Un servidor de inferencia sin modelo</h2>
 </div>
-<div style="display:flex;flex-direction:column;gap:20px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:48px">
-<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim batching</p><p style="font-size:32px;color:#6C757D">estático vs continuo</p></div>
-<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim memoria</p><p style="font-size:32px;color:#6C757D">contiguo vs bloques</p></div>
-<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim cow</p><p style="font-size:32px;color:#6C757D">copy-on-write</p></div>
-<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/servidor</p><p style="font-size:32px;color:#6C757D">HTTP + SSE de verdad</p></div>
-<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/proxy -buffer</p><p style="font-size:32px;color:#6C757D">el bug de streaming</p></div>
+<div style="display:flex;flex-direction:column;gap:20px;background:#0B0F11;border:1px solid #263034;border-radius:16px;padding:48px">
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim batching</p><p style="font-size:32px;color:#7F8B91">estático vs continuo</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim memoria</p><p style="font-size:32px;color:#7F8B91">contiguo vs bloques</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim cow</p><p style="font-size:32px;color:#7F8B91">copy-on-write</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">go run ./cmd/servidor</p><p style="font-size:32px;color:#7F8B91">HTTP + SSE de verdad</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">go run ./cmd/proxy -buffer</p><p style="font-size:32px;color:#7F8B91">el bug de streaming</p></div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#33393E">El mismo motor corre en tiempo virtual (sim) y en tiempo real (servidor). Go 1.24, sin dependencias.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">servir-tokens · go test ./...</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">30</p>
+<p style="font-size:32px;line-height:1.4;color:#B4BEC3">El mismo motor corre en tiempo virtual (sim) y en tiempo real (servidor). Go 1.24, sin dependencias.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">servir-tokens · go test ./...</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">30</p>
 <aside>Tiempo: 1:24–1:27 (3 min).
 Idea clave: todo lo de la clase se puede reproducir y modificar con el repositorio.
 Decir: el modelo no existe: cada iteración cuesta un tiempo que sale de un modelo de costo, 20 ms de leer los pesos más un poco por secuencia y por token de prefill. Todo lo demás es lo que hace un servidor real: admisión por orden de llegada, batching continuo, tabla de bloques, copy-on-write, desalojo con recomputación y streaming con cancelación.

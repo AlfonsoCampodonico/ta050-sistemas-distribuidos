@@ -1,28 +1,28 @@
-<section data-estilo="curso" id="cow" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<section data-estilo="curso" id="cow" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Compartir · §4.4</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Varias muestras, un solo prompt: copy-on-write</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">Compartir · §4.4</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Varias muestras, un solo prompt: copy-on-write</h2>
 </div>
 <div style="display:flex;gap:64px;align-items:center">
 <div style="flex:1.2;display:flex;flex-direction:column;gap:12px">
 <div style="display:flex;gap:12px;align-items:stretch">
-<div style="width:420px;background:#E3EFF1;border:2px solid #046B7D;border-radius:12px;display:flex;flex-direction:column;justify-content:center;padding:24px"><p style="font-size:28px;font-weight:600;color:#0D0D0D">Prompt compartido</p><p style="font-size:24px;color:#0D0D0D">cada bloque con 4 referencias</p></div>
+<div style="width:420px;background:#12292D;border:2px solid #3AA6B9;border-radius:12px;display:flex;flex-direction:column;justify-content:center;padding:24px"><p style="font-size:28px;font-weight:600;color:#E8ECEE">Prompt compartido</p><p style="font-size:24px;color:#E8ECEE">cada bloque con 4 referencias</p></div>
 <div style="display:flex;flex-direction:column;gap:12px">
-<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><p style="font-size:24px;color:#33393E">muestra 1</p></div>
-<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><p style="font-size:24px;color:#33393E">muestra 2</p></div>
-<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><p style="font-size:24px;color:#33393E">muestra 3</p></div>
-<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><p style="font-size:24px;color:#33393E">muestra 4</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#2A2114;border:2px solid #E0A050;border-radius:8px"></div><p style="font-size:24px;color:#B4BEC3">muestra 1</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#2A2114;border:2px solid #E0A050;border-radius:8px"></div><p style="font-size:24px;color:#B4BEC3">muestra 2</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#2A2114;border:2px solid #E0A050;border-radius:8px"></div><p style="font-size:24px;color:#B4BEC3">muestra 3</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#2A2114;border:2px solid #E0A050;border-radius:8px"></div><p style="font-size:24px;color:#B4BEC3">muestra 4</p></div>
 </div>
 </div>
-<p style="font-size:24px;line-height:1.4;color:#33393E">Cuando una muestra escribe en un bloque compartido, recién ahí se copia ese bloque. Es el fork() de Unix.</p>
+<p style="font-size:24px;line-height:1.4;color:#B4BEC3">Cuando una muestra escribe en un bloque compartido, recién ahí se copia ese bloque. Es el fork() de Unix.</p>
 </div>
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:96px;font-weight:600;line-height:1;color:#046B7D">152 → 59</p><p style="font-size:24px;color:#33393E">bloques para 4 muestras de un prompt de 500 tokens (repositorio)</p></div>
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:44px;font-weight:600;color:#0D0D0D">hasta 66%</p><p style="font-size:24px;color:#33393E">menos memoria con beam search en ShareGPT (paper)</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:96px;font-weight:600;line-height:1;color:#3AA6B9">152 → 59</p><p style="font-size:24px;color:#B4BEC3">bloques para 4 muestras de un prompt de 500 tokens (repositorio)</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:44px;font-weight:600;color:#E8ECEE">hasta 66%</p><p style="font-size:24px;color:#B4BEC3">menos memoria con beam search en ShareGPT (paper)</p></div>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.4 y §6.3 · go run ./cmd/sim cow</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">22</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.4 y §6.3 · go run ./cmd/sim cow</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">22</p>
 <aside>Tiempo: 0:58–1:02 (4 min).
 Idea clave: con una tabla de por medio, varias secuencias pueden compartir bloques físicos, y se copia recién cuando alguna escribe.
 Decir: cuando se piden varias respuestas para el mismo prompt (muestreo paralelo) o se hace beam search, todas las secuencias empiezan con el mismo prompt. vLLM no lo copia: las tablas de bloques de todas apuntan a los mismos bloques físicos, y cada bloque físico lleva un contador de referencias.

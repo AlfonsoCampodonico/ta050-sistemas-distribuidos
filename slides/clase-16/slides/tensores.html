@@ -1,36 +1,36 @@
-<section data-estilo="curso" data-transition="fade" id="tensores" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<section data-estilo="curso" data-transition="fade" id="tensores" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Paralelismo de tensores (Megatron)</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Partir cada matriz entre GPUs</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">Paralelismo de tensores (Megatron)</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Partir cada matriz entre GPUs</h2>
 </div>
-<div style="display:flex;gap:120px"><p style="font-size:44px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">Y = GeLU(X·A)</p><p style="font-size:44px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">Z = Y·B</p></div>
+<div style="display:flex;gap:120px"><p style="font-size:44px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">Y = GeLU(X·A)</p><p style="font-size:44px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">Z = Y·B</p></div>
 <div style="display:flex;gap:32px;align-items:stretch">
 <div style="display:flex;flex-direction:column;gap:24px">
 <div style="display:flex;gap:24px;align-items:center">
-<p style="width:120px;font-size:32px;font-weight:600;color:#33393E">GPU 0</p>
-<div style="width:380px;background:#FFFFFF;border:2px solid #C3CAD0;border-radius:12px;padding:24px"><p style="font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">Y₁ = GeLU(X·A₁)</p></div>
-<x-shape kind="arrow-right" style="width:56px;height:28px;background:#ADB5BD"></x-shape>
-<div style="width:260px;background:#FFFFFF;border:2px solid #C3CAD0;border-radius:12px;padding:24px"><p style="font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">Z₁ = Y₁·B₁</p></div>
+<p style="width:120px;font-size:32px;font-weight:600;color:#B4BEC3">GPU 0</p>
+<div style="width:380px;background:#161D20;border:2px solid #3A464C;border-radius:12px;padding:24px"><p style="font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">Y₁ = GeLU(X·A₁)</p></div>
+<x-shape kind="arrow-right" style="width:56px;height:28px;background:#4E5A60"></x-shape>
+<div style="width:260px;background:#161D20;border:2px solid #3A464C;border-radius:12px;padding:24px"><p style="font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">Z₁ = Y₁·B₁</p></div>
 </div>
 <div style="display:flex;gap:24px;align-items:center">
-<p style="width:120px;font-size:32px;font-weight:600;color:#33393E">GPU 1</p>
-<div style="width:380px;background:#FFFFFF;border:2px solid #C3CAD0;border-radius:12px;padding:24px"><p style="font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">Y₂ = GeLU(X·A₂)</p></div>
-<x-shape kind="arrow-right" style="width:56px;height:28px;background:#ADB5BD"></x-shape>
-<div style="width:260px;background:#FFFFFF;border:2px solid #C3CAD0;border-radius:12px;padding:24px"><p style="font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">Z₂ = Y₂·B₂</p></div>
+<p style="width:120px;font-size:32px;font-weight:600;color:#B4BEC3">GPU 1</p>
+<div style="width:380px;background:#161D20;border:2px solid #3A464C;border-radius:12px;padding:24px"><p style="font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">Y₂ = GeLU(X·A₂)</p></div>
+<x-shape kind="arrow-right" style="width:56px;height:28px;background:#4E5A60"></x-shape>
+<div style="width:260px;background:#161D20;border:2px solid #3A464C;border-radius:12px;padding:24px"><p style="font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">Z₂ = Y₂·B₂</p></div>
 </div>
 </div>
-<x-shape kind="arrow-right" style="width:56px;height:28px;background:#ADB5BD;align-self:center"></x-shape>
-<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px;background:#046B7D;border-radius:12px;padding:32px">
-<p style="font-size:32px;font-weight:600;color:#FFFFFF">all-reduce</p>
-<p style="font-size:32px;color:#FFFFFF;font-family:'IBM Plex Mono', monospace">Z = Z₁ + Z₂</p>
+<x-shape kind="arrow-right" style="width:56px;height:28px;background:#4E5A60;align-self:center"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px;background:#1F6E7C;border-radius:12px;padding:32px">
+<p style="font-size:32px;font-weight:600;color:#E8ECEE">all-reduce</p>
+<p style="font-size:32px;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">Z = Z₁ + Z₂</p>
 </div>
 </div>
 <div style="display:flex;gap:48px">
-<p style="flex:1;font-size:32px;line-height:1.4;color:#33393E">A se parte por columnas: GeLU actúa elemento por elemento y no necesita la otra mitad. B se parte por filas: recién al final se suma.</p>
-<p style="flex:1;font-size:32px;line-height:1.4;color:#0D0D0D"><b>2 all-reduce en el forward y 2 en el backward,</b> por capa y por microbatch, en el camino crítico.</p>
+<p style="flex:1;font-size:32px;line-height:1.4;color:#B4BEC3">A se parte por columnas: GeLU actúa elemento por elemento y no necesita la otra mitad. B se parte por filas: recién al final se suma.</p>
+<p style="flex:1;font-size:32px;line-height:1.4;color:#E8ECEE"><b>2 all-reduce en el forward y 2 en el backward,</b> por capa y por microbatch, en el camino crítico.</p>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Narayanan et al., §2.3</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">16</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Narayanan et al., §2.3</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">16</p>
 <aside>Tiempo: 0:44–0:49 (5 min).
 Idea clave: el paralelismo de tensores parte cada multiplicación de matrices entre GPUs, a costa de all-reduce en cada capa.
 Decir: el bloque MLP de un transformer son dos multiplicaciones de matrices con una GeLU en el medio. El truco de Megatron está en cómo se parte cada matriz.

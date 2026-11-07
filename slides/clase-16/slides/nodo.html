@@ -1,26 +1,26 @@
-<section data-estilo="curso" id="nodo" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" id="nodo" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El hardware decide</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Los tensores se quedan dentro del servidor</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">El hardware decide</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Los tensores se quedan dentro del servidor</h2>
 </div>
 <div style="display:flex;gap:48px">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:48px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Dentro de un DGX A100</p>
-<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#0D0D0D;">8 GPUs por NVLink y NVSwitch</h3>
-<p style="font-size:32px;line-height:1.4;color:#33393E">El enlace más rápido del clúster. Ahí van los all-reduce de cada capa.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161D20;border:2px solid #3AA6B9;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">Dentro de un DGX A100</p>
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:600;color:#E8ECEE;;letter-spacing:-0.5px">8 GPUs por NVLink y NVSwitch</h3>
+<p style="font-size:32px;line-height:1.4;color:#B4BEC3">El enlace más rápido del clúster. Ahí van los all-reduce de cada capa.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:48px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#33393E;font-family:'IBM Plex Mono', monospace">Entre servidores</p>
-<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#0D0D0D;">8 placas InfiniBand de 200 Gb/s</h3>
-<p style="font-size:32px;line-height:1.4;color:#33393E">Bastante más lento. Con t = 16, cada all-reduce cruzaría la red entre nodos.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161D20;border:1px solid #263034;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#B4BEC3;font-family:'IBM Plex Mono', monospace">Entre servidores</p>
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:600;color:#E8ECEE;;letter-spacing:-0.5px">8 placas InfiniBand de 200 Gb/s</h3>
+<p style="font-size:32px;line-height:1.4;color:#B4BEC3">Bastante más lento. Con t = 16, cada all-reduce cruzaría la red entre nodos.</p>
 </div>
 </div>
-<div style="display:flex;gap:32px;align-items:center;background:#EEF0F2;border-radius:16px;padding:40px 48px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#B45309;white-space:nowrap;font-family:'IBM Plex Mono', monospace">Takeaway #1</p>
-<p style="font-size:32px;line-height:1.4;color:#0D0D0D">Tensores hasta la cantidad de GPUs de un servidor; más allá, pipeline. Partir de más también hace matrices chicas que la GPU usa mal.</p>
+<div style="display:flex;gap:32px;align-items:center;background:#1C2428;border-radius:16px;padding:40px 48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#E0A050;white-space:nowrap;font-family:'IBM Plex Mono', monospace">Takeaway #1</p>
+<p style="font-size:32px;line-height:1.4;color:#E8ECEE">Tensores hasta la cantidad de GPUs de un servidor; más allá, pipeline. Partir de más también hace matrices chicas que la GPU usa mal.</p>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Narayanan et al., §3.2, §3.3.2 y §5</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">17</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Narayanan et al., §3.2, §3.3.2 y §5</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">17</p>
 <aside>Tiempo: 0:49–0:52 (3 min).
 Idea clave: el paralelismo de tensores sólo funciona sobre el enlace más rápido, dentro del servidor.
 Decir: el clúster del paper, Selene, tiene nodos DGX A100: 8 GPUs de 80 GB conectadas por NVLink y NVSwitch. Entre nodos, cada servidor tiene 8 placas InfiniBand HDR de 200 Gb/s, en un fat-tree de tres niveles: bastante más lento.

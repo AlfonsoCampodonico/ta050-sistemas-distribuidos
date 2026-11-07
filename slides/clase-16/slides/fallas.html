@@ -1,32 +1,32 @@
-<section data-estilo="curso" id="fallas" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" id="fallas" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Fallas</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Una GPU que falla detiene a las 3.072</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">Fallas</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Una GPU que falla detiene a las 3.072</h2>
 </div>
 <div style="display:flex;gap:48px">
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
-<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:40px">
-<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#33393E;">MapReduce</h3>
-<p style="font-size:32px;line-height:1.4;color:#0D0D0D">Se reintenta la tarea que falló; el resto sigue.</p>
+<div style="display:flex;flex-direction:column;gap:8px;background:#161D20;border:1px solid #263034;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:600;color:#B4BEC3;;letter-spacing:-0.5px">MapReduce</h3>
+<p style="font-size:32px;line-height:1.4;color:#E8ECEE">Se reintenta la tarea que falló; el resto sigue.</p>
 </div>
-<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:40px">
-<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#046B7D;">Entrenamiento sincrónico</h3>
-<p style="font-size:32px;line-height:1.4;color:#0D0D0D">Todos vuelven al último checkpoint y rehacen los pasos. Funciona porque cada paso es determinista.</p>
+<div style="display:flex;flex-direction:column;gap:8px;background:#161D20;border:2px solid #3AA6B9;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:600;color:#3AA6B9;;letter-spacing:-0.5px">Entrenamiento sincrónico</h3>
+<p style="font-size:32px;line-height:1.4;color:#E8ECEE">Todos vuelven al último checkpoint y rehacen los pasos. Funciona porque cada paso es determinista.</p>
 </div>
 </div>
 <div style="flex:1;display:flex;flex-direction:column;gap:32px">
 <div style="display:flex;gap:40px">
-<div style="flex:1;display:flex;flex-direction:column;gap:4px"><p style="font-size:72px;font-weight:600;color:#046B7D">13,8 TB</p><p style="font-size:24px;color:#33393E">un checkpoint del modelo de un billón</p></div>
-<div style="flex:1;display:flex;flex-direction:column;gap:4px"><p style="font-size:72px;font-weight:600;color:#046B7D">273 GB/s</p><p style="font-size:24px;color:#33393E">al guardar: casi un minuto con todas las GPUs esperando</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px"><p style="font-size:72px;font-weight:600;color:#3AA6B9">13,8 TB</p><p style="font-size:24px;color:#B4BEC3">un checkpoint del modelo de un billón</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:4px"><p style="font-size:72px;font-weight:600;color:#3AA6B9">273 GB/s</p><p style="font-size:24px;color:#B4BEC3">al guardar: casi un minuto con todas las GPUs esperando</p></div>
 </div>
 <div style="display:flex;flex-direction:column;gap:12px">
-<p style="font-size:24px;color:#33393E">Cada cuánto guardar, con costo de checkpoint C y tiempo medio entre fallas F (Young):</p>
-<p style="font-size:44px;font-weight:600;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">T ≈ √(2·C·F)</p>
+<p style="font-size:24px;color:#B4BEC3">Cada cuánto guardar, con costo de checkpoint C y tiempo medio entre fallas F (Young):</p>
+<p style="font-size:44px;font-weight:600;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">T ≈ √(2·C·F)</p>
 </div>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">go run ./cmd/demo train -fail-at 120 · Narayanan et al., §5.10</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">27</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">go run ./cmd/demo train -fail-at 120 · Narayanan et al., §5.10</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">27</p>
 <aside>Tiempo: 1:17–1:22 (5 min, con demo).
 Idea clave: en un entrenamiento sincrónico una sola falla detiene a todos; la recuperación es volver al último checkpoint, y funciona porque cada paso es determinista.
 Decir: comparar las dos tarjetas. En MapReduce una falla era barata: se reintentaba la tarea y el resto seguía. Acá cada paso necesita los gradientes de todas las réplicas, cada etapa necesita a la anterior y cada capa partida necesita a sus 8 GPUs. Si una se cae, ningún paso termina.

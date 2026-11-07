@@ -1,21 +1,21 @@
-<section data-estilo="curso" id="kvcache" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" id="kvcache" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El KV cache</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Cada token deja una key y un value en cada capa</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">El KV cache</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Cada token deja una key y un value en cada capa</h2>
 </div>
 <div style="display:flex;gap:64px;align-items:center">
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
-<p style="font-size:32px;line-height:1.4;color:#0D0D0D">La atención compara cada token nuevo con todos los anteriores. Para eso necesita de cada uno su key y su value.</p>
-<p style="font-size:32px;line-height:1.4;color:#0D0D0D">Se calculan una vez y se guardan: es el estado de cada secuencia en curso, y crece con cada token.</p>
+<p style="font-size:32px;line-height:1.4;color:#E8ECEE">La atención compara cada token nuevo con todos los anteriores. Para eso necesita de cada uno su key y su value.</p>
+<p style="font-size:32px;line-height:1.4;color:#E8ECEE">Se calculan una vez y se guardan: es el estado de cada secuencia en curso, y crece con cada token.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:48px">
-<p style="font-size:24px;color:#33393E">Bytes por token</p>
-<p style="font-size:32px;font-weight:600;line-height:1.5;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">2 × capas × cabezas KV × dimensión × bytes</p>
-<p style="font-size:24px;line-height:1.4;color:#33393E">El 2 es una key y un value.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#161D20;border:2px solid #3AA6B9;border-radius:16px;padding:48px">
+<p style="font-size:24px;color:#B4BEC3">Bytes por token</p>
+<p style="font-size:32px;font-weight:600;line-height:1.5;color:#E8ECEE;font-family:'IBM Plex Mono', monospace">2 × capas × cabezas KV × dimensión × bytes</p>
+<p style="font-size:24px;line-height:1.4;color:#B4BEC3">El 2 es una key y un value.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §2 y §3</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">8</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §2 y §3</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">8</p>
 <aside>Tiempo: 0:19–0:23 (4 min).
 Idea clave: el KV cache es el estado de cada secuencia: las keys y values de todos sus tokens en todas las capas. Se guarda para no recalcularlo en cada paso.
 Decir: en cada capa, la atención compara el token actual (su query) con las keys de todos los anteriores y mezcla sus values. Si no se guardaran, en cada paso habría que recalcular las keys y values de todo el prompt y de todo lo generado: rehacer el prefill por cada token. En lugar de eso se calculan una vez, en el prefill para el prompt y en cada paso para el token nuevo, y se guardan.

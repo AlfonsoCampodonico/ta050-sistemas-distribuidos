@@ -1,22 +1,22 @@
-<section data-estilo="curso" id="desperdicio" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<section data-estilo="curso" id="desperdicio" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El problema de la memoria</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Reservar el máximo contiguo desperdicia de tres formas</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">El problema de la memoria</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Reservar el máximo contiguo desperdicia de tres formas</h2>
 </div>
 <div style="display:flex;height:72px;gap:0">
-<div style="width:320px;background:#046B7D;border-radius:10px 0 0 10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#FFFFFF">tokens</p></div>
-<div style="width:200px;background:#035A69;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#0D0D0D">1 · reserva</p></div>
-<div style="width:520px;background:#E3EFF1;border-radius:0 10px 10px 0;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#0D0D0D">2 · fragmentación interna</p></div>
-<div style="width:180px;border:3px dashed #B45309;border-radius:10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#B45309">3 · externa</p></div>
-<div style="width:440px;background:#B45309;border-radius:10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#FFFFFF">otro pedido</p></div>
+<div style="width:320px;background:#1F6E7C;border-radius:10px 0 0 10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#E8ECEE">tokens</p></div>
+<div style="width:200px;background:#1F6E7C;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#E8ECEE">1 · reserva</p></div>
+<div style="width:520px;background:#12292D;border-radius:0 10px 10px 0;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#E8ECEE">2 · fragmentación interna</p></div>
+<div style="width:180px;border:3px dashed #E0A050;border-radius:10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#E0A050">3 · externa</p></div>
+<div style="width:440px;background:#8A5A1E;border-radius:10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#E8ECEE">otro pedido</p></div>
 </div>
 <div style="display:flex;gap:40px">
-<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#0D0D0D;">1 · Reserva</h3><p style="font-size:24px;line-height:1.4;color:#33393E">Lugar para tokens que todavía no se generaron. Se va a usar, pero mientras tanto nadie más puede.</p></div>
-<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#0D0D0D;">2 · Fragmentación interna</h3><p style="font-size:24px;line-height:1.4;color:#33393E">Lugar que nunca se va a usar, porque la respuesta terminó antes del máximo. Se sabe recién al final.</p></div>
-<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#B45309;">3 · Fragmentación externa</h3><p style="font-size:24px;line-height:1.4;color:#33393E">Huecos entre tramos: suman mucho, pero por separado no le sirven a un pedido nuevo.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:600;color:#E8ECEE;;letter-spacing:-0.5px">1 · Reserva</h3><p style="font-size:24px;line-height:1.4;color:#B4BEC3">Lugar para tokens que todavía no se generaron. Se va a usar, pero mientras tanto nadie más puede.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:600;color:#E8ECEE;;letter-spacing:-0.5px">2 · Fragmentación interna</h3><p style="font-size:24px;line-height:1.4;color:#B4BEC3">Lugar que nunca se va a usar, porque la respuesta terminó antes del máximo. Se sabe recién al final.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:600;color:#E0A050;;letter-spacing:-0.5px">3 · Fragmentación externa</h3><p style="font-size:24px;line-height:1.4;color:#B4BEC3">Huecos entre tramos: suman mucho, pero por separado no le sirven a un pedido nuevo.</p></div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §3.1</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">15</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §3.1</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">15</p>
 <aside>Tiempo: 0:37–0:41 (4 min).
 Idea clave: guardar el KV cache de cada pedido en un tramo contiguo del tamaño máximo produce tres desperdicios.
 Decir: los sistemas previos guardaban el KV cache de cada pedido en un tramo contiguo, porque los kernels de atención esperaban los datos uno al lado del otro. Cuando llega un pedido nadie sabe cuánto va a generar, así que la única opción segura es reservar el máximo, por ejemplo 2.048 tokens.

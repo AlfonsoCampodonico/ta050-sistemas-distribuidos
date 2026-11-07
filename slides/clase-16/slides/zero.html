@@ -1,33 +1,33 @@
-<section data-estilo="curso" id="zero" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" id="zero" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">ZeRO = sharding del estado</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Partir lo redundante baja la memoria de 120 GB a 1,9 GB</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">ZeRO = sharding del estado</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Partir lo redundante baja la memoria de 120 GB a 1,9 GB</h2>
 </div>
 <div style="display:flex;flex-direction:column;gap:32px">
 <div style="display:flex;align-items:center;gap:32px">
-<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#0D0D0D">Paralelismo de datos</p><p style="font-size:24px;color:#33393E">nada se parte</p></div>
-<div style="width:960px;height:56px;background:#ADB5BD;border-radius:8px"></div>
-<p style="font-size:32px;font-weight:600;color:#0D0D0D;white-space:nowrap">120 GB</p>
+<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#E8ECEE">Paralelismo de datos</p><p style="font-size:24px;color:#B4BEC3">nada se parte</p></div>
+<div style="width:960px;height:56px;background:#4E5A60;border-radius:8px"></div>
+<p style="font-size:32px;font-weight:600;color:#E8ECEE;white-space:nowrap">120 GB</p>
 </div>
 <div style="display:flex;align-items:center;gap:32px">
-<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#0D0D0D">ZeRO-1</p><p style="font-size:24px;color:#33393E">+ estado del optimizador</p></div>
-<div style="width:251px;height:56px;background:#046B7D;border-radius:8px"></div>
-<p style="font-size:32px;font-weight:600;color:#0D0D0D;white-space:nowrap">31,4 GB</p>
+<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#E8ECEE">ZeRO-1</p><p style="font-size:24px;color:#B4BEC3">+ estado del optimizador</p></div>
+<div style="width:251px;height:56px;background:#1F6E7C;border-radius:8px"></div>
+<p style="font-size:32px;font-weight:600;color:#E8ECEE;white-space:nowrap">31,4 GB</p>
 </div>
 <div style="display:flex;align-items:center;gap:32px">
-<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#0D0D0D">ZeRO-2</p><p style="font-size:24px;color:#33393E">+ gradientes</p></div>
-<div style="width:133px;height:56px;background:#046B7D;border-radius:8px"></div>
-<p style="font-size:32px;font-weight:600;color:#0D0D0D;white-space:nowrap">16,6 GB</p>
+<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#E8ECEE">ZeRO-2</p><p style="font-size:24px;color:#B4BEC3">+ gradientes</p></div>
+<div style="width:133px;height:56px;background:#1F6E7C;border-radius:8px"></div>
+<p style="font-size:32px;font-weight:600;color:#E8ECEE;white-space:nowrap">16,6 GB</p>
 </div>
 <div style="display:flex;align-items:center;gap:32px">
-<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#0D0D0D">ZeRO-3</p><p style="font-size:24px;color:#33393E">+ pesos</p></div>
-<div style="width:16px;height:56px;background:#046B7D;border-radius:8px"></div>
-<p style="font-size:32px;font-weight:600;color:#0D0D0D;white-space:nowrap">1,9 GB</p>
+<div style="width:440px;display:flex;flex-direction:column;gap:4px"><p style="font-size:32px;font-weight:600;color:#E8ECEE">ZeRO-3</p><p style="font-size:24px;color:#B4BEC3">+ pesos</p></div>
+<div style="width:16px;height:56px;background:#1F6E7C;border-radius:8px"></div>
+<p style="font-size:32px;font-weight:600;color:#E8ECEE;white-space:nowrap">1,9 GB</p>
 </div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#33393E">Memoria por GPU para 7.500 millones de parámetros con d = 64. Las etapas 1 y 2 no agregan comunicación; la 3 trae los pesos por la red en cada capa.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Rajbhandari et al., 2020, figura 1</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">14</p>
+<p style="font-size:32px;line-height:1.4;color:#B4BEC3">Memoria por GPU para 7.500 millones de parámetros con d = 64. Las etapas 1 y 2 no agregan comunicación; la 3 trae los pesos por la red en cada capa.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">TA050 · Clase 16 · Entrenamiento distribuido · Rajbhandari et al., 2020, figura 1</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">14</p>
 <aside>Tiempo: 0:39–0:44 (5 min).
 Idea clave: ZeRO aplica sharding al estado del entrenamiento: si las d réplicas guardan lo mismo, cada una se queda con 1/d.
 Decir: el ejemplo es la figura 1 del paper de ZeRO: 7.500 millones de parámetros y 64 réplicas. Sin ZeRO, 120 GB por GPU. Cada etapa parte algo más.

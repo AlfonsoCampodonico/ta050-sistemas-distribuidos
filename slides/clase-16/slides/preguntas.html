@@ -1,25 +1,25 @@
-<section data-estilo="curso" id="preguntas" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" id="preguntas" style="background:#0F1416;color:#E8ECEE;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Para repasar</p>
-<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Preguntas y lecturas</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#3AA6B9;font-family:'IBM Plex Mono', monospace">Para repasar</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#E8ECEE;;letter-spacing:-0.5px">Preguntas y lecturas</h2>
 </div>
 <div style="display:flex;gap:64px">
-<ol style="flex:1.4;font-size:32px;line-height:1.4;color:#0D0D0D">
+<ol style="flex:1.4;font-size:32px;line-height:1.4;color:#E8ECEE">
 <li>¿Por qué más réplicas no permiten entrenar un modelo que no entra en una GPU?</li>
 <li>Con 8 GPUs, ¿cuánto envía el rank más cargado en un all-reduce central y en uno en anillo?</li>
 <li>¿Por qué los tensores van dentro del nodo y el pipeline entre nodos?</li>
 <li>Con p = 8, ¿cuántos microbatches hacen falta para una burbuja menor al 10%?</li>
 <li>¿Por qué no sirven las backup tasks de MapReduce en un entrenamiento sincrónico?</li>
 </ol>
-<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:40px">
-<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#0D0D0D;">Lecturas</h3>
-<p style="font-size:24px;line-height:1.4;color:#0D0D0D"><b>Paper:</b> Narayanan et al., Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM. SC 2021.</p>
-<p style="font-size:24px;line-height:1.4;color:#33393E">Rajbhandari et al., ZeRO. SC 2020.</p>
-<p style="font-size:24px;line-height:1.4;color:#33393E">Patarasuk y Yuan, Bandwidth Optimal All-reduce Algorithms. JPDC 2009.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161D20;border:1px solid #263034;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:600;color:#E8ECEE;;letter-spacing:-0.5px">Lecturas</h3>
+<p style="font-size:24px;line-height:1.4;color:#E8ECEE"><b>Paper:</b> Narayanan et al., Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM. SC 2021.</p>
+<p style="font-size:24px;line-height:1.4;color:#B4BEC3">Rajbhandari et al., ZeRO. SC 2020.</p>
+<p style="font-size:24px;line-height:1.4;color:#B4BEC3">Patarasuk y Yuan, Bandwidth Optimal All-reduce Algorithms. JPDC 2009.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 16 · Entrenamiento distribuido</p>
-<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">30</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">TA050 · Clase 16 · Entrenamiento distribuido</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">30</p>
 <aside>Tiempo: 1:27–1:30 (3 min).
 Idea clave: cerrar con las preguntas de repaso. Las respuestas cortas, para tener a mano:
 1. Cada réplica guarda los 16 bytes por parámetro completos: agregar réplicas no reduce la memoria por GPU.
