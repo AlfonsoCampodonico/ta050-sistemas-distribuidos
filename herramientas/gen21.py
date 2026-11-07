@@ -94,12 +94,12 @@ d.slide("fallas", D, head("Nadie sabe cuánto va a durar su trabajo", "Ni siquie
         ["Bien", "69,3%", "44,5%"], ["Lo mató el usuario", "13,5%", "37,7%"], ["Falló", "17,2%", "17,8%"]],
         D, widths=[46, 27, 27], right=(1, 2), size=28, bold_rows=(1,)), p("Jeon et al., tabla 6", D, size=24, color="muted"), gap=12, flex=1),
         col(card(label("Por qué fallan", D, color="warn") +
-                 p("Sobre todo errores del usuario: falta de memoria en la CPU, entradas incorrectas, errores en el código. Las fallas de infraestructura son el 6,2% de los intentos.", D, size=28), D, pad=36),
+                 p("Sobre todo errores del usuario: falta de memoria en la CPU, entradas incorrectas, errores en el código. Las de infraestructura son el 6,2% de los intentos, pero el 36% del tiempo hasta fallar.", D, size=28), D, pad=36),
             p("Lección del paper: atrapar los errores antes de pedir un clúster grande.", D, size=28, color="ink"), gap=24, width=760), gap=56, align="center"),
     """Tiempo: 0:12–0:16 (4 min).
 Idea clave: el planificador no conoce la duración de los trabajos, y casi un tercio ni siquiera termina bien; eso descarta las políticas que necesitan saber cuánto falta.
 Decir: la tabla 6 del paper. De los 96.260 trabajos, el 69,3% terminó bien y usó el 44,5% del GPU·tiempo. El 13,5% lo mató el usuario y el 17,2% falló. Juntos son el 30,7% de los trabajos y se llevaron alrededor del 55% del GPU·tiempo. Que el usuario lo mate no es necesariamente malo: muchos entrenan hasta ver que la curva no mejora, o hacen búsqueda de hiperparámetros y matan las configuraciones malas.
-¿Por qué fallan? Mayormente errores del usuario: la causa más frecuente es quedarse sin memoria en la CPU, después entradas incorrectas y errores semánticos en el código. Las fallas de infraestructura son sólo el 6,2% de los intentos, aunque por durar más antes de fallar pesan más en tiempo. Y los trabajos de más de 4 GPUs reintentan más y fallan más.
+¿Por qué fallan? Mayormente errores del usuario: la causa más frecuente es quedarse sin memoria en la CPU, después entradas incorrectas y errores semánticos en el código. Dos fallas de infraestructura, error al guardar el checkpoint y falla del runtime de MPI, son sólo el 6,2% de los intentos, pero aparecen tarde y suman el 36% del tiempo hasta fallar. Y los trabajos de más de 4 GPUs reintentan más y fallan más.
 La tercera recomendación del paper: muchas fallas deberían atraparse temprano, antes de que el trabajo pida un clúster grande. Por ejemplo, correr primero un rato en una GPU.
 Conectar con la Clase 17: allá las fallas eran del hardware, una cada tres horas en 16.000 GPUs. En un clúster compartido, la mayoría las causa el usuario.
 Pasar a la siguiente: el primer problema de planificar, todo o nada.""",
@@ -152,7 +152,7 @@ d.slide("cabeza", D, head("Bloqueo de cabeza de cola", "El primero no entra, y n
     """Tiempo: 0:24–0:27 (3 min).
 Idea clave: con gang scheduling y FIFO estricto, un trabajo grande al frente de la cola deja GPUs libres que los chicos de atrás podrían usar; backfill los deja pasar.
 Decir: la cola tiene al frente un trabajo de 32 GPUs, y quedan 20 libres. Con FIFO estricto, el de 32 espera a que se liberen 12 más, y los de 1, 1, 4, 1 y 2 de atrás también esperan, aunque entran de sobra. Es el bloqueo de cabeza de cola (head-of-line blocking), el mismo de las colas de red o de un supermercado con una sola caja.
-Backfill: si el primero no entra, se prueba con los siguientes y entran los que caben. Philly lo hace: el 38,1% de las decisiones de su planificador fueron fuera de orden, y para los trabajos de más de 4 GPUs, todas. El análisis de Alibaba de 2022 encuentra el mismo problema: alrededor del 9% de las instancias cortas pasó más de la mitad de su tiempo esperando.
+Backfill: si el primero no entra, se prueba con los siguientes y entran los que caben. Philly lo hace: el 38,1% de las decisiones de su planificador fueron fuera de orden, y todos los trabajos de más de 4 GPUs vieron pasar a otros adelante; en el 85% de esos casos, sin alargar su espera. El análisis de Alibaba de 2022 encuentra el mismo problema: alrededor del 9% de las instancias cortas pasó más de la mitad de su tiempo esperando.
 Pasar a la siguiente: el precio de dejar pasar.""",
     d.footer("Jeon et al., §3.1.1 · Weng et al., NSDI 2022, §1"), gap=40)
 
@@ -272,13 +272,13 @@ d.slide("colas", D, head("Tiresias · §3.2.3", "Dos colas alcanzan", D) +
     col(lane("Cola 1 · alta prioridad", "recibieron menos que el umbral", [("1 GPU · 5 min", "blue"), ("8 GPUs · 2 min", "acc"), ("32 GPUs · 1 min", "warn")], accent=True),
         f'<div style="display:flex;align-items:center;gap:16px;padding-left:32px">{p("↓", D, size=40, color="muted")}{p("baja al pasar el umbral de GPU·tiempo: 3.200 GPU·s en su testbed", D, size=28)}</div>',
         lane("Cola 2 · baja prioridad", "dentro de cada cola, FIFO por hora de arranque", [("1 GPU · 3 h", "muted"), ("16 GPUs · 1 h", "muted")]), gap=16) +
-    p("Con 3 o 4 colas, el JCT mejora sólo un 1%. Contra el hambre: si un trabajo esperó K veces lo que corrió, vuelve a la cola 1 (PROMOTEKNOB).", D, size=28),
+    p("Con 3 o 4 colas, el JCT mejora sólo un 1%. Contra el hambre: si un trabajo esperó PROMOTEKNOB veces lo que corrió, vuelve a la cola 1.", D, size=28),
     """Tiempo: 0:51–0:54 (3 min).
 Idea clave: LAS puro desalojaría todo el tiempo; Tiresias lo discretiza en pocas colas, y con dos ya alcanza.
 Decir: LAS al pie de la letra cambia de prioridad continuamente: cada vez que un trabajo recibe un poco de servicio, otro lo pasa, y habría que desalojar a cada rato. Con GPUs, desalojar es caro (próxima slide). Tiresias discretiza: K colas con umbrales de GPU·tiempo; un trabajo empieza en la cola 1 y baja cuando su GPU·tiempo pasa el umbral. Entre colas, prioridad estricta y preempción; dentro de cada cola, FIFO.
 El detalle importante: FIFO por la hora en que arrancó por primera vez, no por la hora de llegada. Si fuera por llegada, un trabajo que llegó antes pero todavía no pudo arrancar desalojaría a uno que ya está corriendo, sin ganar nada.
 ¿Cuántas colas? El paper dice que con K = 2 se anda casi igual que con más: con 3 o 4 colas el JCT promedio mejora sólo un 1%. En su testbed usan 2 colas con un umbral de 3.200 GPU·segundos.
-El hambre: los que bajan a la cola 2 pueden no volver a correr nunca si siguen llegando trabajos nuevos. Tiresias tiene un parámetro, PROMOTEKNOB: si un trabajo lleva esperando K veces lo que corrió, vuelve a la cola 1. Es el aging de los planificadores de procesos. En el testbed lo apagaron.
+El hambre: los que bajan a la cola 2 pueden no volver a correr nunca si siguen llegando trabajos nuevos. Tiresias tiene un parámetro, PROMOTEKNOB: si un trabajo lleva esperando PROMOTEKNOB veces lo que corrió, vuelve a la cola 1. Es el aging de los planificadores de procesos. En el testbed lo apagaron.
 Pasar a la siguiente: cuánto cuesta desalojar.""",
     d.footer("Gu et al., NSDI 2019, §3.2.3, §5.2 y §5.4.2"), gap=32)
 
@@ -303,7 +303,7 @@ d.slide("tiresias", L, col(eyebrow("Resultados · Tiresias, NSDI 2019", L), h2("
     p("En simulación, con la traza de Philly: 2,4× contra YARN-CS, 1,5× contra best-effort y 2× contra Gandiva, y el mismo JCT promedio que SRTF, que conoce las duraciones.", L, size=28),
     """Tiempo: 0:57–1:00 (3 min).
 Idea clave: con dos colas de 2D-LAS y consolidando sólo a los sensibles, Tiresias logra lo que lograría SRTF sabiendo las duraciones.
-Decir: el testbed: 60 GPUs P100 en 15 máquinas de 4. Contra YARN-CS, el planificador de capacidad de YARN que usaba Philly (FIFO con gang), el JCT promedio mejora 5,5 veces y el mediano 27 veces: la mayoría de los trabajos, que son cortos, deja de esperar detrás de los largos. La espera promedio en la cola baja de más de 8.000 segundos a unos 1.000; la mitad de los trabajos espera 13 segundos o menos. El makespan, el tiempo hasta que termina el último, también baja, 1,21 veces.
+Decir: el testbed: 60 GPUs P100 en 15 máquinas de 4. Contra YARN-CS, un planificador de capacidad de YARN como el que usaba Microsoft (FIFO con gang), el JCT promedio mejora 5,5 veces y el mediano 27 veces: la mayoría de los trabajos, que son cortos, deja de esperar detrás de los largos. La espera promedio en la cola baja de más de 8.000 segundos a unos 1.000; la mitad de los trabajos espera 13 segundos o menos. El makespan, el tiempo hasta que termina el último, también baja, 1,21 veces.
 En simulación con la traza de Philly, la tabla 5: 2,4 veces mejor que YARN-CS, 1,5 contra best-effort (FIFO dejando pasar a los que entran, nuestro backfill) y 2 contra Gandiva. Y el JCT promedio queda igual al de SRTF, que conoce las duraciones.
 Remarcar: la ganancia grande es contra FIFO estricto; contra backfill es más chica. Lo vamos a ver en la demo.
 Pasar a la siguiente: la demo.""",
@@ -325,7 +325,7 @@ Demo: go run ./cmd/sim duraciones, y en el simulador, cambiar entre FIFO + backf
 Leer la tabla, la misma carga. FIFO: 10 horas de JCT promedio. Backfill: 3,82. 2D-LAS con el umbral de Tiresias, 3.200 GPU·segundos: 4,12, peor que backfill. ¿Por qué? Porque en esta carga los trabajos duran horas: con 3.200 GPU·s un trabajo de 32 GPUs baja de cola a los 100 segundos y uno de 1 GPU a los 53 minutos; casi todo está en la cola 2 y se desaloja 2.642 veces. Con un umbral de 300.000 GPU·s (unas 80 GPU·horas): 3,70 horas, a un 1% de SRTF (3,67), con 569 preempciones. El umbral se elige mirando la carga.
 Mirar la columna de los grandes: con backfill esperan 3,2 horas; con 2D-LAS, 23 minutos. Un trabajo nuevo de 32 GPUs tiene prioridad alta mientras recibió poco, así que no lo pasan los chicos. LAS también arregla el hambre del backfill.
 A la derecha, el costo de cada preempción con el umbral bueno: con 30 minutos por desalojo, el JCT sube a 3,91. Si guardar un checkpoint cuesta mucho, conviene desalojar menos.
-Lo honesto: la diferencia contra backfill es chica (3%); la grande es contra FIFO estricto. En el paper, igual: 5,5 veces contra YARN-CS, 1,5 contra best-effort.
+Lo honesto: la diferencia contra backfill es chica (3%); la grande es contra FIFO estricto. En la simulación del paper, igual: 2,4 veces contra YARN-CS, que tiene bloqueo de cabeza de cola, y sólo 1,5 contra best-effort, que ya hace backfill.
 Pasar a la siguiente: compartir.""",
     d.footer("go run ./cmd/sim duraciones · " + SIM, L, plain=True), gap=36)
 
@@ -374,12 +374,12 @@ Pasar a la siguiente: cómo se ve a escala hoy.""",
 d.slide("hoy", D, head("Hoy · a escala de Meta", "Planificar entre regiones, y entrenar y servir en la misma flota", D) +
     row(col(label("MAST · OSDI 2024", D), big("2,63 → 0,98", "demanda sobre oferta de GPUs en la región más cargada, para los trabajos de alta prioridad", D, size=72),
             p("Decenas de regiones, millones de máquinas, decenas de miles de GPUs. Antes, cada usuario elegía la región a mano; ahora la elige un planificador global.", D, size=28), gap=24, flex=1),
-        card(label("Una flota para todo", D, color="warn") + p("El serving tiene picos de día y valles de noche. DeepSeek apaga nodos de inferencia de noche y usa esas GPUs para otra cosa (Clase 19).", D, size=28) +
+        card(label("Una flota para todo", D, color="warn") + p("El serving tiene picos de día y valles de noche. DeepSeek reduce los nodos de inferencia de noche y usa esas GPUs para investigación y entrenamiento.", D, size=28) +
              p("La próxima clase: entrenar con lo que se sirve.", D, size=28, color="ink"), D, width=640, pad=40), gap=64, align="center"),
     """Tiempo: 1:14–1:17 (3 min).
 Idea clave: a escala de hiperescalador, el problema sube un nivel: no sólo qué GPUs, sino en qué región; y entrenar y servir comparten la misma flota.
 Decir: MAST es el planificador global de entrenamiento de Meta (OSDI 2024). Su flota: decenas de regiones, millones de máquinas y decenas de miles de GPUs. El problema que encontraron: cada usuario elegía a mano en qué región guardar sus datos y correr su entrenamiento (tienen que estar juntos), y esas decisiones aisladas dejaban algunas regiones sobrecargadas mientras otras sobraban. Con MAST, el usuario manda el trabajo al planificador global, que decide dónde van los datos y el trabajo, y dentro de la región otro planificador elige las máquinas. Sus tres principios: desacoplar en el tiempo, desacoplar el alcance y búsqueda exhaustiva. El número: en la región más cargada, la demanda de GPUs para trabajos de alta prioridad era 2,63 veces la oferta; con MAST, 0,98.
-Y la otra tendencia: entrenar y servir en la misma flota. El serving sigue a los usuarios: picos de día, valles de noche. Las GPUs de serving que sobran de noche se pueden usar para entrenar, si el planificador puede devolverlas a tiempo, con preempción y checkpoints. En la Clase 19 vimos que DeepSeek reduce los nodos de inferencia de noche y usa las GPUs para otra cosa.
+Y la otra tendencia: entrenar y servir en la misma flota. El serving sigue a los usuarios: picos de día, valles de noche. Las GPUs de serving que sobran de noche se pueden usar para entrenar, si el planificador puede devolverlas a tiempo, con preempción y checkpoints. DeepSeek lo cuenta en su resumen del sistema de inferencia, que vimos en la Clase 19: reduce los nodos de inferencia de noche y usa esas GPUs para investigación y entrenamiento.
 Pasar a la siguiente: qué llevarse.""",
     d.footer("Choudhury et al., OSDI 2024 · DeepSeek, Open Infra Index, 2025"), gap=40)
 

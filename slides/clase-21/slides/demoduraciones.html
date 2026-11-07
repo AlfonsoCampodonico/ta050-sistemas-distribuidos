@@ -8,6 +8,6 @@ Demo: go run ./cmd/sim duraciones, y en el simulador, cambiar entre FIFO + backf
 Leer la tabla, la misma carga. FIFO: 10 horas de JCT promedio. Backfill: 3,82. 2D-LAS con el umbral de Tiresias, 3.200 GPU·segundos: 4,12, peor que backfill. ¿Por qué? Porque en esta carga los trabajos duran horas: con 3.200 GPU·s un trabajo de 32 GPUs baja de cola a los 100 segundos y uno de 1 GPU a los 53 minutos; casi todo está en la cola 2 y se desaloja 2.642 veces. Con un umbral de 300.000 GPU·s (unas 80 GPU·horas): 3,70 horas, a un 1% de SRTF (3,67), con 569 preempciones. El umbral se elige mirando la carga.
 Mirar la columna de los grandes: con backfill esperan 3,2 horas; con 2D-LAS, 23 minutos. Un trabajo nuevo de 32 GPUs tiene prioridad alta mientras recibió poco, así que no lo pasan los chicos. LAS también arregla el hambre del backfill.
 A la derecha, el costo de cada preempción con el umbral bueno: con 30 minutos por desalojo, el JCT sube a 3,91. Si guardar un checkpoint cuesta mucho, conviene desalojar menos.
-Lo honesto: la diferencia contra backfill es chica (3%); la grande es contra FIFO estricto. En el paper, igual: 5,5 veces contra YARN-CS, 1,5 contra best-effort.
+Lo honesto: la diferencia contra backfill es chica (3%); la grande es contra FIFO estricto. En la simulación del paper, igual: 2,4 veces contra YARN-CS, que tiene bloqueo de cabeza de cola, y sólo 1,5 contra best-effort, que ya hace backfill.
 Pasar a la siguiente: compartir.</aside>
 </section>

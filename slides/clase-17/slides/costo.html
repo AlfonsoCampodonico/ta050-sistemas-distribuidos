@@ -4,7 +4,7 @@
 <p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">19</p>
 <aside>Tiempo: 0:49–0:52 (3 min).
 Idea clave: con estas técnicas, DeepSeek entrenó un modelo de 671B en 2.048 GPUs, un orden de magnitud menos que Llama 3, y publicó exactamente cuánto costó.
-Decir: 2,788 millones de horas de H800 en total; a 2 dólares la hora, 5,576 millones de dólares. Fueron 14,8 billones de tokens, y cada billón tardó 180.000 horas de GPU: 3,7 días en su clúster de 2.048 GPUs.
+Decir: 2,788 millones de horas de H800 en total (2,664 millones el preentrenamiento, más extensión de contexto y post-entrenamiento); a 2 dólares la hora, 5,576 millones de dólares. Fueron 14,8 billones de tokens, y cada billón tardó 180.000 horas de GPU: 3,7 días en su clúster de 2.048 GPUs.
 Dos aclaraciones del propio informe, que hay que decir siempre que se cita este número: es sólo la corrida final, no la investigación ni los experimentos anteriores, y 2 dólares la hora es un precio de alquiler supuesto, no lo que les costó el clúster.
 Y dos datos de sistemas: no usaron paralelismo de tensores, y el informe dice que no tuvieron ningún pico de loss irrecuperable ni tuvieron que volver atrás a un checkpoint en todo el entrenamiento.
 Preguntar a la clase: comparar con la cuenta de Llama 3 de hace un rato. ¿Qué hizo posible usar menos GPUs? (Un modelo que por token cuesta como uno de 37B, FP8 y comunicación escondida.)

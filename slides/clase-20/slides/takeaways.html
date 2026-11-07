@@ -4,7 +4,7 @@
 <p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">30</p>
 <aside>Tiempo: 1:19–1:22 (3 min).
 Idea clave: servir muchos modelos en pocas GPUs se reduce a tres decisiones: dónde guardar los pesos, dónde arrancar cada modelo y qué compartir.
-Decir: tres verbos. Acercar: el arranque en frío lo dominan la distancia y el cargador; con el checkpoint en la DRAM del servidor y un cargador en pipeline, un modelo de 13 GB está en la GPU en medio segundo, y el keep-alive se abarata. Ubicar: el scheduler estima el arranque en cada servidor (cola más tamaño sobre ancho de banda) y elige; cuando el mejor está ocupado, migra la inferencia mandando los tokens y recalculando el KV cache, en lugar de cortarla. Compartir: si los modelos son fine-tunes de uno mismo, no se cargan enteros: se batchea la parte común y se pagina todo junto.
+Decir: tres verbos. Acercar: el arranque en frío lo dominan la distancia y el cargador; con el checkpoint en la DRAM del servidor y un cargador en pipeline, un modelo de 13 GB está en la GPU en medio segundo, y un keep-alive largo deja de pagar. Ubicar: el scheduler estima el arranque en cada servidor (cola más tamaño sobre ancho de banda) y elige; cuando el mejor está ocupado, migra la inferencia mandando los tokens y recalculando el KV cache, en lugar de cortarla. Compartir: si los modelos son fine-tunes de uno mismo, no se cargan enteros: se batchea la parte común y se pagina todo junto.
 Conectar con la serie: la Clase 21 sigue con cómo repartir un clúster de GPUs entre trabajos distintos, y la 22 con entrenar con lo que se sirve.
 Pasar a la siguiente: el repositorio.</aside>
 </section>

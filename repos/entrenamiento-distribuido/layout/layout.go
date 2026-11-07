@@ -48,7 +48,7 @@ type Group struct {
 	Dim
 	Stride int   // distancia en ranks entre dos miembros consecutivos
 	Scope  Scope // hasta dónde llega el grupo más disperso
-	Nodes  int   // servidores que toca un grupo
+	Nodes  int   // servidores que toca el grupo que más toca
 }
 
 // Place devuelve dónde cae cada dimensión, en el orden dado (la primera
@@ -65,26 +65,33 @@ func Place(t Topology, dims []Dim) ([]Group, error) {
 	stride := 1
 	for i, d := range dims {
 		g := Group{Dim: d, Stride: stride}
-		// El grupo de la GPU 0: ranks 0, stride, 2·stride, …
-		nodes, pods := map[int]bool{}, map[int]bool{}
-		for k := range d.Size {
-			rank := k * stride
-			node := rank / t.GPUsPerNode
-			nodes[node] = true
-			pods[node/t.NodesPerPod] = true
-		}
-		g.Nodes = len(nodes)
-		switch {
-		case len(nodes) == 1:
-			g.Scope = SameNode
-		case len(pods) == 1:
-			g.Scope = SamePod
-		default:
-			g.Scope = CrossPod
+		// Se recorren todos los grupos de la dimensión (uno por cada rank
+		// con coordenada 0 en ella) y se reporta el peor: con tamaños que no
+		// dividen al servidor o al pod, un grupo puede cruzar un borde
+		// aunque el de la GPU 0 no lo cruce.
+		for base := range total {
+			if (base/stride)%d.Size != 0 {
+				continue
+			}
+			nodes, pods := map[int]bool{}, map[int]bool{}
+			for k := range d.Size {
+				rank := base + k*stride
+				node := rank / t.GPUsPerNode
+				nodes[node] = true
+				pods[node/t.NodesPerPod] = true
+			}
+			scope := CrossPod
+			switch {
+			case len(nodes) == 1:
+				scope = SameNode
+			case len(pods) == 1:
+				scope = SamePod
+			}
+			g.Scope = max(g.Scope, scope)
+			g.Nodes = max(g.Nodes, len(nodes))
 		}
 		groups[i] = g
 		stride *= d.Size
 	}
-	_ = total
 	return groups, nil
 }

@@ -14,3 +14,13 @@ func TestOrderDecidesLocality(t *testing.T) {
 		t.Fatalf("TP afuera tenía que cruzar pods, quedó %v", bad[3].Scope)
 	}
 }
+
+// Con CP = 16 y DP = 8, el grupo de pipeline de la GPU 0 (0..1920) entra en un
+// pod, pero el de la GPU 2048 (2048..3968) cruza el borde en 3072: hay que
+// reportar el peor grupo, no el primero.
+func TestScopeIsWorstGroup(t *testing.T) {
+	g, _ := Place(Llama3, []Dim{{Name: "TP", Size: 8}, {Name: "CP", Size: 16}, {Name: "PP", Size: 16}, {Name: "DP", Size: 8}})
+	if g[2].Scope != CrossPod {
+		t.Fatalf("PP tenía que cruzar pods, quedó %v", g[2].Scope)
+	}
+}

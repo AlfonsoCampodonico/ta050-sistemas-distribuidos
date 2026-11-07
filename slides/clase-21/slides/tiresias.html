@@ -4,7 +4,7 @@
 <p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">21</p>
 <aside>Tiempo: 0:57–1:00 (3 min).
 Idea clave: con dos colas de 2D-LAS y consolidando sólo a los sensibles, Tiresias logra lo que lograría SRTF sabiendo las duraciones.
-Decir: el testbed: 60 GPUs P100 en 15 máquinas de 4. Contra YARN-CS, el planificador de capacidad de YARN que usaba Philly (FIFO con gang), el JCT promedio mejora 5,5 veces y el mediano 27 veces: la mayoría de los trabajos, que son cortos, deja de esperar detrás de los largos. La espera promedio en la cola baja de más de 8.000 segundos a unos 1.000; la mitad de los trabajos espera 13 segundos o menos. El makespan, el tiempo hasta que termina el último, también baja, 1,21 veces.
+Decir: el testbed: 60 GPUs P100 en 15 máquinas de 4. Contra YARN-CS, un planificador de capacidad de YARN como el que usaba Microsoft (FIFO con gang), el JCT promedio mejora 5,5 veces y el mediano 27 veces: la mayoría de los trabajos, que son cortos, deja de esperar detrás de los largos. La espera promedio en la cola baja de más de 8.000 segundos a unos 1.000; la mitad de los trabajos espera 13 segundos o menos. El makespan, el tiempo hasta que termina el último, también baja, 1,21 veces.
 En simulación con la traza de Philly, la tabla 5: 2,4 veces mejor que YARN-CS, 1,5 contra best-effort (FIFO dejando pasar a los que entran, nuestro backfill) y 2 contra Gandiva. Y el JCT promedio queda igual al de SRTF, que conoce las duraciones.
 Remarcar: la ganancia grande es contra FIFO estricto; contra backfill es más chica. Lo vamos a ver en la demo.
 Pasar a la siguiente: la demo.</aside>

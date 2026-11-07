@@ -192,8 +192,8 @@ Pasar a la siguiente: dónde arrancar.""",
 d.slide("estimar", D, head("Ubicación consciente de la localidad · §6", "El scheduler estima cuánto tarda en arrancar en cada servidor", D) +
     row(card(label("Cargar · §6.1", D, color="acc") + p("q + n ÷ b", D, size=56, color="ink", mono=True, weight=600, lh=1.1) +
              p("q: lo que ya está en la cola de carga del servidor (las cargas van de a una). n: tamaño. b: ancho de banda del nivel más lento del camino.", D, size=26), D, accent=True, pad=36),
-        card(label("Mudar una inferencia · §6.2", D, color="blue") + p("a·(t<sub>in</sub> + t<sub>out</sub>) + b", D, size=56, color="ink", mono=True, weight=600, lh=1.1) +
-             p("recalcular el KV cache de los tokens de entrada y los generados. t<sub>out</sub> se estima como duración ÷ tiempo por token.", D, size=26), D, pad=36), gap=32) +
+        card(label("Mudar una inferencia · §6.2", D, color="blue") + p("α·(t<sub>in</sub> + t<sub>out</sub>) + β", D, size=56, color="ink", mono=True, weight=600, lh=1.1) +
+             p("recalcular el KV cache de los tokens de entrada y los generados. t<sub>out</sub> se estima como duración ÷ tiempo por token; α y β se ajustan con lo medido.", D, size=26), D, pad=36), gap=32) +
     p("Error de la estimación: hasta 5 ms en GPU y 40 ms desde SSD. El scheduler corrige los anchos de banda con lo que va midiendo.", D, size=28),
     """Tiempo: 0:31–0:34 (3 min).
 Idea clave: como la carga en pipeline es predecible, el scheduler puede estimar el tiempo de arranque en cada servidor con una cuenta simple y elegir el menor.
@@ -323,7 +323,7 @@ d.slide("keepalive", D, head("Keep-alive", "Cuánto tiempo dejar cargado un mode
 Idea clave: el keep-alive es el TTL de un caché de modelos en GPU; su valor depende de cuánto cuesta un fallo, y si los checkpoints están cerca, el fallo es barato.
 Decir: después de atender el último pedido, ¿cuánto tiempo dejamos el modelo en la GPU? Si lo sacamos enseguida, el próximo pedido arranca en frío. Si lo dejamos mucho, la GPU está ocupada sin hacer nada, y en la nube eso es plata. Es el dilema que estudia "Serverless in the Wild" con la traza de Azure, donde proponen un keep-alive adaptativo por aplicación en lugar de uno fijo.
 La demo, tabla 3: a la izquierda un serverless clásico que descarga el checkpoint cada vez. Pasar de 0 a 600 segundos de keep-alive baja los arranques en frío de 86% a 58% y la demora media de 60 a 47 s; a cambio, más de la mitad del tiempo de GPU es modelos cargados sin pedidos. A la derecha, con DRAM y SSD como caché y el cargador en pipeline: los arranques en frío bajan igual, pero la demora casi no cambia, porque un arranque desde DRAM cuesta medio segundo.
-Conclusión: el caché multinivel no sólo baja la latencia; abarata el keep-alive. Se puede liberar la GPU enseguida y dejar el modelo en la DRAM, que es mucho más barata.
+Conclusión: con el caché multinivel un fallo es barato, así que un keep-alive largo deja de pagar: con 600 s la GPU queda ociosa un 82% del tiempo para ganar 0,2 s. Se puede liberar la GPU enseguida y dejar el modelo en la DRAM, que es mucho más barata.
 Conectar con la materia: en la flota de la demo, un modelo ocioso se desaloja si hace falta su GPU, como una entrada de un caché LRU. TTL y LRU juntos, igual que en un caché web.
 Pasar a la siguiente: la segunda parte, los fine-tunes.""",
     d.footer("Shahrad et al., ATC 2020 · Fu et al., OSDI 2024, §7.4"), gap=40)
@@ -441,7 +441,7 @@ d.slide("takeaways", D, head("Para llevarse", "Compartir GPUs es un problema de 
         card(label("Compartir", D, color="acc") + p("Los fine-tunes, en el mismo lote: x·W una vez para todos, x·A·B para cada uno, todo en un pool paginado.", D, size=28), D), gap=32),
     """Tiempo: 1:19–1:22 (3 min).
 Idea clave: servir muchos modelos en pocas GPUs se reduce a tres decisiones: dónde guardar los pesos, dónde arrancar cada modelo y qué compartir.
-Decir: tres verbos. Acercar: el arranque en frío lo dominan la distancia y el cargador; con el checkpoint en la DRAM del servidor y un cargador en pipeline, un modelo de 13 GB está en la GPU en medio segundo, y el keep-alive se abarata. Ubicar: el scheduler estima el arranque en cada servidor (cola más tamaño sobre ancho de banda) y elige; cuando el mejor está ocupado, migra la inferencia mandando los tokens y recalculando el KV cache, en lugar de cortarla. Compartir: si los modelos son fine-tunes de uno mismo, no se cargan enteros: se batchea la parte común y se pagina todo junto.
+Decir: tres verbos. Acercar: el arranque en frío lo dominan la distancia y el cargador; con el checkpoint en la DRAM del servidor y un cargador en pipeline, un modelo de 13 GB está en la GPU en medio segundo, y un keep-alive largo deja de pagar. Ubicar: el scheduler estima el arranque en cada servidor (cola más tamaño sobre ancho de banda) y elige; cuando el mejor está ocupado, migra la inferencia mandando los tokens y recalculando el KV cache, en lugar de cortarla. Compartir: si los modelos son fine-tunes de uno mismo, no se cargan enteros: se batchea la parte común y se pagina todo junto.
 Conectar con la serie: la Clase 21 sigue con cómo repartir un clúster de GPUs entre trabajos distintos, y la 22 con entrenar con lo que se sirve.
 Pasar a la siguiente: el repositorio.""",
     d.footer())

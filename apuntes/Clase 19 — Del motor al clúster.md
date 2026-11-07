@@ -21,16 +21,16 @@ Es la última de las cuatro clases: 16 y 17 sobre entrenar, 18 y 19 sobre servir
 
 ## 2. La carga: cuánto se repite
 
-Mooncake publicó una traza de una hora de pedidos reales de Kimi. El prompt promedio tiene **8.590 tokens** y la respuesta **182**: unas 47 veces más tokens de entrada que de salida. En la Clase 18 pensábamos en prompts de cientos de tokens; en un chatbot real, el prefill domina.
+Mooncake publicó una traza de una hora de pedidos reales de Kimi. El prompt promedio tiene **7.590 tokens** y la respuesta **182**: unas 42 veces más tokens de entrada que de salida (Mooncake, versión de arXiv, §4.2). En la Clase 18 pensábamos en prompts de cientos de tokens; en un chatbot real, el prefill domina.
 
 ¿Por qué tan largos? El modelo no tiene memoria entre pedidos: cada turno manda el prompt de sistema, toda la historia y el mensaje nuevo, más documentos, herramientas o el contexto de un agente. Y **cada turno es el prefijo del siguiente**.
 
 En producción, más o menos la mitad del prefill no hace falta calcularlo:
 
 - **DeepSeek**, en las estadísticas de un día de servicio (27 al 28 de febrero de 2025): 608 mil millones de tokens de entrada, de los cuales 342 mil millones, el **56,3%**, salieron de su caché de KV en disco.
-- **Mooncake**, sobre la traza de Kimi: con capacidad infinita se podría reusar hasta un 55% del KV cache. La popularidad es muy despareja: más de la mitad de los bloques no se vuelve a usar, y algunos (prompts de sistema, documentos populares) se usan decenas de miles de veces. Con 1.000 bloques de caché la tasa de aciertos es 34%; con 50.000, 55%.
+- **Mooncake**, sobre la traza de Kimi: con capacidad infinita se podría reusar como mucho un 50% del KV cache. La popularidad es muy despareja: más de la mitad de los bloques no se vuelve a usar, y algunos (prompts de sistema, documentos populares) se usan decenas de miles de veces. Con 1.000 bloques de caché la tasa de aciertos es 30%; con 50.000, 50%.
 
-La carga del repositorio (`engine.DefaultChat`) imita esto: 300 conversaciones de 5 turnos, 4 apps con un prompt de sistema de 2.000 tokens cada una. El prompt promedio da unos 3.900 tokens y la respuesta unos 178.
+La carga de las demos (`engine.Chat`) imita esto: 1.000 conversaciones de unos 4,5 turnos en promedio (4.539 pedidos), 4 apps con un prompt de sistema de 2.000 tokens cada una. El prompt promedio da unos 3.900 tokens y la respuesta unos 178.
 
 **Conexión con la materia.** Es la Clase 12, consistencia en caches, con dos diferencias amables: el contenido es inmutable (el KV cache de un prefijo dado es siempre el mismo, no hay invalidación) y fallar es barato (se recalcula). Lo difícil es dónde ponerlo y cómo encontrarlo.
 
@@ -64,8 +64,8 @@ Con caché de prefijos, elegir réplica es un compromiso entre **ir a donde est�
 
 - **En ronda.** Reparte parejo, pero cada turno de una conversación cae en otra réplica: solo aprovecha el prompt de sistema.
 - **Menor carga.** Balancea bien y tampoco sabe dónde está cada conversación.
-- **Por sesión (sticky).** Un hash de la sesión elige siempre la misma réplica: aprovecha el caché pero no mira la carga. Es consistent hashing en su forma más simple.
-- **Consciente del prefijo.** La del Conductor de Mooncake (§6.1): para cada réplica estima el tiempo al primer token como la espera por lo que ya tiene encolado más el prefill de lo que le falta del prompt, y elige la menor. Si el prefijo está en otra máquina, suma traerlo; si ninguna cumple el SLO, devuelve 429 antes de gastar cómputo.
+- **Por sesión (sticky).** Un hash de la sesión elige siempre la misma réplica: aprovecha el caché pero no mira la carga. Es hashing módulo N: si se agrega o se cae una réplica, casi todas las sesiones cambian de réplica y pierden su caché. Consistent hashing movería solo una fracción 1/N.
+- **Consciente del prefijo.** La del Conductor de Mooncake (§6.1): para cada réplica estima el tiempo al primer token como la espera por lo que ya tiene encolado más el prefill de lo que le falta del prompt, y elige la menor. El Conductor real además suma el costo de traer el prefijo si está en otra máquina y rechaza (429) si ninguna réplica cumple el SLO; en el repositorio eso es el ejercicio 5.
 
 **La demo** (`go run ./cmd/sim router`): 1.000 conversaciones, 4.539 pedidos, cuatro réplicas.
 
@@ -82,7 +82,7 @@ Sin caché hay que calcular 18,3 millones de tokens de prefill y el clúster se 
 
 **Con poco caché** (`-cache 256`, un cuarto por réplica) la diferencia crece: en ronda 40% (p99 7,2 s), sticky 44% (p99 26 s), consciente del prefijo 52% (p99 3,0 s), y con pool 88% (155 ms).
 
-**Un caso real.** El postmortem que publicó Anthropic en septiembre de 2025 cuenta que su routing es sticky, y que un cambio de balanceo de carga mandó pedidos de contexto corto a servidores configurados para un millón de tokens; por ser sticky, los siguientes pedidos de esas conversaciones también caían ahí. El router no solo decide la latencia: decide en qué hardware y configuración cae cada pedido.
+**Un caso real.** El postmortem que publicó Anthropic en septiembre de 2025 cuenta que su routing es sticky, y que un error de routing mandaba algunos pedidos de contexto corto a servidores configurados para un millón de tokens, y un cambio de balanceo de carga del 29 de agosto multiplicó esa fracción; por ser sticky, los siguientes pedidos de esas conversaciones también caían ahí. El router no solo decide la latencia: decide en qué hardware y configuración cae cada pedido.
 
 **En Kubernetes.** Un balanceador HTTP común elige por conexiones o en ronda, que es lo peor de la tabla. La **Gateway API Inference Extension** deja que el gateway elija el pod mirando el estado del modelo: la cola, el uso de KV cache, qué prefijos tiene. **llm-d**, en el sandbox de la CNCF desde marzo de 2026, está armado sobre vLLM y esa extensión y trae las piezas de esta clase: scheduler que rutea por prefijo, prefill y decode como servicios separados, offloading del KV cache en niveles y autoscaling. NVIDIA Dynamo hace algo parecido. El Endpoint pasa a ser un objeto con estado, y el scheduler necesita información fresca de cada réplica: el problema clásico de la información de carga en un balanceador distribuido.
 
@@ -92,7 +92,7 @@ Sin caché hay que calcular 18,3 millones de tokens de prefill y el clúster se 
 
 Dos métricas en tensión: el **tiempo al primer token** (TTFT), que ve el usuario nuevo, y el **tiempo entre tokens** (TBT o TPOT), que ve el que ya está leyendo.
 
-**Partir el prefill (Sarathi-Serve, OSDI 2024).** El prompt se procesa de a pedazos de tamaño fijo, por ejemplo 512 tokens por iteración, junto con los decodes del lote (*stall-free scheduling*). Ninguna iteración explota; el prompt largo tarda un poco más en terminar su prefill. Contra vLLM reportan 2,6 veces más capacidad con Mistral-7B en una A100, hasta 3,7 con Yi-34B y hasta 5,6 con Falcon-180B en pipeline. Hoy viene prendido por defecto en los servidores principales.
+**Partir el prefill (Sarathi-Serve, OSDI 2024).** El prompt se procesa de a pedazos de tamaño fijo, por ejemplo 512 tokens por iteración, junto con los decodes del lote (*stall-free scheduling*). Ninguna iteración explota; el prompt largo tarda un poco más en terminar su prefill. Contra vLLM reportan hasta 2,6 veces más capacidad con Mistral-7B en una A100, hasta 3,7 con Yi-34B en dos A100 y hasta 5,6 con Falcon-180B en pipeline. Hoy viene prendido por defecto en los servidores principales.
 
 **Separar las máquinas (DistServe, OSDI 2024).** Un pool de GPUs solo hace prefill: calcula el prompt, produce el primer token y manda el KV cache. Otro pool solo hace decode. Ventajas: no hay interferencia, cada pool usa el paralelismo que le conviene y escala con su propia demanda. La métrica es **goodput**: pedidos por segundo que cumplen a la vez el SLO de TTFT y el de TBT. Reportan hasta 7,4 veces más pedidos o un SLO 12,6 veces más estricto. Según el retrospectivo de sus propios autores, en 2025 la desagregación pasó a ser lo estándar en producción.
 
@@ -132,7 +132,7 @@ Mooncake junta las dos ideas de la clase, caché de prefijos compartido y desagr
 
 **Sobrecarga: a quién no atender.** Kimi tenía más demanda que GPUs. Si un pedido va a terminar fuera del SLO, el cómputo que se le dedicó se pierde; el peor caso es hacer el prefill y que el decode lo rechace. Con **rechazo temprano**, el Conductor rechaza al llegar si la carga no da. Pero el decode se carga recién cuando termina el prefill, así que el rechazo mira una carga vieja y prefill y decode oscilan en contrafase (figura 9). La solución es **predecir** la carga del decode: con la traza a doble velocidad en 8 + 8 máquinas, los rechazos bajan de 4.183 a 3.589. Es control con realimentación demorada, como el control de congestión de TCP.
 
-**Resultados** (versión de FAST). En el despliegue real de Kimi, Mooncake atiende un 115% más de pedidos en los clústeres de A800 y un 107% más en los de H800 que el sistema anterior. En experimentos, la capacidad efectiva (pedidos que cumplen el SLO) sube entre 59% y 498% según el escenario. Corre en miles de nodos y procesa más de 100 mil millones de tokens por día. La versión de arXiv se fue actualizando y tiene otros números; usamos los del paper publicado.
+**Resultados** (versión de FAST). En el despliegue real de Kimi, Mooncake atiende un 115% más de pedidos en los clústeres de A800 y un 107% más en los de H800 que el sistema anterior. En experimentos, la capacidad efectiva (pedidos que cumplen el SLO) sube entre 59% y 498% según el escenario. Corre en miles de nodos y procesa más de 100 mil millones de tokens por día. Los resultados de producción y de capacidad son de la versión de FAST; la sección de sobrecarga, la traza y las estadísticas de caché están sólo en la versión extendida de arXiv (v4), y las citamos con su numeración (§6.1, §7, figura 9).
 
 ## 7. La frontera
 
@@ -151,7 +151,7 @@ Mooncake junta las dos ideas de la clase, caché de prefijos compartido y desagr
 
 La cuenta de servilleta: 14.800 / 21 ≈ 700 usuarios generando a la vez por nodo de decode. El informe calcula un margen teórico de 545% si todo se cobrara a la tarifa de R1, y aclara que el ingreso real es mucho menor.
 
-**Decodificación especulativa** (Leviathan et al., ICML 2023). Un modelo chico propone k tokens; el grande verifica los k en una sola pasada, acepta los primeros que coinciden y en el primero que no pone el suyo. El resultado es exactamente el que habría generado el grande solo. Conviene porque el decode está limitado por leer los pesos: una pasada sobre k+1 tokens cuesta casi lo mismo que sobre uno. Si cada token se acepta con probabilidad α:
+**Decodificación especulativa** (Leviathan et al., ICML 2023). Un modelo chico propone k tokens; el grande verifica los k en una sola pasada, acepta los primeros que coinciden y en el primero que no pone el suyo. El resultado tiene exactamente la misma distribución que si generara el grande solo (con decodificación greedy, el mismo texto). Conviene porque el decode está limitado por leer los pesos: una pasada sobre k+1 tokens cuesta casi lo mismo que sobre uno. Si cada token se acepta con probabilidad α:
 
 > tokens por pasada = (1 − α^(k+1)) / (1 − α), costo = k·c + 1
 
@@ -192,7 +192,7 @@ Ejercicios del README: compartir bloques físicos entre secuencias con el mismo 
 
 **Lecturas.**
 
-- Qin et al., [Mooncake: A KVCache-centric Disaggregated Architecture for LLM Serving](https://www.usenix.org/conference/fast25/presentation/qin), FAST 2025. Es el paper de la clase.
+- Qin et al., [Mooncake: Trading More Storage for Less Computation — A KVCache-centric Architecture for Serving LLM Chatbot](https://www.usenix.org/conference/fast25/presentation/qin), FAST 2025. Es el paper de la clase.
 - Zhong et al., [DistServe](https://arxiv.org/abs/2401.09670), OSDI 2024.
 - Agrawal et al., [Sarathi-Serve](https://arxiv.org/abs/2403.02310), OSDI 2024.
 - DeepSeek, [Day 6: One More Thing, DeepSeek-V3/R1 Inference System Overview](https://github.com/deepseek-ai/open-infra-index), 2025.

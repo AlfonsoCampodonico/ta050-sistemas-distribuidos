@@ -4,7 +4,7 @@
 <p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">28</p>
 <aside>Tiempo: 1:10–1:14 (4 min).
 Idea clave: como el decode está limitado por la memoria, verificar varios tokens propuestos cuesta lo mismo que generar uno, y eso permite generar más de un token por pasada del modelo grande.
-Decir: la idea de Leviathan et al. (ICML 2023): un modelo chico y barato propone k tokens, uno detrás de otro. El modelo grande corre una sola pasada sobre los k y verifica cuáles habría elegido él; acepta los primeros que coinciden y en el primero que no, pone el suyo. El resultado es exactamente el mismo que habría generado el grande solo.
+Decir: la idea de Leviathan et al. (ICML 2023): un modelo chico y barato propone k tokens, uno detrás de otro. El modelo grande corre una sola pasada sobre los k y verifica cuáles habría elegido él; acepta los primeros que coinciden y en el primero que no, pone el suyo. El resultado tiene exactamente la misma distribución que si generara el grande solo (con decodificación greedy, el mismo texto).
 ¿Por qué conviene? Por lo de la Clase 18: una pasada de decode cuesta casi lo mismo con 1 token que con k+1, porque lo caro es leer los pesos. Si cada token propuesto se acepta con probabilidad α, se obtienen en promedio (1 − α^(k+1))/(1 − α) tokens por pasada.
 La tabla es de la demo, con un borrador que cuesta 5% de una pasada del grande: con α = 0,8 y 4 tokens propuestos, 2,8 veces más rápido. Con α bajo, proponer 8 es peor que proponer 4: se tira casi todo.
 Hoy: el borrador suele ser una cabeza chica entrenada sobre el mismo modelo (EAGLE), y DeepSeek-V3 entrena un módulo de predicción de varios tokens (MTP) que se puede usar para esto.

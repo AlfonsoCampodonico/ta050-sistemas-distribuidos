@@ -22,7 +22,7 @@ Idea clave: como ya no se reserva el máximo, la memoria se puede acabar con sec
 Decir: los pedidos se atienden por orden de llegada. Como cada secuencia pide un bloque cuando lo necesita, puede pasar que todas crezcan a la vez y no haya bloques. Entonces vLLM desaloja las secuencias que llegaron último, para respetar FCFS. El desalojo es todo o nada: una secuencia sin parte de sus bloques no puede dar ni un paso, porque la atención necesita todos los tokens anteriores. Los grupos que comparten bloques, como las muestras de un mismo prompt, se desalojan juntos.
 Dos formas de volver. Swapping: copiar los bloques a la memoria de la CPU y traerlos después; es el swap de un sistema operativo. Recomputación: tirar los bloques y, al readmitirla, rehacer su KV cache con un prefill de prompt más lo ya generado; funciona porque el prefill es paralelo y rápido.
 El paper las compara en §7.3: la recomputación nunca agrega más de un 20% sobre la latencia del swapping, y con bloques chicos el swapping rinde mal por las muchas transferencias pequeñas.
-Conectar con la demo: la columna de desalojos de la tabla anterior. El repositorio implementa recomputación; el swapping es el ejercicio 2.
+Conectar con la demo: la columna de desalojos de la tabla anterior. El repositorio implementa recomputación; el swapping es el ejercicio 1.
 Preguntar a la clase: ¿por qué no se pierden tokens que ya se mandaron al cliente? Porque recomputar regenera el KV cache de lo ya generado, no lo vuelve a generar.
 Pasar a la siguiente: cómo funciona todo esto con varias GPUs.</aside>
 </section>

@@ -127,23 +127,25 @@ GPU 0 │12345678.........aabbccddeeffgghh│
 GPU 1 │.12345678......aabbccddeeffgghh..│
 GPU 2 │..12345678...aabbccddeeffgghh....│
 GPU 3 │...12345678aabbccddeeffgghh......│
-burbuja=37.5%   activaciones en memoria: [8 8 8 8]
+tiempo=33  ideal=24  burbuja=37.5%  (fórmula (p-1)/m = 37.5%)
+activaciones en memoria (pico por GPU): [8 8 8 8]
 
 1F1B (PipeDream-Flush) — p=4, m=8, tf=1, tb=2
 GPU 0 │1234......aa5bb6cc7dd8ee.ff.gg.hh│
 GPU 1 │.123....aa4bb5cc6dd7ee8ff.gg.hh..│
 GPU 2 │..12..aa3bb4cc5dd6ee7ff8gg.hh....│
 GPU 3 │...1aa2bb3cc4dd5ee6ff7gg8hh......│
-burbuja=37.5%   activaciones en memoria: [4 3 2 1]
+tiempo=33  ideal=24  burbuja=37.5%  (fórmula (p-1)/m = 37.5%)
+activaciones en memoria (pico por GPU): [4 3 2 1]
 ```
 
-El paper calcula la burbuja (§2.2.1). Llenar el pipeline cuesta p−1 forwards y vaciarlo p−1 backwards, mientras que el trabajo útil son m forwards y m backwards. La fracción de tiempo perdido es:
+El paper calcula la burbuja (§2.2.1). Llenar el pipeline cuesta p−1 forwards y vaciarlo p−1 backwards, mientras que el trabajo útil son m forwards y m backwards. El tiempo perdido, medido respecto del tiempo ideal sin burbuja, es:
 
 ```latex
 \text{burbuja} = \frac{p-1}{m}
 ```
 
-Con p = 4 y m = 8 da 3/8 = 37,5%, exactamente lo que mide el simulador. Para que la burbuja sea chica hace falta **m ≫ p**: muchos microbatches por cada etapa.
+Con p = 4 y m = 8 da 3/8 = 37,5%, exactamente lo que mide el simulador: (33 − 24) / 24. Como fracción del tiempo total es (p−1)/(m+p−1): en el diagrama, 9 de 33 casilleros por GPU. Para que la burbuja sea chica hace falta **m ≫ p**: muchos microbatches por cada etapa.
 
 Los dos schedules tienen la misma burbuja, pero no la misma memoria. **GPipe** hace todos los forwards y después todos los backwards, así que cada GPU guarda las activaciones de los m microbatches hasta el backward. **1F1B** (PipeDream-Flush) arranca con unos pocos forwards y después alterna uno y uno, así que una etapa nunca tiene más de p microbatches en vuelo. Con m ≫ p, que es justo lo que queremos para achicar la burbuja, 1F1B usa mucha menos memoria.
 

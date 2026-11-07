@@ -5,7 +5,7 @@
 <aside>Tiempo: 0:11–0:15 (4 min).
 Idea clave: GRPO reemplaza el crítico de PPO por una comparación dentro del grupo, y eso le saca al sistema un modelo entero.
 Decir: el gradiente de política necesita saber si una respuesta fue mejor o peor de lo esperado: eso es la ventaja. PPO la estima con un crítico, otra red que predice cuánta recompensa espera, y que hay que entrenar en paralelo. El paper de R1 dice que ese crítico es típicamente del mismo tamaño que la política: para un modelo de cientos de miles de millones de parámetros, es otro modelo de ese tamaño.
-GRPO, Group Relative Policy Optimization, hace otra cosa: genera G respuestas al mismo problema y usa el grupo como referencia. La ventaja de cada una es su recompensa menos la media del grupo, dividido por el desvío. Si todas acertaron o todas fallaron, la ventaja es cero: ese problema no enseña nada en ese paso.
+GRPO, Group Relative Policy Optimization, hace otra cosa: genera G respuestas al mismo problema y usa el grupo como referencia. La ventaja de cada una es su recompensa menos la media del grupo, dividido por el desvío. Si todas acertaron o todas fallaron, el desvío es 0 y se toma ventaja 0: ese problema no enseña nada en ese paso.
 El resto es como PPO: la razón entre la política nueva y la que generó, recortada, y un término de KL contra la política de referencia. La versión revisada del paper detalla la configuración: 16 respuestas por problema, con un tope de 32.768 tokens que después sube a 65.536.
 Para sistemas: las G respuestas de un problema son un grupo; el trainer necesita el grupo completo para calcular la ventaja de cualquiera de ellas.
 Pasar a la siguiente: cuántos modelos hay en juego.</aside>

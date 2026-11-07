@@ -79,11 +79,11 @@ El demo `go run ./cmd/demo moe` lo muestra con 256 expertos en 8 nodos: con rute
 
 **FP8.** Entrenan las multiplicaciones en FP8 con escalas por bloque: 1×128 para activaciones y 128×128 para pesos, así un valor extremo no arruina la precisión de todo el tensor. Acumulan en FP32 cada 128 elementos. El error relativo de la pérdida queda por debajo de 0,25% contra BF16.
 
-**El costo.** 14,8 billones de tokens en 2.048 H800, 3,7 días por billón de tokens, **2,788 millones de horas GPU**, unos 5,576 millones de dólares a 2 dólares la hora. El paper aclara que eso cubre solo la corrida oficial: no incluye investigación, ablaciones ni corridas fallidas. La lección para la materia no es el número sino de dónde salió: diseñar el modelo (MoE, ruteo por nodo) y el sistema (DualPipe, FP8) juntos, alrededor de la red que tenían.
+**El costo.** 14,8 billones de tokens en 2.048 H800, 3,7 días por billón de tokens, **2,788 millones de horas GPU** (2,664 millones el preentrenamiento, más extensión de contexto y post-entrenamiento), unos 5,576 millones de dólares a 2 dólares la hora. El paper aclara que eso cubre solo la corrida oficial: no incluye investigación, ablaciones ni corridas fallidas. La lección para la materia no es el número sino de dónde salió: diseñar el modelo (MoE, ruteo por nodo) y el sistema (DualPipe, FP8) juntos, alrededor de la red que tenían.
 
 ## 5. Las fallas son el estado normal
 
-Con miles de GPUs, que algo se rompa no es una excepción. En 54 días de preentrenamiento de Llama 3 405B hubo **466 interrupciones**: 47 planificadas y **419 inesperadas**. El 78% fueron de hardware, y el 58,7% de las inesperadas vino de GPUs (fallas de la GPU, de su memoria HBM3, del NVLink). Aun así mantuvieron más del 90% de tiempo útil, con diagnóstico automático y solo tres intervenciones manuales importantes (§3.3.4).
+Con miles de GPUs, que algo se rompa no es una excepción. En 54 días de preentrenamiento de Llama 3 405B hubo **466 interrupciones**: 47 planificadas y **419 inesperadas**. Cerca del 78% de las inesperadas fueron de hardware, y el 58,7% vino de GPUs (la GPU en sí, su memoria HBM3 o SRAM, su procesador de sistema, corrupción silenciosa de datos). Aun así mantuvieron más del 90% de tiempo útil, con diagnóstico automático y solo tres intervenciones manuales importantes (§3.3.4).
 
 **La cuenta.** Si las fallas son independientes, el tiempo medio entre fallas del clúster es el de una GPU dividido por la cantidad de GPUs:
 
@@ -99,12 +99,12 @@ donde M es el MTBF del clúster. Con C = 30 s y M = 3 h, τ\* ≈ 14 minutos.
 
 **Checkpoints asincrónicos.** Si el checkpoint solo copia el estado a memoria del host y la escritura al almacenamiento sigue en segundo plano, C baja mucho y el intervalo óptimo se acorta. TorchTitan reporta entre 5 y 15 veces menos overhead con checkpoints asincrónicos.
 
-El demo `go run ./cmd/demo fallas` simula esto con 30 s de checkpoint y 3 minutos de reinicio:
+El demo `go run ./cmd/demo fallas` (y `-gpus 131072` para la segunda fila) simula esto con 30 s de checkpoint sincrónico, 3 s de asincrónico y 3 minutos de reinicio, cada uno con su intervalo óptimo:
 
-| GPUs | Intervalo | Sincrónico | Asincrónico |
+| GPUs | Intervalo (sinc. / asinc.) | Sincrónico | Asincrónico |
 | --- | --- | --- | --- |
-| 16.384 | 14 min (óptimo) | 91,4% | 96,1% |
-| 131.072 | óptimo | 71,4% | 82,9% |
+| 16.384 | 14 min / 4 min | 91,4% | 96,1% |
+| 131.072 | 5 min / 2 min | 71,4% | 82,9% |
 
 A 131K GPUs, incluso con checkpoints asincrónicos se pierde casi una quinta parte del clúster. Por eso el problema de la próxima escala no es solo el ancho de banda: es que un trabajo sincrónico, donde cada paso espera a todas las GPUs, se detiene entero cada vez que una falla. La sección siguiente ataca justamente eso.
 
@@ -114,7 +114,7 @@ A 131K GPUs, incluso con checkpoints asincrónicos se pierde casi una quinta par
 
 Todo lo anterior supone una red muy rápida y un trabajo sincrónico: en cada paso, todas las réplicas de datos hacen un all-reduce y esperan a la más lenta. Eso obliga a tener el clúster en un solo edificio y hace que una falla frene a todos.
 
-**DiLoCo** (Douillard et al., 2023) cambia la regla. Cada réplica da H pasos por su cuenta con su optimizador (AdamW) y recién ahí se sincronizan. Lo que se promedia no son gradientes sino el cambio de cada réplica desde los pesos compartidos, el *pseudo-gradiente*, y se aplica con un optimizador externo con momento de Nesterov. Con H = 500 y 8 réplicas igualan al entrenamiento sincrónico comunicándose **500 veces menos**. Con H = 1 y sin momento es paralelismo de datos común.
+**DiLoCo** (Douillard et al., 2023) cambia la regla. Cada réplica da H pasos por su cuenta con su optimizador (AdamW) y recién ahí se sincronizan. Lo que se promedia no son gradientes sino el cambio de cada réplica desde los pesos compartidos, el *pseudo-gradiente*, y se aplica con un optimizador externo con momento de Nesterov. Con H = 500 y 8 réplicas igualan al entrenamiento sincrónico comunicándose **500 veces menos**. Con H = 1, optimizador interno SGD y externo SGD con tasa 1, es paralelismo de datos común. El demo usa justamente SGD adentro y promedio simple afuera, sin momento.
 
 El demo `go run ./cmd/demo diloco` lo reproduce en chico, con 8 réplicas y 400 pasos:
 
@@ -129,9 +129,9 @@ Es el mejor caso posible: el modelo es convexo y las réplicas ven datos parecid
 
 **Decoupled DiLoCo** (Google DeepMind, abril de 2026) lleva la idea a varios datacenters. Cada grupo de réplicas sincroniza por su lado y de forma asincrónica, así que una falla en un sitio no frena a los demás. Reportan:
 
-- ancho de banda entre sitios de 198 a 0,84 Gbps;
-- con fallas inyectadas, 88% de tiempo útil contra 27% del entrenamiento sincrónico;
-- calidad equivalente en Gemma 4: 64,1 contra 64,4 en su promedio de evaluaciones.
+- para sostener 95% de utilización entre 8 datacenters, el ancho de banda necesario baja de 198 Gbps a 3,3 Gbps (0,84 Gbps comunicando en int4);
+- con fallas simuladas sobre 1,2 millones de chips, 88% de tiempo útil contra 58% del paralelismo de datos elástico (27% sin elasticidad);
+- calidad comparable: en un modelo denso de 5B entrenado con 1T tokens, el promedio de evaluaciones de texto da 69,8 contra 70,1 del paralelismo de datos sin fallas, y 69,8 contra 69,7 con fallas simuladas (tabla 2).
 
 **Por qué importa.** Si no hace falta sincronizar cada paso, el clúster deja de tener que estar en un solo lugar, y la energía, que hoy es el límite real para construir un datacenter de un gigawatt, se puede buscar en varios sitios. Es el mismo cambio que vimos en la materia con sistemas que pasan de consistencia fuerte a eventual: se acepta que las réplicas diverjan un rato a cambio de comunicarse menos y tolerar fallas.
 
@@ -175,7 +175,7 @@ Ejercicios nuevos del README: repuestos en caliente y checkpoints en memoria par
 1. ¿Por qué el orden es \[TP, CP, PP, DP\] y no al revés? *Tensores se comunica en cada capa y microbatch, en el camino crítico: va por NVLink. Datos sincroniza una vez por paso y tolera la capa sobresuscripta entre pods.*
 2. Con secuencias de 128K, ¿qué dimensión crece y cuál baja? *Contexto sube de 1 a 16 y datos baja de 128 a 8: en los 16M tokens del paso entran 16 veces menos secuencias, con las mismas GPUs.*
 3. ¿Por qué con expertos la comunicación es all-to-all? *Cada token va a expertos en GPUs distintas, así que cada par de GPUs intercambia datos distintos. Limitar a 4 nodos baja los envíos remotos de 4,6 a 3,5 por token, un 25%.*
-4. Con 65.536 GPUs y checkpoints de 30 s, ¿cada cuánto guardar? *M ≈ 50.700 h / 65.536 ≈ 0,77 h; τ* = √(2 · 30 s · 0,77 h) ≈ 7 minutos.\*
+4. Con 65.536 GPUs y checkpoints de 30 s, ¿cada cuánto guardar? *M ≈ 50.700 h / 65.536 ≈ 0,77 h; τ\* = √(2 · 30 s · 0,77 h) ≈ 7 minutos.*
 5. ¿Por qué DiLoCo aguanta mejor las fallas? *Una falla solo detiene a su grupo, que se reincorpora cuando vuelve; con paralelismo de datos sincrónico detiene a todos.*
 
 **Lecturas.**

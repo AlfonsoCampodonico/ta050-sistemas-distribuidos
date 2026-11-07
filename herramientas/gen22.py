@@ -73,7 +73,7 @@ d.slide("grpo", D, head("GRPO · DeepSeek", "La ventaja se mide contra el resto 
     """Tiempo: 0:11–0:15 (4 min).
 Idea clave: GRPO reemplaza el crítico de PPO por una comparación dentro del grupo, y eso le saca al sistema un modelo entero.
 Decir: el gradiente de política necesita saber si una respuesta fue mejor o peor de lo esperado: eso es la ventaja. PPO la estima con un crítico, otra red que predice cuánta recompensa espera, y que hay que entrenar en paralelo. El paper de R1 dice que ese crítico es típicamente del mismo tamaño que la política: para un modelo de cientos de miles de millones de parámetros, es otro modelo de ese tamaño.
-GRPO, Group Relative Policy Optimization, hace otra cosa: genera G respuestas al mismo problema y usa el grupo como referencia. La ventaja de cada una es su recompensa menos la media del grupo, dividido por el desvío. Si todas acertaron o todas fallaron, la ventaja es cero: ese problema no enseña nada en ese paso.
+GRPO, Group Relative Policy Optimization, hace otra cosa: genera G respuestas al mismo problema y usa el grupo como referencia. La ventaja de cada una es su recompensa menos la media del grupo, dividido por el desvío. Si todas acertaron o todas fallaron, el desvío es 0 y se toma ventaja 0: ese problema no enseña nada en ese paso.
 El resto es como PPO: la razón entre la política nueva y la que generó, recortada, y un término de KL contra la política de referencia. La versión revisada del paper detalla la configuración: 16 respuestas por problema, con un tope de 32.768 tokens que después sube a 65.536.
 Para sistemas: las G respuestas de un problema son un grupo; el trainer necesita el grupo completo para calcular la ventaja de cualquiera de ellas.
 Pasar a la siguiente: cuántos modelos hay en juego.""",
@@ -391,12 +391,12 @@ Pasar a la siguiente: cerrar la serie.""",
 
 # 24 ─ serie
 d.slide("serie", D, head("Las mismas tres preguntas", "Qué se parte, qué se comunica, qué pasa si falla", D) +
-    table(["", "Entrenar (16–17)", "Servir (18–19)", "El bucle de RL (22)"], [
-        ["Qué se parte", "el modelo, en 4 dimensiones", "el KV cache, en bloques y en niveles", "el clúster, entre generar y entrenar"],
-        ["Qué se comunica", "gradientes y activaciones", "KV cache entre prefill y decode", "pesos, después de cada paso"],
-        ["A quién se espera", "al straggler, en cada all-reduce", "al prefill largo, en cada iteración", "a la respuesta más larga, en cada paso"],
-        ["Si algo falla", "volver al checkpoint", "recalcular el pedido", "regenerar; checkpoint del trainer"],
-    ], D, widths=[19, 27, 27, 27], size=26),
+    table(["", "Entrenar (16–17)", "Servir (18–19)", "Compartir (20–21)", "El bucle de RL (22)"], [
+        ["Qué se parte", "el modelo, en 4 dimensiones", "el KV cache, en bloques y en niveles", "las GPUs, entre modelos y entre trabajos", "el clúster, entre generar y entrenar"],
+        ["Qué se comunica", "gradientes y activaciones", "KV cache entre prefill y decode", "pesos, del SSD o la red a la GPU", "pesos, después de cada paso"],
+        ["A quién se espera", "al straggler, en cada all-reduce", "al prefill largo, en cada iteración", "a la carga en frío; a juntar las GPUs del gang", "a la respuesta más larga, en cada paso"],
+        ["Si algo falla", "volver al checkpoint", "recalcular el pedido", "recargar el checkpoint; desalojar y reencolar", "regenerar; checkpoint del trainer"],
+    ], D, widths=[16, 21, 21, 21, 21], size=22),
     """Tiempo: 1:18–1:22 (4 min).
 Idea clave: el bucle de RL no trae problemas nuevos: trae los de entrenar y los de servir al mismo tiempo, y uno nuevo que es la versión de los datos.
 Decir: recorrer por filas. Qué se parte: en entrenamiento, el modelo en datos, tensores, pipeline y contexto; en serving, el KV cache en bloques y en niveles; en RL, además, el clúster entre los dos trabajos, y cada uno con su propio layout del mismo modelo.
@@ -415,7 +415,7 @@ d.slide("takeaways", D, head("Para llevarse", "Entrenar con lo que se sirve", D)
     """Tiempo: 1:22–1:24 (2 min).
 Idea clave: tres ideas para el bucle de RL, y una frase para toda la serie.
 Decir: no esperar a la cola: con respuestas de largo de cola larga, un paso sincrónico espera casi todo el tiempo; partir las largas (Kimi) o no esperar (AReaL) recupera la mayor parte. Mover los pesos bien: si se comparte GPUs, la transición entre layouts es un all-gather y se puede diseñar para mover poco (HybridFlow); si se separan, es un broadcast y tiene que ser en anillo o en pipeline. Acotar lo viejo: la asincronía hace que se entrene con datos de pesos viejos; se acota cuánto, como en SSP, y se corrige el objetivo para que lo viejo no tire de más.
-Cerrar la serie: en la 16 partimos un modelo para entrenarlo. En la 18 lo servimos. En la 22 vimos que, para los modelos de razonamiento de hoy, entrenar es servir miles de veces: el mismo modelo, en dos layouts, yendo y viniendo. Todo lo de las seis clases anteriores aparece en ese bucle.
+Cerrar la serie: en la 16 partimos un modelo para entrenarlo. En la 18 lo servimos. En la 20 y la 21 compartimos las GPUs entre modelos y entre trabajos. En la 22 vimos que, para los modelos de razonamiento de hoy, entrenar es servir miles de veces: el mismo modelo, en dos layouts, yendo y viniendo. Todo lo de las seis clases anteriores aparece en ese bucle.
 Pasar a la siguiente: el repositorio.""",
     d.footer(), gap=48)
 
