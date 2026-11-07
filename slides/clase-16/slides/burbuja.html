@@ -100,7 +100,7 @@
 <aside>Tiempo: 0:55–1:00 (5 min, con demo).
 Idea clave: llenar y vaciar el pipeline deja tiempo ocioso, la burbuja, y su tamaño es (p−1)/m.
 Decir: este es el schedule de GPipe, tomado de la salida real del simulador con p = 4 etapas y m = 8 microbatches. Azul es forward, naranja es backward (dura el doble) y gris es GPU ociosa.
-Recorrer el dibujo: la GPU 3 no puede arrancar hasta que pasaron 3 forwards; la GPU 0 termina sus forwards y espera a que vuelvan los backwards. La cuenta del paper (§2.2.1): llenar cuesta p−1 forwards, vaciar p−1 backwards, y el trabajo útil son m de cada uno. La fracción perdida es (p−1)/m, que acá da 3/8 = 37,5%. El simulador mide exactamente eso.
+Recorrer el dibujo: la GPU 3 no puede arrancar hasta que pasaron 3 forwards; la GPU 0 termina sus forwards y espera a que vuelvan los backwards. La cuenta del paper (§2.2.1): llenar cuesta p−1 forwards, vaciar p−1 backwards, y el trabajo útil son m de cada uno. El tiempo perdido, medido respecto del tiempo ideal sin burbuja, es (p−1)/m, que acá da 3/8 = 37,5%: el simulador mide (33 − 24) / 24. Como fracción del tiempo total es (p−1)/(m+p−1): 9 de 33 casilleros por GPU.
 Demo: go run ./cmd/demo pipeline -p 4 -m 32. La burbuja baja a 3/32, cerca del 9%. Para achicarla hace falta m mucho mayor que p.
 Preguntar a la clase: ¿por qué no arrancamos el batch siguiente sin esperar? Por el flush: el optimizador se aplica al final del batch, y cada microbatch tiene que ver en el backward los mismos pesos que vio en el forward. Es la semántica estricta otra vez.
 Pasar a la siguiente: GPipe tiene además un problema de memoria.</aside>

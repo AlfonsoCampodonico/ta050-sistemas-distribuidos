@@ -14,7 +14,7 @@
 <p style="font-size:24px;line-height:1.4;color:#B4BEC3">En nginx: proxy_buffering off, o el header X-Accel-Buffering: no.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">go run ./cmd/servidor · go run ./cmd/proxy -buffer · medido con curl</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7F8B91;font-family:'IBM Plex Mono', monospace">go run ./cmd/servidor -speed 2 · go run ./cmd/proxy -buffer · medido con curl</p>
 <p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#7F8B91">27</p>
 <aside>Tiempo: 1:13–1:18 (5 min, con demo).
 Idea clave: cada token sale apenas existe, como un evento en una respuesta HTTP que queda abierta; cualquier salto que junte la respuesta rompe el streaming.

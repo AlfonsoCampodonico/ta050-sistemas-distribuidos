@@ -5,8 +5,10 @@
 //
 // Cada ronda externa, cada réplica calcula cuánto se movió desde los pesos
 // compartidos (su "pseudo-gradiente"), se promedian esos cambios y se
-// aplican con un optimizador externo con momento de Nesterov. Con H = 1 y
-// sin momento es paralelismo de datos común.
+// aplican con un optimizador externo con momento de Nesterov. Con H = 1 es
+// paralelismo de datos común sólo porque el optimizador interno es SGD y el
+// externo, con Momentum = 0 (como en dilocoCmd), un promedio simple: con
+// AdamW adentro, como en el paper, ya no sería equivalente.
 //
 // El modelo es la regresión lineal del paquete train: es convexa, así que
 // este experimento es optimista. DiLoCo muestra que con LLMs reales también

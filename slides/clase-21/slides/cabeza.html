@@ -5,6 +5,6 @@
 <aside>Tiempo: 0:24–0:27 (3 min).
 Idea clave: con gang scheduling y FIFO estricto, un trabajo grande al frente de la cola deja GPUs libres que los chicos de atrás podrían usar; backfill los deja pasar.
 Decir: la cola tiene al frente un trabajo de 32 GPUs, y quedan 20 libres. Con FIFO estricto, el de 32 espera a que se liberen 12 más, y los de 1, 1, 4, 1 y 2 de atrás también esperan, aunque entran de sobra. Es el bloqueo de cabeza de cola (head-of-line blocking), el mismo de las colas de red o de un supermercado con una sola caja.
-Backfill: si el primero no entra, se prueba con los siguientes y entran los que caben. Philly lo hace: el 38,1% de las decisiones de su planificador fueron fuera de orden, y para los trabajos de más de 4 GPUs, todas. El análisis de Alibaba de 2022 encuentra el mismo problema: alrededor del 9% de las instancias cortas pasó más de la mitad de su tiempo esperando.
+Backfill: si el primero no entra, se prueba con los siguientes y entran los que caben. Philly lo hace: el 38,1% de las decisiones de su planificador fueron fuera de orden, y todos los trabajos de más de 4 GPUs vieron pasar a otros adelante; en el 85% de esos casos, sin alargar su espera. El análisis de Alibaba de 2022 encuentra el mismo problema: alrededor del 9% de las instancias cortas pasó más de la mitad de su tiempo esperando.
 Pasar a la siguiente: el precio de dejar pasar.</aside>
 </section>

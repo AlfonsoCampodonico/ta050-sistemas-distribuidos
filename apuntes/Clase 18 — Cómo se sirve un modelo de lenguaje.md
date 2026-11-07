@@ -139,7 +139,7 @@ Para traer de vuelta una secuencia desalojada hay dos caminos:
 - **Swapping.** Copiar sus bloques a la memoria de la CPU y traerlos después. Es el swap de un sistema operativo.
 - **Recomputación.** Tirar sus bloques y, al volver a admitirla, recalcularlos con un prefill de prompt más lo ya generado. Funciona porque el prefill es rápido: procesa todos esos tokens en paralelo.
 
-> El paper compara las dos en §7.3: la recomputación nunca agrega más de un 20% sobre la latencia del swapping, y con bloques chicos el swapping rinde mal porque hace muchas transferencias pequeñas. En el rango de 16 a 64 tokens por bloque las dos andan parecido. El repositorio implementa recomputación; agregar swapping es el ejercicio 2.
+> El paper compara las dos en §7.3: la recomputación nunca agrega más de un 20% sobre la latencia del swapping, y con bloques chicos el swapping rinde mal porque hace muchas transferencias pequeñas. En el rango de 16 a 64 tokens por bloque las dos andan parecido. El repositorio implementa recomputación; agregar swapping es el ejercicio 1.
 
 En el simulador se ve: con memoria paginada y bastante carga, el contador de desalojos sube y algunas secuencias vuelven a empezar con un prefill.
 
@@ -158,7 +158,7 @@ La comparación es contra FasterTransformer y contra tres versiones de Orca que 
 | Orca (Oracle) | Exactamente lo necesario, sabiéndolo de antemano | 1,7× a 2,7× más |
 | FasterTransformer | Batching por pedido | Hasta 22× más |
 
-Orca (Oracle) es imposible en la práctica: nadie sabe de antemano cuánto va a generar un pedido. Que vLLM le gane igual muestra que el problema no era sólo la reserva, sino también la fragmentación. El resumen del paper: **2 a 4 veces más throughput** que los sistemas del estado del arte con la misma latencia.
+Orca (Oracle) es imposible en la práctica: nadie sabe de antemano cuánto va a generar un pedido. Que vLLM le gane igual muestra que el problema no era sólo reservar de más: Oracle todavía aparta de entrada lugar para tokens que no existen y sufre fragmentación externa, y vLLM no tiene ninguna de las dos (§6.2: procesa 2,2 veces más pedidos a la vez). El resumen del paper: **2 a 4 veces más throughput** que los sistemas del estado del arte con la misma latencia.
 
 ## 9. El stream de vuelta
 
@@ -176,7 +176,7 @@ El formato exacto cambia según el proveedor. En el camino de vuelta, el gateway
 
 Dos problemas de sistemas distribuidos aparecen acá:
 
-- **Proxies que juntan la respuesta.** Un proxy con buffering lee la respuesta entera antes de reenviarla. El servidor manda cada token a tiempo, pero el cliente recibe todo junto al final. En nginx se desactiva con `proxy_buffering off` o con el header `X-Accel-Buffering: no` que manda el servidor. En la demo, con `cmd/proxy -buffer`, los 60 tokens que el servidor mandó cada 40 ms llegan todos juntos a los 2,5 s.
+- **Proxies que juntan la respuesta.** Un proxy con buffering lee la respuesta entera antes de reenviarla. El servidor manda cada token a tiempo, pero el cliente recibe todo junto al final. En nginx se desactiva con `proxy_buffering off` o con el header `X-Accel-Buffering: no` que manda el servidor. En la demo, con `cmd/servidor -speed 2` y `cmd/proxy -buffer` delante, los 60 tokens que el servidor mandó cada 40 ms llegan todos juntos a los 2,5 s.
 - **Clientes que se van.** Si el usuario cierra la pestaña, el servidor tiene que darse cuenta y cancelar el pedido. Si no, sigue generando tokens que nadie va a leer, ocupando un lugar en el lote y bloques de KV cache que otro pedido podría usar. En Go, eso es mirar `r.Context().Done()` en el handler y avisarle al motor.
 
 Los números de un pedido típico, con valores ilustrativos: la red, decenas de milisegundos; la cola y el prefill, decenas a cientos; cada token de decode, del orden de 10 a 50 ms. Una respuesta de 300 tokens a 30 ms por token tarda 9 segundos, y casi todo es decode. Por eso el streaming importa: el usuario empieza a leer después del primer token, no del último.
@@ -189,14 +189,14 @@ El simulador **Motor de inferencia** corre en el navegador: muestra el mapa de m
 go run ./cmd/sim batching      # estático vs continuo (Orca)
 go run ./cmd/sim memoria       # reserva contigua vs bloques (vLLM)
 go run ./cmd/sim cow           # muestreo paralelo con copy-on-write
-go run ./cmd/servidor          # el motor detrás de HTTP + SSE
+go run ./cmd/servidor -speed 2 # el motor detrás de HTTP + SSE
 go run ./cmd/proxy -buffer     # un proxy que rompe el streaming
 ```
 
 **Preguntas de repaso**
 
 1. ¿Por qué el decode está limitado por el ancho de banda de memoria y no por el cómputo? ¿Qué cambia en el costo de una iteración al pasar de 1 a 32 secuencias en el lote?
-2. Calculá el tamaño del KV cache por token de un modelo de 32 capas con 8 cabezas KV de 128 dimensiones, en 16 bits. ¿Cuántas secuencias de 4.000 tokens entran en 40 GB?
+2. Calculá el tamaño del KV cache por token de un modelo de 32 capas con 8 cabezas KV de 128 dimensiones, en 16 bits. ¿Cuántas secuencias de 4.000 tokens entran en 40 GB dedicados al KV cache?
 3. En batching estático, ¿por qué el primer token llega con la respuesta completa? ¿Qué cambia Orca para evitarlo?
 4. Nombrá los tres desperdicios de la reserva contigua y explicá cuáles elimina la paginación y cuál reduce a menos de un bloque.
 5. ¿Qué analogía hace el paper entre vLLM y un sistema operativo? ¿Qué cumple el rol de la tabla de páginas?

@@ -6,7 +6,7 @@
 Idea clave: el keep-alive es el TTL de un caché de modelos en GPU; su valor depende de cuánto cuesta un fallo, y si los checkpoints están cerca, el fallo es barato.
 Decir: después de atender el último pedido, ¿cuánto tiempo dejamos el modelo en la GPU? Si lo sacamos enseguida, el próximo pedido arranca en frío. Si lo dejamos mucho, la GPU está ocupada sin hacer nada, y en la nube eso es plata. Es el dilema que estudia "Serverless in the Wild" con la traza de Azure, donde proponen un keep-alive adaptativo por aplicación en lugar de uno fijo.
 La demo, tabla 3: a la izquierda un serverless clásico que descarga el checkpoint cada vez. Pasar de 0 a 600 segundos de keep-alive baja los arranques en frío de 86% a 58% y la demora media de 60 a 47 s; a cambio, más de la mitad del tiempo de GPU es modelos cargados sin pedidos. A la derecha, con DRAM y SSD como caché y el cargador en pipeline: los arranques en frío bajan igual, pero la demora casi no cambia, porque un arranque desde DRAM cuesta medio segundo.
-Conclusión: el caché multinivel no sólo baja la latencia; abarata el keep-alive. Se puede liberar la GPU enseguida y dejar el modelo en la DRAM, que es mucho más barata.
+Conclusión: con el caché multinivel un fallo es barato, así que un keep-alive largo deja de pagar: con 600 s la GPU queda ociosa un 82% del tiempo para ganar 0,2 s. Se puede liberar la GPU enseguida y dejar el modelo en la DRAM, que es mucho más barata.
 Conectar con la materia: en la flota de la demo, un modelo ocioso se desaloja si hace falta su GPU, como una entrada de un caché LRU. TTL y LRU juntos, igual que en un caché web.
 Pasar a la siguiente: la segunda parte, los fine-tunes.</aside>
 </section>

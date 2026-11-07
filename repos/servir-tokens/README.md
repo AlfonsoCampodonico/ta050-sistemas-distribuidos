@@ -134,7 +134,7 @@ sistema de 2.000 tokens compartido por las conversaciones de cada app. Con la
 configuración por defecto son 1.000 conversaciones y 4.539 pedidos, con un
 prompt promedio de unos 3.900 tokens y respuestas de unos 180: prompts largos,
 respuestas cortas y casi todo el prompt repetido, como en la traza de Kimi
-(8.590 y 182 tokens en promedio, Mooncake §4).
+(7.590 y 182 tokens en promedio, Mooncake, versión de arXiv, §4.2).
 
 ## Demo 5 — el router y el caché de prefijos
 

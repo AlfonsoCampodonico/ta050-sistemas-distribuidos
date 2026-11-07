@@ -27,7 +27,7 @@ type Tarea struct {
 	Sigma    float64 // dispersión de la política: el ancho de la cola larga
 }
 
-// Default: con 300 tokens se acierta 13% de las veces, con 2.000 el 75%, con
+// Default: con 300 tokens se acierta 19% de las veces, con 2.000 el 75%, con
 // 6.000 el 98%; el tope es 8.192.
 func Default() Tarea { return Tarea{Escala: 1400, MaxLargo: 8192, Sigma: 0.6} }
 

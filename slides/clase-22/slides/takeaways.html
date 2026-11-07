@@ -5,6 +5,6 @@
 <aside>Tiempo: 1:22–1:24 (2 min).
 Idea clave: tres ideas para el bucle de RL, y una frase para toda la serie.
 Decir: no esperar a la cola: con respuestas de largo de cola larga, un paso sincrónico espera casi todo el tiempo; partir las largas (Kimi) o no esperar (AReaL) recupera la mayor parte. Mover los pesos bien: si se comparte GPUs, la transición entre layouts es un all-gather y se puede diseñar para mover poco (HybridFlow); si se separan, es un broadcast y tiene que ser en anillo o en pipeline. Acotar lo viejo: la asincronía hace que se entrene con datos de pesos viejos; se acota cuánto, como en SSP, y se corrige el objetivo para que lo viejo no tire de más.
-Cerrar la serie: en la 16 partimos un modelo para entrenarlo. En la 18 lo servimos. En la 22 vimos que, para los modelos de razonamiento de hoy, entrenar es servir miles de veces: el mismo modelo, en dos layouts, yendo y viniendo. Todo lo de las seis clases anteriores aparece en ese bucle.
+Cerrar la serie: en la 16 partimos un modelo para entrenarlo. En la 18 lo servimos. En la 20 y la 21 compartimos las GPUs entre modelos y entre trabajos. En la 22 vimos que, para los modelos de razonamiento de hoy, entrenar es servir miles de veces: el mismo modelo, en dos layouts, yendo y viniendo. Todo lo de las seis clases anteriores aparece en ese bucle.
 Pasar a la siguiente: el repositorio.</aside>
 </section>

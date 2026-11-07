@@ -71,9 +71,9 @@ Lo importante del pipeline es que hace la carga **predecible**: mientras un peda
 
 con q la cola de carga del servidor (las cargas van de a una a propósito, para que no se peleen el SSD y la estimación siga valiendo), n el tamaño y b el ancho de banda del nivel donde está el checkpoint en ese servidor, corregido con lo que va midiendo. Para mudar una inferencia en curso:
 
-> tiempo de reanudar = a · (t_in + t_out) + b
+> tiempo de reanudar = α · (t_in + t_out) + β
 
-lineal en los tokens de entrada y los generados; t_out se estima como duración sobre tiempo por token, sin preguntarle al servidor. El error medido está acotado en 5 ms en GPU y 40 ms desde SSD; la limpieza del estado de la GPU después de migrar lo empeora (en promedio 26 ms; una vez, 623 ms en 119 migraciones). Es el router consciente del prefijo de Mooncake con otra fórmula: allá cola más prefill de lo que falta, acá cola más carga de lo que no está.
+con α y β ajustados con lo medido; lineal en los tokens de entrada y los generados; t_out se estima como duración sobre tiempo por token, sin preguntarle al servidor. El error medido está acotado en 5 ms en GPU y 40 ms desde SSD; la limpieza del estado de la GPU después de migrar lo empeora (en promedio 26 ms; una vez, 623 ms en 119 migraciones). Es el router consciente del prefijo de Mooncake con otra fórmula: allá cola más prefill de lo que falta, acá cola más carga de lo que no está.
 
 **El servidor bueno está ocupado** (§5.1, figura 3). S1 tiene la GPU libre, A en DRAM y B en SSD; S2 corre una inferencia de A y tiene B en DRAM. Llega un pedido para B:
 
@@ -207,7 +207,7 @@ Lo que más pesa es el cargador; después, arrancar donde está el checkpoint. D
 | 60 s | 61% | 47 s | 42% | 5,4 s |
 | 600 s | 58% | 47 s | 35% | 5,4 s |
 
-Clásico: descarga cada vez, cargador ingenuo, al azar. Con caché local los arranques en frío bajan igual pero la demora casi no cambia: el keep-alive se abarata. Y contra una GPU por modelo: 64 GPUs ocupadas un 4% del tiempo, contra 16 ocupadas un 16%.
+Clásico: descarga cada vez, cargador ingenuo, al azar. Con caché local los arranques en frío bajan igual pero la demora casi no cambia: un fallo es barato, así que un keep-alive largo deja de pagar (con 600 s la GPU queda ociosa un 82% del tiempo para ganar 0,2 s). Y contra una GPU por modelo: 64 GPUs ocupadas un 4% del tiempo, contra 16 ocupadas un 16%.
 
 **LoRA** (capacidad en pedidos por segundo, con carga de sobra):
 
@@ -227,7 +227,7 @@ Ejercicios del README: ubicación inicial según popularidad, keep-alive adaptat
 **Preguntas de repaso.**
 
 1. ¿Por qué con un cargador en pipeline el tiempo de carga es el del nivel más lento y no la suma? *Los niveles trabajan a la vez sobre pedazos distintos: el flujo lo limita el caño más angosto.*
-2. ¿Qué estima el scheduler de ServerlessLLM para elegir servidor? *q + n/b: la cola de carga del servidor, el tamaño del checkpoint y el ancho de banda del nivel donde está en ese servidor. Para migrar, a·(t_in + t_out) + b.*
+2. ¿Qué estima el scheduler de ServerlessLLM para elegir servidor? *q + n/b: la cola de carga del servidor, el tamaño del checkpoint y el ancho de banda del nivel donde está en ese servidor. Para migrar, α·(t_in + t_out) + β.*
 3. ¿Por qué ServerlessLLM manda los tokens y Mooncake el KV cache? *Depende de la red contra el cómputo. Mooncake tiene RDMA de 800 Gb/s y prompts largos; ServerlessLLM, Ethernet de 10 Gb/s, KV caches de gigabytes y un destino libre para recalcular.*
 4. Si un arranque desde DRAM cuesta medio segundo, ¿qué pasa con el keep-alive óptimo? *Baja: un fallo es barato, así que conviene liberar la GPU y dejar el modelo en DRAM. El TTL óptimo crece con el costo del fallo.*
 5. ¿Por qué el throughput de S-LoRA casi no cae de 100 a 2.000 adaptadores? *El costo extra depende de los adaptadores distintos de un lote, acotados por el tamaño del lote.*

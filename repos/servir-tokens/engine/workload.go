@@ -30,8 +30,8 @@ func Workload(n int, rate float64, seed uint64, maxLen int) []Request {
 // Chat describe una carga de conversaciones de varios turnos, la forma de la
 // carga de un chatbot: cada turno manda la conversación entera otra vez, así
 // que los prompts son largos, crecen turno a turno y casi todo es un prefijo
-// que ya se vio. En la traza de Kimi el prompt promedio tiene 8.590 tokens y
-// la respuesta 182 (Mooncake, §4).
+// que ya se vio. En la traza de Kimi el prompt promedio tiene 7.590 tokens y
+// la respuesta 182 (Mooncake, versión de arXiv, §4.2).
 type Chat struct {
 	Sessions     int     // conversaciones
 	Rate         float64 // conversaciones nuevas por segundo

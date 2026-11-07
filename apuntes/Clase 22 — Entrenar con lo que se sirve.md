@@ -31,7 +31,7 @@ Y vuelta a generar con los pesos nuevos. A diferencia del pre-entrenamiento, los
 
 > Aᵢ = (rᵢ − media(r₁…r_G)) / desvío(r₁…r_G)
 
-Si todo el grupo acertó o todo falló, la ventaja es cero y ese problema no enseña nada en ese paso. El resto es como PPO (razón entre política nueva y vieja, recortada) más un término de KL contra la política de referencia. La versión revisada de R1 detalla: 16 respuestas por problema, tope de 32.768 tokens que sube a 65.536 desde el paso 8.200, y 512 H800 durante unas 198 horas para R1-Zero.
+Si todo el grupo acertó o todo falló, la ventaja es cero (con desvío 0 se toma ventaja 0) y ese problema no enseña nada en ese paso. El resto es como PPO (razón entre política nueva y vieja, recortada) más un término de KL contra la política de referencia. La versión revisada de R1 detalla: 16 respuestas por problema, tope de 32.768 tokens que sube a 65.536 desde el paso 8.200, y 512 H800 durante unas 198 horas para R1-Zero.
 
 **Los modelos.** HybridFlow describe el RLHF clásico (PPO) con hasta cuatro modelos y tres etapas:
 
@@ -197,12 +197,12 @@ Sincrónico, una GPU de rollout que se cae frena el paso como un straggler infin
 
 ## 7. Cerrar la serie
 
-| | Entrenar (16–17) | Servir (18–19) | El bucle de RL (22) |
-| --- | --- | --- | --- |
-| Qué se parte | el modelo, en 4 dimensiones | el KV cache, en bloques y niveles | el clúster, entre generar y entrenar |
-| Qué se comunica | gradientes y activaciones | KV cache entre prefill y decode | pesos, después de cada paso |
-| A quién se espera | al straggler, en cada all-reduce | al prefill largo, en cada iteración | a la respuesta más larga, en cada paso |
-| Si algo falla | volver al checkpoint | recalcular el pedido | regenerar; checkpoint del trainer |
+| | Entrenar (16–17) | Servir (18–19) | Compartir (20–21) | El bucle de RL (22) |
+| --- | --- | --- | --- | --- |
+| Qué se parte | el modelo, en 4 dimensiones | el KV cache, en bloques y niveles | las GPUs, entre modelos y entre trabajos | el clúster, entre generar y entrenar |
+| Qué se comunica | gradientes y activaciones | KV cache entre prefill y decode | pesos, del SSD o la red a la GPU | pesos, después de cada paso |
+| A quién se espera | al straggler, en cada all-reduce | al prefill largo, en cada iteración | a la carga en frío; a juntar las GPUs del gang | a la respuesta más larga, en cada paso |
+| Si algo falla | volver al checkpoint | recalcular el pedido | recargar el checkpoint; desalojar y reencolar | regenerar; checkpoint del trainer |
 
 **Para llevarse.**
 
@@ -253,4 +253,4 @@ Ejercicios del README: descartar lo viejo en lugar de usarlo, PPO con recorte, u
 - Wu et al., [LlamaRL](https://arxiv.org/abs/2505.24034), 2025.
 - Ho et al., More Effective Distributed ML via a Stale Synchronous Parallel Parameter Server, NIPS 2013.
 
-**Cierre de la serie.** En la 16 partimos un modelo para entrenarlo; en la 18 lo servimos; en la 22 vimos que, para los modelos de razonamiento, entrenar es servir miles de veces: el mismo modelo, en dos layouts, yendo y viniendo, con una versión pegada a cada dato. Las preguntas siguen siendo las mismas: qué se parte, qué se comunica, qué pasa cuando falla.
+**Cierre de la serie.** En la 16 partimos un modelo para entrenarlo; en la 18 lo servimos; en la 20 y la 21 compartimos las GPUs entre modelos y entre trabajos; en la 22 vimos que, para los modelos de razonamiento, entrenar es servir miles de veces: el mismo modelo, en dos layouts, yendo y viniendo, con una versión pegada a cada dato. Las preguntas siguen siendo las mismas: qué se parte, qué se comunica, qué pasa cuando falla.

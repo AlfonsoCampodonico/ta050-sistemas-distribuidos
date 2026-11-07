@@ -6,7 +6,7 @@
 Idea clave: si el prefill se hace en pedazos de tamaño fijo, cada iteración tiene un costo acotado y los decodes nunca esperan mucho.
 Decir: Sarathi-Serve (Agrawal et al., OSDI 2024) propone chunked prefill: el prompt se procesa de a pedazos de, por ejemplo, 512 tokens por iteración, y en cada iteración entran también los decodes del lote. Lo llaman stall-free scheduling: los decodes no se detienen nunca. El dibujo: las iteraciones con prefill son un poco más largas, pero ninguna explota.
 El costo: el prompt largo tarda más en terminar su prefill, porque se reparte en varias iteraciones; su TTFT sube un poco. A cambio, el TBT de todos los demás queda acotado.
-Los resultados del paper, contra vLLM y con límites de latencia en la cola: 2,6 veces más capacidad con Mistral-7B en una A100, hasta 3,7 con Yi-34B en dos, y hasta 5,6 con Falcon-180B usando paralelismo de pipeline, donde además las iteraciones parejas reducen las burbujas.
+Los resultados del paper, contra vLLM y con límites de latencia en la cola: hasta 2,6 veces más capacidad con Mistral-7B en una A100, hasta 3,7 con Yi-34B en dos A100, y hasta 5,6 con Falcon-180B usando paralelismo de pipeline, donde además las iteraciones parejas reducen las burbujas.
 Hoy chunked prefill viene prendido por defecto en los servidores de inferencia principales.
 Pasar a la siguiente: la otra solución, separar las máquinas.</aside>
 </section>
