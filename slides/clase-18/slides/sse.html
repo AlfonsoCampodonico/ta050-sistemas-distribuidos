@@ -1,20 +1,21 @@
-<section id="sse" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<section data-estilo="curso" id="sse" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El stream de vuelta</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Un evento por token, y un proxy que puede arruinarlo</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El stream de vuelta</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Un evento por token, y un proxy que puede arruinarlo</h2>
 </div>
 <div style="display:flex;gap:56px;align-items:start">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#1A2027;border-radius:16px;padding:40px">
-<p style="font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">Content-Type: text/event-stream</p>
-<p style="font-size:28px;line-height:1.6;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">data: {"delta":"La "}<br/><br/>data: {"delta":"luz "}<br/><br/>data: [DONE]</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#EEF0F2;border-radius:16px;padding:40px">
+<p style="font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">Content-Type: text/event-stream</p>
+<p style="font-size:28px;line-height:1.6;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">data: {"delta":"La "}<br/><br/>data: {"delta":"luz "}<br/><br/>data: [DONE]</p>
 </div>
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;color:#A8B3BC">directo o con un proxy que reenvía</p><p style="font-size:44px;font-weight:600;color:#34D399">un token cada 40 ms</p></div>
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;color:#A8B3BC">con un proxy que junta la respuesta</p><p style="font-size:44px;font-weight:600;color:#F5A524">los 60 tokens juntos a los 2,5 s</p></div>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">En nginx: proxy_buffering off, o el header X-Accel-Buffering: no.</p>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;color:#33393E">directo o con un proxy que reenvía</p><p style="font-size:44px;font-weight:600;color:#046B7D">un token cada 40 ms</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;color:#33393E">con un proxy que junta la respuesta</p><p style="font-size:44px;font-weight:600;color:#B45309">los 60 tokens juntos a los 2,5 s</p></div>
+<p style="font-size:24px;line-height:1.4;color:#33393E">En nginx: proxy_buffering off, o el header X-Accel-Buffering: no.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/servidor · go run ./cmd/proxy -buffer · medido con curl</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">go run ./cmd/servidor · go run ./cmd/proxy -buffer · medido con curl</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">27</p>
 <aside>Tiempo: 1:13–1:18 (5 min, con demo).
 Idea clave: cada token sale apenas existe, como un evento en una respuesta HTTP que queda abierta; cualquier salto que junte la respuesta rompe el streaming.
 Decir: la respuesta es server-sent events: Content-Type text/event-stream, y cada evento es una línea data: seguida de una línea vacía. El formato exacto cambia según el proveedor. En el camino de vuelta, el gateway cuenta los tokens de salida y el navegador agrega cada fragmento.

@@ -3,125 +3,210 @@
 <title>Flota de GPUs</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap">
 <style>
-/* Clase 20 · 64 modelos sobre 16 GPUs en vivo: servidores al centro, instrumentos a la derecha, comparación abajo. */
+/* Identidad visual de TA050 (fiubata050.github.io): teal #046b7d, Chakra Petch / Rubik / IBM Plex Mono. Claro por defecto. */
 :root {
-  --bg: #0E1114; --panel: #161B20; --panel2: #1A2027; --ink: #F2F3EF; --muted: #A8B3BC; --faint: #7D8892;
-  --line: #2A3138; --cell: #232A31; --accent: #34D399; --accent-ink: #0E1114; --accent-soft: #132A22;
-  --warn: #F5A524; --bad: #FF7A6B; --blue: #7AA2FF;
-  --c0: #34D399; --c1: #F5A524; --c2: #7AA2FF; --c3: #F472B6; --c4: #A78BFA; --c5: #FACC15; --c6: #22D3EE; --c7: #FB923C;
-  --t-dram: #34D399; --t-ssd: #F5A524; --t-remote: #FF7A6B;
-  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
-  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  color-scheme: dark;
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
-    --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
-    --warn: #A35F00; --bad: #C2362B; --blue: #2C56C9;
-    --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
-    --t-dram: #0E8A60; --t-ssd: #B86E00; --t-remote: #C2362B;
-    color-scheme: light;
-  }
-}
-:root[data-theme="light"] {
-  --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
-  --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
-  --warn: #A35F00; --bad: #C2362B; --blue: #2C56C9;
-  --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
-  --t-dram: #0E8A60; --t-ssd: #B86E00; --t-remote: #C2362B;
+  --bg: #f3f4f5; --page: #f3f4f5;
+  --panel: #ffffff; --panel2: #f3f4f5; --ink: #0d0d0d; --muted: #495057; --faint: #6c757d;
+  --line: #dee2e6; --cell: #e9ecef; --code-bg: #e9ecef; --code: #393a34;
+  --accent: #046b7d; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: #e3f0f2;
+  --warn: #8a5a00; --warn-soft: #fdf3e0; --bad: #c0261f; --bad-soft: #fbeceb;
+  --h1-color: #0d0d0d; --h1-shadow: .1rem .1rem 0 #046b7d; --h1-case: none; --btn-glow: none;
+  /* Series: una por pedido / réplica. Giran alrededor del teal y se distinguen en los dos temas. */
+  --s0: #046b7d; --s1: #e8590c; --s2: #3b5bdb; --s3: #c2255c; --s4: #7048e8; --s5: #2f8a3e; --s6: #a68a00; --s7: #ae3ec9;
+  --head: "Chakra Petch", "Rubik", system-ui, sans-serif;
+  --sans: "Rubik", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   color-scheme: light;
 }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+    --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+    --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+    --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+    --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+    --h1-color: #ffffff; --h1-case: uppercase;
+    --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+    --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+    --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+  --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+  --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+  --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+  --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+  --h1-color: #ffffff; --h1-case: uppercase;
+  --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+  --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+  --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
+  color-scheme: dark;
+}
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
 body {
-  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  margin: 0; min-height: 100vh; background: var(--page); color: var(--ink);
+  font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.55;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 24px 48px;
+  padding-block: 24px 56px;
+  -webkit-text-size-adjust: 100%;
 }
-.wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-header { display: flex; flex-direction: column; gap: 8px; }
-.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
-h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
-.lead { margin: 0; color: var(--muted); max-width: 72ch; }
-h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+b, strong { font-weight: 500; }
+code, .code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); color: var(--code); padding: .1em .35em; border-radius: 4px; white-space: nowrap; }
+.wrap { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 10px; }
+.back { display: flex; gap: 8px 20px; flex-wrap: wrap; margin-bottom: 14px; font: 400 13px var(--mono); }
+.back a { color: var(--accent); text-decoration: none; }
+.back a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.eyebrow { font: 500 12px/1.3 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 clamp(30px, 5vw, 46px)/1.08 var(--head); letter-spacing: .01em; color: var(--h1-color); text-shadow: var(--h1-shadow); text-transform: var(--h1-case); text-wrap: balance; }
+h2 { margin: 0; font: 600 19px/1.25 var(--head); letter-spacing: .01em; text-wrap: balance; }
+h3 { margin: 0; font: 600 15px/1.3 var(--head); letter-spacing: .02em; }
+.lead { margin: 0; color: var(--muted); max-width: 72ch; font-size: 16px; }
 .small { font-size: 13px; color: var(--muted); }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-
-.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
-.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.field > span { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
-.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 11px; cursor: pointer; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+.controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.field > span, .label { font: 500 11px/1.2 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.field .hint { font: 300 12px/1.35 var(--sans); letter-spacing: 0; text-transform: none; color: var(--faint); max-width: 30ch; }
+.val { font: 600 13px var(--mono); letter-spacing: 0; text-transform: none; color: var(--accent); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 170px; max-width: 100%; accent-color: var(--accent-fill); }
+.seg { align-self: flex-start; display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 400 13px var(--sans); padding: 7px 12px; cursor: pointer; }
 .seg button + button { border-left: 1px solid var(--line); }
-.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-input[type=range] { width: 140px; accent-color: var(--accent); }
-.val { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
-.actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
-.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); cursor: pointer; }
-.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.seg button:hover:not(:disabled) { background: var(--accent-soft); }
+.seg button[aria-pressed="true"] { background: var(--accent-fill); color: var(--accent-ink); font-weight: 500; box-shadow: var(--btn-glow); }
+.seg button:disabled { color: var(--faint); cursor: not-allowed; }
+.seg button[aria-pressed="true"]:disabled { color: var(--accent-ink); opacity: .55; }
+.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 11px; font: 400 13px var(--sans); cursor: pointer; background: var(--panel); color: var(--ink); }
+.tog:hover { border-color: var(--accent); }
+.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 500; }
+.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); flex: none; }
+.tog[aria-pressed="true"] i { background: var(--accent); border-color: var(--accent); }
+.btn { font: 400 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent-fill); color: var(--accent-ink); border-color: var(--accent-fill); font-weight: 500; box-shadow: var(--btn-glow); }
+.btn.primary:hover:not(:disabled) { color: var(--accent-ink); filter: brightness(1.12); }
 .btn:disabled { opacity: .55; cursor: progress; }
-button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select.btn { padding-right: 10px; }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gauges { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; }
+.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
+.gauge span { font-size: 12px; line-height: 1.35; color: var(--muted); }
+.gauge b.good { color: var(--accent); } .gauge b.warn { color: var(--warn); } .gauge b.bad { color: var(--bad); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+.note { font-size: 13.5px; color: var(--ink); background: var(--panel2); border: 1px solid var(--line); border-left: 5px solid var(--accent-fill); border-radius: .5rem; padding: 10px 14px; margin: 0; }
+.tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font: 500 11px/1.3 var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); text-align: left; }
+.foot { font-size: 12.5px; color: var(--faint); margin: 0; }
+svg text { font-family: var(--mono); }
+@media (max-width: 520px) {
+  body { padding-block: 16px 40px; }
+  .panel { padding: 14px; }
+  .controls { gap: 14px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
 
+/* Texto sobre un color de serie (chips, trabajos, GPUs ocupadas). */
+:root { --on-series: #ffffff; --on-s0: #fff; --on-s1: #0d0d0d; --on-s2: #fff; --on-s3: #fff; --on-s4: #fff; --on-s5: #fff; --on-s6: #0d0d0d; --on-s7: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --on-series: #031315; --on-s0: #031315; --on-s1: #031315; --on-s2: #031315; --on-s3: #031315; --on-s4: #031315; --on-s5: #031315; --on-s6: #031315; --on-s7: #031315; } }
+:root[data-theme="dark"] { --on-series: #031315; --on-s0: #031315; --on-s1: #031315; --on-s2: #031315; --on-s3: #031315; --on-s4: #031315; --on-s5: #031315; --on-s6: #031315; --on-s7: #031315; }
+/* --- Común a flota, planificador y rl --- */
+.controls-panel { gap: 16px; }
+.controls { align-items: flex-start; }
+.field .hint { margin: 0; }
+.ticks { display: flex; justify-content: space-between; width: 170px; max-width: 100%; margin-top: -3px; font: 400 10.5px/1.2 var(--mono); color: var(--faint); }
+.runbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.runbar .speed { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.runbar .speed .label { white-space: nowrap; }
+.runbar input[type=range] { width: 130px; }
+.runbar .status { margin-left: auto; font: 400 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.btn .ico { display: inline-block; width: 12px; text-align: center; font-size: 11px; line-height: 1; }
+#play { min-width: 112px; justify-content: center; }
+.gauge small { font-size: 11.5px; line-height: 1.35; color: var(--faint); }
+.legend > span { display: inline-flex; align-items: center; }
+.legend i { flex: none; }
+th, td { white-space: nowrap; }
+td { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+th { text-align: right; vertical-align: bottom; }
+th:first-child, td:first-child { text-align: left; font-family: var(--sans); }
+tr.best td { background: var(--accent-soft); }
+tr.best td:first-child { box-shadow: inset 4px 0 0 var(--accent-fill); font-weight: 500; }
+.cmp-head { align-items: center; }
+.empty-state { margin: 0; padding: 18px; border: 1px dashed var(--line); border-radius: .5rem; text-align: center; color: var(--faint); font-size: 13px; }
+@media (max-width: 520px) {
+  .runbar .status { margin-left: 0; width: 100%; }
+  .gauge b { font-size: 19px; }
+}
+.seg { align-self: flex-start; }
+.controls.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px 28px; }
+.controls.grid .wide { grid-column: 1 / -1; }
+.tag { font: 400 12px/1.35 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
+
+/* --- Flota (clase 20): servidores al centro, instrumentos a la derecha, comparación abajo --- */
+:root { --t-dram: var(--s0); --t-ssd: var(--s1); --t-remote: var(--bad); }
 .main { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+@media (max-width: 960px) { .main { grid-template-columns: minmax(0, 1fr); } }
 
-.servers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-@media (max-width: 560px) { .servers { grid-template-columns: minmax(0, 1fr); } }
-.srv { border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--panel2); min-width: 0; }
-.srv-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.srv-h b { font-size: 14px; font-weight: 600; }
+.servers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 600px) { .servers { grid-template-columns: minmax(0, 1fr); } }
+.srv { border: 1px solid var(--line); border-radius: .6rem; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--panel2); min-width: 0; }
+.srv-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.srv-h b { font: 600 14px var(--head); letter-spacing: .04em; }
 .gpus { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-.gpu { position: relative; height: 64px; border-radius: 8px; border: 1px solid var(--line); background: var(--cell); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 6px 7px; min-width: 0; }
-.gpu .m { font: 600 13px/1 var(--mono); color: var(--accent-ink); position: relative; }
-.gpu .s { font: 500 10px/1.1 var(--mono); position: relative; color: var(--accent-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gpu.free .m, .gpu.free .s { color: var(--faint); }
-.gpu.idle { background: transparent; border-width: 2px; }
+.gpu { position: relative; height: 62px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 6px 7px 8px; min-width: 0; }
+.gpu .m { font: 600 13px/1 var(--mono); color: inherit; position: relative; }
+.gpu .s { font: 400 10.5px/1.15 var(--mono); position: relative; color: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gpu.free { border-style: dashed; }
+.gpu.free .m, .gpu.free .s { color: var(--faint); font-weight: 400; }
+.gpu.idle { border-width: 2px; padding: 5px 6px 7px; }
 .gpu.idle .m, .gpu.idle .s { color: var(--ink); }
-.gpu.loading { background: repeating-linear-gradient(135deg, var(--cell) 0 6px, transparent 6px 12px); border-width: 2px; }
+.gpu.loading { border-width: 2px; padding: 5px 6px 7px; background: repeating-linear-gradient(135deg, var(--cell) 0 6px, transparent 6px 12px); }
 .gpu.loading .m, .gpu.loading .s { color: var(--ink); }
-.gpu .bar { position: absolute; left: 0; bottom: 0; height: 4px; background: var(--ink); opacity: .55; }
-.lbl { font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
-.chips { display: flex; flex-wrap: wrap; gap: 4px; min-height: 20px; }
-.chip { min-width: 24px; height: 18px; border-radius: 4px; font: 600 10px/18px var(--mono); text-align: center; color: var(--accent-ink); padding: 0 3px; }
-.kv { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+.gpu .bar { position: absolute; left: 0; bottom: 0; height: 4px; background: currentColor; color: var(--ink); opacity: .5; }
+.gpu.busy .bar { display: none; }
+.lbl { font: 500 10.5px/1 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); display: flex; justify-content: space-between; gap: 8px; }
+.lbl em { font: 400 10.5px var(--mono); letter-spacing: 0; text-transform: none; font-style: normal; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; min-height: 22px; align-content: flex-start; }
+.chip { min-width: 26px; height: 20px; border-radius: 4px; font: 600 10.5px/20px var(--mono); text-align: center; padding: 0 4px; }
+.chips .empty { font-size: 12px; color: var(--faint); line-height: 20px; }
+.kv { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--muted); }
 .kv span:last-child { font-family: var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
 .meter { height: 6px; border-radius: 3px; background: var(--cell); overflow: hidden; }
-.meter > div { height: 100%; background: var(--warn); width: 0; }
+.meter > div { height: 100%; background: var(--warn); width: 0; transition: width .1s linear; }
 
-.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
-.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+.legend .sw-busy { background: var(--s2); }
+.legend .sw-idle { border: 2px solid var(--s2); background: transparent; }
+.legend .sw-load { border: 2px solid var(--s2); background: repeating-linear-gradient(135deg, var(--cell) 0 3px, transparent 3px 6px); }
+.legend .sw-free { border: 1px dashed var(--faint); background: transparent; }
 
-.gauges { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.gauge span { font-size: 12px; color: var(--muted); }
-.gauge b.warn { color: var(--warn); }
-.gauge b.bad { color: var(--bad); }
+.gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .tiers { display: flex; height: 14px; border-radius: 4px; overflow: hidden; background: var(--cell); }
-.tiers > div { height: 100%; }
-.note { font-size: 13px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 10px; margin: 0; }
-.log { font: 12px/1.55 var(--mono); color: var(--muted); margin: 0; padding: 0; list-style: none; min-height: 112px; }
+.tiers > div { height: 100%; transition: width .2s; }
+.tiers > div + div { box-shadow: inset 1px 0 0 var(--panel); }
+.log { font: 400 12px/1.6 var(--mono); color: var(--muted); margin: 0; padding: 0; list-style: none; height: calc(6 * 1.6em); overflow: hidden; }
 .log li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-.tablewrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 640px; }
-th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-th:first-child, td:first-child { text-align: left; }
-th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
-td { font-variant-numeric: tabular-nums; font-family: var(--mono); }
-td:first-child { font-family: var(--sans); }
-tr.best td { color: var(--accent); }
-.foot { font-size: 12px; color: var(--faint); }
-.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
-.back a{color:var(--muted);text-decoration:none}
-.back a:hover{color:var(--accent)}
+.log li b { font-weight: 600; color: var(--ink); }
+.log .tr-0 { color: var(--t-dram); } .log .tr-1 { color: var(--t-ssd); } .log .tr-2 { color: var(--t-remote); }
+.stack { display: flex; flex-direction: column; gap: 6px; }
+#explain { min-height: 7.4em; }
+table { min-width: 680px; }
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <header>
     <nav class="back"><a href="../">← Volver al inicio</a><a href="../slides/clase-20/">Slides de la clase 20</a></nav>
@@ -130,33 +215,44 @@ tr.best td { color: var(--accent); }
     <p class="lead">64 modelos comparten 4 servidores de 4 GPUs. Casi todos están ociosos casi siempre, y cuando llega un pedido para uno que no está cargado hay que traer su checkpoint de 13 GB: desde la DRAM del servidor, desde su SSD o desde el almacenamiento remoto. Probá dónde arrancar cada modelo, con qué cargador, y cuánto tiempo dejarlo cargado.</p>
   </header>
 
-  <section class="controls" aria-label="Controles">
-    <div class="field"><span>Dónde arrancar</span>
-      <div class="seg" id="policy">
-        <button data-v="random" aria-pressed="false">Al azar</button>
-        <button data-v="locality" aria-pressed="false">Localidad</button>
-        <button data-v="migrate" aria-pressed="true">Localidad + migración</button>
-        <button data-v="preempt" aria-pressed="false">Localidad + desalojo</button>
+  <section class="panel controls-panel" aria-label="Controles">
+    <div class="controls grid">
+      <div class="field wide"><span>Dónde arrancar</span>
+        <div class="seg" id="policy" role="group" aria-label="Dónde arrancar">
+          <button data-v="random" aria-pressed="false">Al azar</button>
+          <button data-v="locality" aria-pressed="false">Localidad</button>
+          <button data-v="migrate" aria-pressed="true">Localidad + migración</button>
+          <button data-v="preempt" aria-pressed="false">Localidad + desalojo</button>
+        </div>
+        <p class="hint" style="max-width:52ch">Qué GPU elige el planificador cuando llega un pedido para un modelo que no está cargado en ningún lado.</p>
+      </div>
+      <div class="field"><span>Cargador</span>
+        <div class="seg" id="loader" role="group" aria-label="Cargador">
+          <button data-v="naive" aria-pressed="false">Ingenuo</button>
+          <button data-v="fast" aria-pressed="true">En pipeline</button>
+        </div>
+        <p class="hint">Cómo se lee el checkpoint: de a un nivel por vez, o todos los niveles a la vez.</p>
+      </div>
+      <div class="field"><span>Keep-alive · <b class="val" id="keep-v">30 s</b></span>
+        <input type="range" id="keep" min="0" max="5" step="1" value="2" aria-label="Keep-alive">
+        <div class="ticks" aria-hidden="true"><span>0</span><span>10 s</span><span>30 s</span><span>1 min</span><span>5 min</span><span>∞</span></div>
+        <p class="hint">Cuánto queda cargado un modelo sin pedidos antes de liberar su GPU.</p>
+      </div>
+      <div class="field"><span>Carga · <b class="val" id="rate-v">1 pedido/s</b></span>
+        <input type="range" id="rate" min="0" max="4" step="1" value="1" aria-label="Pedidos por segundo">
+        <div class="ticks" aria-hidden="true"><span>0,5</span><span>1</span><span>1,5</span><span>2</span><span>3</span></div>
+        <p class="hint">Pedidos por segundo entre los 64 modelos. Unos pocos reciben casi todo y llegan en ráfagas.</p>
       </div>
     </div>
-    <div class="field"><span>Cargador</span>
-      <div class="seg" id="loader">
-        <button data-v="naive" aria-pressed="false">Ingenuo</button>
-        <button data-v="fast" aria-pressed="true">En pipeline</button>
+    <div class="runbar">
+      <div class="actions">
+        <button class="btn primary" id="play"><span class="ico" aria-hidden="true">❚❚</span><span>Pausa</span></button>
+        <button class="btn" id="reset"><span class="ico" aria-hidden="true">↺</span>Reiniciar</button>
       </div>
-    </div>
-    <div class="field"><span>Keep-alive · <b class="val" id="keep-v">30 s</b></span>
-      <input type="range" id="keep" min="0" max="5" step="1" value="2" aria-label="Keep-alive">
-    </div>
-    <div class="field"><span>Pedidos por segundo · <b class="val" id="rate-v">1</b></span>
-      <input type="range" id="rate" min="0" max="4" step="1" value="1" aria-label="Pedidos por segundo">
-    </div>
-    <div class="field"><span>Velocidad · <b class="val" id="speed-v">10×</b></span>
-      <input type="range" id="speed" min="0" max="4" step="1" value="2" aria-label="Velocidad de la simulación">
-    </div>
-    <div class="actions">
-      <button class="btn" id="play">Pausa</button>
-      <button class="btn" id="reset">Reiniciar</button>
+      <div class="speed"><span class="label">Velocidad · <b class="val" id="speed-v">10×</b></span>
+        <input type="range" id="speed" min="0" max="4" step="1" value="2" aria-label="Velocidad de la simulación">
+      </div>
+      <span class="status" id="clock">t = 0 s</span>
     </div>
   </section>
 
@@ -164,52 +260,56 @@ tr.best td { color: var(--accent); }
     <section class="panel" aria-labelledby="stage-h">
       <div class="panel-head">
         <h2 id="stage-h">Los servidores</h2>
-        <span class="small mono" id="clock">t = 0 s</span>
+        <span class="tag">4 servidores × 4 GPUs</span>
       </div>
       <div class="servers" id="servers"></div>
       <div class="legend">
-        <span><i style="background:var(--c0)"></i>con pedidos (lleno: número de modelo, abajo cuántos)</span>
-        <span><i style="border:2px solid var(--faint)"></i>cargado y ocioso (la barra es el keep-alive)</span>
-        <span><i style="background:repeating-linear-gradient(135deg,var(--cell) 0 3px,transparent 3px 6px);border:1px solid var(--faint)"></i>cargando</span>
+        <span><i class="sw-busy"></i>atendiendo pedidos (abajo, cuántos)</span>
+        <span><i class="sw-load"></i>cargando el checkpoint</span>
+        <span><i class="sw-idle"></i>cargado y ocioso (la barra: keep-alive que le queda)</span>
+        <span><i class="sw-free"></i>libre</span>
       </div>
-      <p class="small"><b>DRAM</b>: los checkpoints que el servidor tiene en memoria (entran 10), del más reciente al menos. El SSD tiene 32; lo que no está en ningún lado se baja del almacenamiento remoto.</p>
+      <p class="small">Un color por modelo; el número es el modelo (M0 es el más pedido). <b>DRAM</b>: los checkpoints que el servidor tiene en memoria (entran 10), del más reciente al menos. El SSD guarda 32; lo que no está en ninguno de los dos se baja del almacenamiento remoto. <b>Cola de carga</b>: cuánto falta para que el cargador del servidor se desocupe.</p>
     </section>
 
     <section class="panel" aria-labelledby="inst-h">
-      <div class="panel-head"><h2 id="inst-h">Instrumentos</h2><span class="small">últimos 300 pedidos</span></div>
+      <div class="panel-head"><h2 id="inst-h">Instrumentos</h2><span class="tag">últimos 300 pedidos</span></div>
       <div class="gauges">
-        <div class="gauge"><b id="g-cold">–</b><span>esperó una carga</span></div>
+        <div class="gauge"><b id="g-cold">–</b><span>de los pedidos esperó una carga</span></div>
         <div class="gauge"><b id="g-mean">–</b><span>demora media</span></div>
-        <div class="gauge"><b id="g-busy">–</b><span>GPU con pedidos</span></div>
+        <div class="gauge"><b id="g-busy">–</b><span>del tiempo de GPU, con pedidos</span></div>
         <div class="gauge"><b id="g-p99">–</b><span>demora p99</span></div>
-        <div class="gauge"><b id="g-idle">–</b><span>GPU cargada y ociosa</span></div>
-        <div class="gauge"><b id="g-mig">–</b><span>mudadas / cortadas</span></div>
+        <div class="gauge"><b id="g-idle">–</b><span>del tiempo de GPU, cargada y ociosa</span></div>
+        <div class="gauge"><b id="g-mig">–</b><span>migraciones / desalojos</span></div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <div class="kv"><span>De dónde salieron las últimas 60 cargas</span><span id="g-tiers">–</span></div>
-        <div class="tiers" id="tiers"></div>
-        <div class="legend"><span><i style="background:var(--t-dram)"></i>DRAM</span><span><i style="background:var(--t-ssd)"></i>SSD</span><span><i style="background:var(--t-remote)"></i>remoto</span></div>
+      <div class="stack">
+        <span class="lbl"><span>De dónde salieron las últimas 60 cargas</span></span>
+        <div class="tiers" id="tiers" role="img" aria-label="Proporción de cargas desde DRAM, SSD y remoto"></div>
+        <div class="legend" id="g-tiers"><span><i style="background:var(--t-dram)"></i>DRAM</span><span><i style="background:var(--t-ssd)"></i>SSD</span><span><i style="background:var(--t-remote)"></i>remoto</span></div>
       </div>
       <p class="note" id="explain"></p>
-      <span class="lbl">Últimas cargas</span>
-      <ul class="log" id="log"></ul>
-      <p class="small">Demora: lo que tardó cada pedido de más respecto de tener el modelo cargado y una GPU para él. Anchos de banda ilustrativos, del orden del testbed de ServerlessLLM: red de 10 Gb/s, SSD de 6 GB/s, PCIe de 25 GB/s. Cada GPU atiende hasta 8 pedidos de su modelo a la vez.</p>
+      <div class="stack">
+        <span class="lbl"><span>Últimas cargas</span><em>hora · modelo → servidor/GPU</em></span>
+        <ul class="log" id="log"></ul>
+      </div>
+      <p class="small"><b>Demora</b>: lo que tardó cada pedido de más respecto de tener el modelo cargado y una GPU para él. Con el cargador en pipeline, 13 GB tardan 0,5 s desde DRAM, 2,2 s desde SSD y 10 s desde remoto. Anchos de banda ilustrativos, del orden del testbed de ServerlessLLM: red de 10 Gb/s, SSD de 6 GB/s, PCIe de 25 GB/s. Cada GPU atiende hasta 8 pedidos de su modelo a la vez.</p>
     </section>
   </div>
 
   <section class="panel" aria-labelledby="cmp-h">
-    <div class="panel-head">
+    <div class="panel-head cmp-head">
       <h2 id="cmp-h">Todas las políticas, con la misma carga</h2>
       <button class="btn primary" id="cmp-run">Comparar</button>
     </div>
-    <p class="small" id="cmp-desc">Corre una hora de pedidos en cada configuración, sin animación, con el keep-alive y la tasa elegidos.</p>
+    <p class="small" id="cmp-desc">Corre una hora simulada de pedidos con cada configuración, sin animación, con el keep-alive y la carga elegidos arriba.</p>
     <div class="tablewrap">
+      <p class="empty-state" id="cmp-empty">Apretá <b>Comparar</b> para ver las cinco configuraciones lado a lado.</p>
       <table id="cmp" hidden>
-        <thead><tr><th>Configuración</th><th>frío</th><th>de DRAM</th><th>de remoto</th><th>demora media</th><th>p99</th><th>GPU ociosa</th></tr></thead>
+        <thead><tr><th>Configuración</th><th>esperó carga</th><th>cargas de DRAM</th><th>cargas de remoto</th><th>demora media</th><th>demora p99</th><th>GPU ociosa</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
-    <p class="foot">El mismo modelo que <span class="mono">go run ./cmd/sim arranque</span> del repositorio servir-tokens (paquete flota).</p>
+    <p class="foot">El mismo modelo que <code>go run ./cmd/sim arranque</code> del repositorio servir-tokens (paquete flota).</p>
   </section>
 </div>
 
@@ -476,7 +576,8 @@ const KEEPS = [0, 10, 30, 60, 300, Infinity], RATES = [0.5, 1, 1.5, 2, 3], SPEED
 const opt = { policy: "migrate", loader: "fast", keep: 30, rate: 1 };
 let speed = 10, playing = true, fl, last = 0;
 
-const keepName = k => isFinite(k) ? k + " s" : "∞";
+const keepName = k => !isFinite(k) ? "∞" : k >= 60 ? k / 60 + " min" : k + " s";
+const rateName = r => String(r).replace(".", ",") + (r === 1 ? " pedido/s" : " pedidos/s");
 function seg(id, key) {
   const root = $(id);
   root.addEventListener("click", e => {
@@ -486,19 +587,21 @@ function seg(id, key) {
 }
 seg("#policy", "policy"); seg("#loader", "loader");
 $("#keep").addEventListener("input", e => { opt.keep = KEEPS[+e.target.value]; $("#keep-v").textContent = keepName(opt.keep); reset(); });
-$("#rate").addEventListener("input", e => { opt.rate = RATES[+e.target.value]; $("#rate-v").textContent = String(opt.rate).replace(".", ","); reset(); });
+$("#rate").addEventListener("input", e => { opt.rate = RATES[+e.target.value]; $("#rate-v").textContent = rateName(opt.rate); reset(); });
 $("#speed").addEventListener("input", e => { speed = SPEEDS[+e.target.value]; $("#speed-v").textContent = speed + "×"; });
-$("#play").addEventListener("click", () => { playing = !playing; $("#play").textContent = playing ? "Pausa" : "Seguir"; });
+function setPlaying(v) { playing = v; $("#play").innerHTML = playing ? `<span class="ico" aria-hidden="true">❚❚</span><span>Pausa</span>` : `<span class="ico" aria-hidden="true">▶</span><span>Seguir</span>`; render(); }
+$("#play").addEventListener("click", () => setPlaying(!playing));
 $("#reset").addEventListener("click", reset);
 
-const col = m => `var(--c${m % 8})`;
+const col = m => `var(--s${m % 8})`;
+const onCol = m => `var(--on-s${m % 8})`;
 function buildStage() {
   const st = $("#servers"); st.innerHTML = "";
   for (const srv of fl.servers) {
     const el = document.createElement("div"); el.className = "srv";
     el.innerHTML = `<div class="srv-h"><b>Servidor ${srv.id + 1}</b><span class="small mono" data-k="ssd"></span></div>
       <div class="gpus">${srv.slots.map(() => `<div class="gpu"><span class="m"></span><span class="s"></span><div class="bar"></div></div>`).join("")}</div>
-      <span class="lbl">DRAM</span><div class="chips" data-k="dram"></div>
+      <span class="lbl"><span>DRAM</span><em data-k="dramn"></em></span><div class="chips" data-k="dram"></div>
       <div class="kv"><span>Cola de carga</span><span data-k="queue">–</span></div><div class="meter"><div data-k="qm"></div></div>`;
     srv.el = el; st.appendChild(el);
   }
@@ -512,7 +615,7 @@ function explain() {
   };
   let s = t[opt.policy];
   s += opt.loader === "naive" ? " Cargador ingenuo: nivel por nivel y con el 30% del ancho de banda local." : " Cargador en pipeline: 13 GB desde DRAM en 0,5 s, desde SSD en 2,2 s, desde remoto en 10 s.";
-  s += opt.keep === 0 ? " Sin keep-alive: cada modelo se descarga apenas queda ocioso." : isFinite(opt.keep) ? ` Un modelo ocioso queda cargado ${opt.keep} s.` : " Un modelo ocioso queda cargado hasta que otro necesite su GPU.";
+  s += opt.keep === 0 ? " Sin keep-alive: cada modelo se descarga apenas queda ocioso." : isFinite(opt.keep) ? ` Un modelo ocioso queda cargado ${keepName(opt.keep)}.` : " Un modelo ocioso queda cargado hasta que otro necesite su GPU.";
   $("#explain").textContent = s;
 }
 function reset() {
@@ -521,11 +624,13 @@ function reset() {
 }
 const fmtS = v => isNaN(v) ? "–" : v >= 100 ? Math.round(v) + " s" : v.toFixed(1).replace(".", ",") + " s";
 const pctf = v => isNaN(v) ? "–" : Math.round(100 * v) + "%";
+const clockName = t => { t = Math.floor(t); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`; };
 function render() {
-  $("#clock").textContent = `t = ${Math.floor(fl.now)} s de ${DURATION}`;
+  $("#clock").textContent = `hora simulada ${clockName(fl.now)} de ${clockName(DURATION)}` + (playing ? "" : " · en pausa");
   for (const srv of fl.servers) {
-    srv.el.querySelector('[data-k="ssd"]').textContent = `SSD: ${srv.ssd.order.length} modelos`;
-    srv.el.querySelector('[data-k="dram"]').innerHTML = [...srv.dram.order].reverse().map(m => `<span class="chip" style="background:${col(m)}">${m}</span>`).join("") || `<span class="small">vacía</span>`;
+    srv.el.querySelector('[data-k="ssd"]').textContent = `SSD: ${srv.ssd.order.length} de 32`;
+    srv.el.querySelector('[data-k="dramn"]').textContent = `${srv.dram.order.length} de 10`;
+    srv.el.querySelector('[data-k="dram"]').innerHTML = [...srv.dram.order].reverse().map(m => `<span class="chip" style="background:${col(m)};color:${onCol(m)}">${m}</span>`).join("") || `<span class="empty">vacía</span>`;
     const q = Math.max(0, srv.loaderFree - fl.now);
     srv.el.querySelector('[data-k="queue"]').textContent = q > 0 ? fmtS(q) : "libre";
     srv.el.querySelector('[data-k="qm"]').style.width = Math.min(100, q * 5) + "%";
@@ -535,7 +640,9 @@ function render() {
       g.className = "gpu " + cls;
       const c = s.model >= 0 ? col(s.model) : "var(--line)";
       g.style.background = s.state === 2 ? c : "";
+      g.style.color = s.state === 2 ? onCol(s.model) : "";
       g.style.borderColor = s.state === 1 || s.state === 3 ? c : "";
+      g.querySelector(".bar").style.color = s.state === 1 || s.state === 3 ? c : "";
       g.querySelector(".m").textContent = s.state === 0 ? "libre" : "M" + s.model;
       let sub = "", bar = 0;
       if (s.state === 1) { sub = s.victim ? (s.resuming ? "recalcula KV" : "migra · " + TIER[s.loadTier]) : "desde " + TIER[s.loadTier]; bar = (fl.now - s.loadStart) / Math.max(1e-6, s.readyAt - s.loadStart); }
@@ -550,9 +657,9 @@ function render() {
   set("#g-cold", pctf(s.cold)); set("#g-mean", fmtS(s.mean), s.mean > 10 ? "bad" : s.mean > 3 ? "warn" : "");
   set("#g-p99", fmtS(s.p99), s.p99 > 60 ? "bad" : s.p99 > 20 ? "warn" : "");
   set("#g-busy", pctf(s.busy)); set("#g-idle", pctf(s.idle)); set("#g-mig", `${fl.migrations} / ${fl.preemptions}`);
-  $("#g-tiers").textContent = s.nloads ? s.tiers.map((x, i) => Math.round(100 * x) + "% " + TIER[i]).join(" · ") : "–";
+  $("#g-tiers").innerHTML = s.tiers.map((x, i) => `<span><i style="background:var(--t-${["dram", "ssd", "remote"][i]})"></i>${TIER[i]}&nbsp;<b class="mono">${s.nloads ? Math.round(100 * x) + "%" : "–"}</b></span>`).join("");
   $("#tiers").innerHTML = s.tiers.map((x, i) => `<div style="width:${100 * x}%;background:var(--t-${["dram", "ssd", "remote"][i]})"></div>`).join("");
-  $("#log").innerHTML = fl.log.map(l => `<li>t=${Math.floor(l.t)} s · M${l.m} → S${l.srv + 1}·GPU${l.g + 1} desde ${TIER[l.tier]}, lista en ${fmtS(l.dur)}</li>`).join("") || `<li>todavía nada</li>`;
+  $("#log").innerHTML = fl.log.map(l => `<li>${clockName(l.t)} <b>M${l.m}</b> → S${l.srv + 1}/GPU${l.g + 1} de <span class="tr-${l.tier}">${TIER[l.tier]}</span>, lista en ${fmtS(l.dur)}</li>`).join("") || `<li>todavía ninguna</li>`;
 }
 let uiAcc = 0;
 function frame(ts) {
@@ -577,13 +684,13 @@ const CONFIGS = [
 $("#cmp-run").addEventListener("click", () => {
   const btn = $("#cmp-run"); btn.disabled = true;
   const reqs = workload(opt.rate, 1), rows = [];
-  const tb = $("#cmp tbody"); tb.innerHTML = ""; $("#cmp").hidden = false;
+  const tb = $("#cmp tbody"); tb.innerHTML = ""; $("#cmp").hidden = false; $("#cmp-empty").hidden = true;
   let k = 0;
   const one = () => {
     if (k === CONFIGS.length) {
       const best = rows.reduce((a, r) => r.s.mean < a.s.mean ? r : a, rows[0]);
       tb.innerHTML = rows.map(r => `<tr class="${r === best ? "best" : ""}"><td>${r.name}</td><td>${pctf(r.s.cold)}</td><td>${pctf(r.s.tiers[0])}</td><td>${pctf(r.s.tiers[2])}</td><td>${fmtS(r.s.mean)}</td><td>${fmtS(r.s.p99)}</td><td>${pctf(r.s.idle)}</td></tr>`).join("");
-      $("#cmp-desc").textContent = `${reqs.length} pedidos en una hora a ${String(opt.rate).replace(".", ",")} por segundo, keep-alive de ${keepName(opt.keep)}. En verde, la de menor demora media.`;
+      $("#cmp-desc").textContent = `${reqs.length.toLocaleString("es-AR")} pedidos en una hora simulada a ${rateName(opt.rate)}, keep-alive de ${keepName(opt.keep)}. Resaltada, la de menor demora media.`;
       btn.disabled = false; return;
     }
     const [name, o] = CONFIGS[k++];
@@ -599,5 +706,5 @@ $("#cmp-run").addEventListener("click", () => {
 reset();
 requestAnimationFrame(frame);
 </script>
-
+</body>
 </html>

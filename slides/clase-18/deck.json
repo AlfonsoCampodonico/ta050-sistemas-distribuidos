@@ -14,21 +14,26 @@
     "loop",
     "fases",
     "batching",
+    "div-kvcache",
     "kvcache",
     "kvnumeros",
+    "div-estatico",
     "estatico",
     "orca",
     "demobatch",
+    "div-desperdicio",
     "desperdicio",
     "medicion",
     "analogia",
     "tabla",
     "propiedades",
     "demomem",
+    "div-cow",
     "cow",
     "desalojo",
     "distribuido",
     "resultados",
+    "div-sse",
     "sse",
     "desconexion",
     "tiempos",
@@ -42,33 +47,37 @@
     },
     "s2": {
       "description": "El KV cache y por qué el lote decide el throughput.",
-      "start": "kvcache"
+      "start": "div-kvcache"
     },
     "s3": {
       "description": "Orca: batching por iteración.",
-      "start": "estatico"
+      "start": "div-estatico"
     },
     "s4": {
       "description": "PagedAttention: el KV cache como memoria virtual.",
-      "start": "desperdicio"
+      "start": "div-desperdicio"
     },
     "s5": {
       "description": "Compartir, desalojar, distribuir y resultados.",
-      "start": "cow"
+      "start": "div-cow"
     },
     "s6": {
       "description": "El stream de vuelta, los tiempos y la demo.",
-      "start": "sse"
+      "start": "div-sse"
     }
   },
   "faces": {
-    "geist": {
-      "family": "Geist",
-      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    "chakra-petch": {
+      "family": "Chakra Petch",
+      "href": "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap"
     },
-    "geist-mono": {
-      "family": "Geist Mono",
-      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    "rubik": {
+      "family": "Rubik",
+      "href": "https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    },
+    "ibm-plex-mono": {
+      "family": "IBM Plex Mono",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     }
   },
   "designSystems": []

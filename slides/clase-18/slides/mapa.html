@@ -1,17 +1,18 @@
-<section id="mapa" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" id="mapa" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Dónde estamos</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">La otra mitad: después de entrenar, servir</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Dónde estamos</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">La otra mitad: después de entrenar, servir</h2>
 </div>
-<table style="font-size:32px;color:#F2F3EF;font-family:Geist, Arial, sans-serif">
+<table style="font-size:32px;color:#0D0D0D;font-family:Rubik, Arial, sans-serif">
 <tr><th style="width:50%">Idea de hoy</th><th style="width:50%">Dónde la vimos</th></tr>
 <tr><td>Paralelismo de tensores para servir</td><td>Megatron-LM (Clase 16)</td></tr>
 <tr><td>El pedido más lento no frena a todos</td><td>Pipeline y stragglers (Clase 16)</td></tr>
 <tr><td>Bloques, tabla de bloques, copy-on-write</td><td>Paginación (Sistemas Operativos)</td></tr>
 <tr><td>Un stream que queda abierto</td><td>Sistemas de mensajería (Clase 13)</td></tr>
 </table>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El paper de hoy toma la idea más vieja de la lista, la paginación, y la aplica a la memoria de una GPU.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">El paper de hoy toma la idea más vieja de la lista, la paginación, y la aplica a la memoria de una GPU.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">2</p>
 <aside>Tiempo: 0:02–0:04 (2 min).
 Idea clave: casi todo lo de hoy son ideas conocidas aplicadas a un recurso nuevo, la memoria de la GPU.
 Decir: recorrer la tabla. El paralelismo de tensores de la Clase 16 se usa también para servir, porque un modelo grande no entra en una GPU. La idea de que el pedido más lento no frene a todos es la misma que en el pipeline. Y la contribución central del paper, bloques con tabla de bloques y copy-on-write, es literalmente paginación.

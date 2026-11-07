@@ -3,97 +3,156 @@
 <title>Entrenamiento a escala</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap">
 <style>
-/* Clase 17 · dos instrumentos: fallas y checkpoints a escala (arriba) y dónde cae cada dimensión de paralelismo (abajo). */
+/* Identidad visual de TA050 (fiubata050.github.io): teal #046b7d, Chakra Petch / Rubik / IBM Plex Mono. Claro por defecto. */
 :root {
-  --bg: #0E1114; --panel: #161B20; --panel2: #1A2027; --ink: #F2F3EF; --muted: #A8B3BC; --faint: #7D8892;
-  --line: #2A3138; --cell: #232A31; --accent: #34D399; --accent-ink: #0E1114; --accent-soft: #132A22;
-  --warn: #F5A524; --bad: #FF7A6B; --blue: #7AA2FF; --pink: #F472B6;
-  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
-  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  color-scheme: dark;
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
-    --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
-    --warn: #A35F00; --bad: #C2362B; --blue: #2C56C9; --pink: #C0307F;
-    color-scheme: light;
-  }
-}
-:root[data-theme="light"] {
-  --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
-  --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
-  --warn: #A35F00; --bad: #C2362B; --blue: #2C56C9; --pink: #C0307F;
+  --bg: #f3f4f5; --page: #f3f4f5;
+  --panel: #ffffff; --panel2: #f3f4f5; --ink: #0d0d0d; --muted: #495057; --faint: #6c757d;
+  --line: #dee2e6; --cell: #e9ecef; --code-bg: #e9ecef; --code: #393a34;
+  --accent: #046b7d; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: #e3f0f2;
+  --warn: #8a5a00; --warn-soft: #fdf3e0; --bad: #c0261f; --bad-soft: #fbeceb;
+  --h1-color: #0d0d0d; --h1-shadow: .1rem .1rem 0 #046b7d; --h1-case: none; --btn-glow: none;
+  /* Series: una por pedido / réplica. Giran alrededor del teal y se distinguen en los dos temas. */
+  --s0: #046b7d; --s1: #e8590c; --s2: #3b5bdb; --s3: #c2255c; --s4: #7048e8; --s5: #2f8a3e; --s6: #a68a00; --s7: #ae3ec9;
+  --head: "Chakra Petch", "Rubik", system-ui, sans-serif;
+  --sans: "Rubik", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   color-scheme: light;
 }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+    --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+    --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+    --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+    --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+    --h1-color: #ffffff; --h1-case: uppercase;
+    --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+    --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+    --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+  --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+  --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+  --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+  --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+  --h1-color: #ffffff; --h1-case: uppercase;
+  --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+  --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+  --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
+  color-scheme: dark;
+}
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
 body {
-  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  margin: 0; min-height: 100vh; background: var(--page); color: var(--ink);
+  font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.55;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 24px 48px;
+  padding-block: 24px 56px;
+  -webkit-text-size-adjust: 100%;
 }
-.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
-header { display: flex; flex-direction: column; gap: 8px; }
-.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
-h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
-h2 { margin: 0; font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 600; text-wrap: balance; }
-h3 { margin: 0; font-size: 15px; font-weight: 600; }
-.lead { margin: 0; color: var(--muted); max-width: 72ch; }
+b, strong { font-weight: 500; }
+code, .code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); color: var(--code); padding: .1em .35em; border-radius: 4px; white-space: nowrap; }
+.wrap { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 10px; }
+.back { display: flex; gap: 8px 20px; flex-wrap: wrap; margin-bottom: 14px; font: 400 13px var(--mono); }
+.back a { color: var(--accent); text-decoration: none; }
+.back a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.eyebrow { font: 500 12px/1.3 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 clamp(30px, 5vw, 46px)/1.08 var(--head); letter-spacing: .01em; color: var(--h1-color); text-shadow: var(--h1-shadow); text-transform: var(--h1-case); text-wrap: balance; }
+h2 { margin: 0; font: 600 19px/1.25 var(--head); letter-spacing: .01em; text-wrap: balance; }
+h3 { margin: 0; font: 600 15px/1.3 var(--head); letter-spacing: .02em; }
+.lead { margin: 0; color: var(--muted); max-width: 72ch; font-size: 16px; }
 .small { font-size: 13px; color: var(--muted); }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.controls { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: end; }
-.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.field > span { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
-input[type=range] { width: 170px; accent-color: var(--accent); }
-.val { font: 500 13px var(--mono); color: var(--ink); }
-.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 11px; cursor: pointer; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+.controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.field > span, .label { font: 500 11px/1.2 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.field .hint { font: 300 12px/1.35 var(--sans); letter-spacing: 0; text-transform: none; color: var(--faint); max-width: 30ch; }
+.val { font: 600 13px var(--mono); letter-spacing: 0; text-transform: none; color: var(--accent); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 170px; max-width: 100%; accent-color: var(--accent-fill); }
+.seg { align-self: flex-start; display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 400 13px var(--sans); padding: 7px 12px; cursor: pointer; }
 .seg button + button { border-left: 1px solid var(--line); }
-.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font: 13px var(--sans); cursor: pointer; background: transparent; color: var(--ink); }
-.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
-.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); }
+.seg button:hover:not(:disabled) { background: var(--accent-soft); }
+.seg button[aria-pressed="true"] { background: var(--accent-fill); color: var(--accent-ink); font-weight: 500; box-shadow: var(--btn-glow); }
+.seg button:disabled { color: var(--faint); cursor: not-allowed; }
+.seg button[aria-pressed="true"]:disabled { color: var(--accent-ink); opacity: .55; }
+.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 11px; font: 400 13px var(--sans); cursor: pointer; background: var(--panel); color: var(--ink); }
+.tog:hover { border-color: var(--accent); }
+.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 500; }
+.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); flex: none; }
 .tog[aria-pressed="true"] i { background: var(--accent); border-color: var(--accent); }
-button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); cursor: pointer; }
-
-.gauges { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-@media (max-width: 640px) { .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.btn { font: 400 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent-fill); color: var(--accent-ink); border-color: var(--accent-fill); font-weight: 500; box-shadow: var(--btn-glow); }
+.btn.primary:hover:not(:disabled) { color: var(--accent-ink); filter: brightness(1.12); }
+.btn:disabled { opacity: .55; cursor: progress; }
+select.btn { padding-right: 10px; }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gauges { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; }
 .gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.gauge span { font-size: 12px; color: var(--muted); }
-.gauge b.bad { color: var(--bad); } .gauge b.warn { color: var(--warn); } .gauge b.good { color: var(--accent); }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
+.gauge span { font-size: 12px; line-height: 1.35; color: var(--muted); }
+.gauge b.good { color: var(--accent); } .gauge b.warn { color: var(--warn); } .gauge b.bad { color: var(--bad); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+.note { font-size: 13.5px; color: var(--ink); background: var(--panel2); border: 1px solid var(--line); border-left: 5px solid var(--accent-fill); border-radius: .5rem; padding: 10px 14px; margin: 0; }
+.tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font: 500 11px/1.3 var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); text-align: left; }
+.foot { font-size: 12.5px; color: var(--faint); margin: 0; }
+svg text { font-family: var(--mono); }
+@media (max-width: 520px) {
+  body { padding-block: 16px 40px; }
+  .panel { padding: 14px; }
+  .controls { gap: 14px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+
+/* Escala (clase 17): fallas y checkpoints a escala (arriba) y dónde cae cada dimensión de paralelismo (abajo). */
+:root { --ckpt: var(--s4); --lost: #e09a1a; --tier1: var(--s2); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --lost: #f2b44c; } }
+:root[data-theme="dark"] { --lost: #f2b44c; }
+.wrap { gap: 22px; }
+.panel { gap: 16px; }
+.panel > h2 { font-size: 22px; }
+.panel-intro { margin: 0; color: var(--muted); max-width: 80ch; }
+.gauges { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 640px) { .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
 @media (max-width: 860px) { .two { grid-template-columns: minmax(0, 1fr); } }
-.box { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--panel2); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.box { border: 1px solid var(--line); border-radius: .6rem; padding: 14px; background: var(--panel2); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.box p { margin: 0; }
 svg { display: block; width: 100%; height: auto; }
-.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
-.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
-.note { font-size: 13px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 10px; margin: 0; }
-
+.row-between { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
+.legend i.line { height: 3px; vertical-align: 3px; }
+.legend i.dash { height: 0; background: none !important; border-top: 2px dashed var(--accent); vertical-align: 4px; }
+.legend i.dot { width: 10px; height: 10px; border-radius: 50%; }
 .cluster { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 @media (max-width: 640px) { .cluster { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.pod { display: contents; }
 .server { border: 1px solid var(--line); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px; background: var(--panel2); }
-.server .lbl { font: 500 10px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); display: flex; justify-content: space-between; }
+.server .lbl { font: 500 10px/1 var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); display: flex; justify-content: space-between; }
 .gpus { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
-.gpu { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font: 500 10px var(--mono); color: #0E1114; max-width: 100%; }
-.podsep { grid-column: 1 / -1; font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); display: flex; align-items: center; gap: 8px; }
+.gpu { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font: 600 10px var(--mono); color: #0d0d0d; max-width: 100%; cursor: default; }
+.podsep { grid-column: 1 / -1; font: 600 11px/1 var(--head); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 8px; margin-top: 4px; }
 .podsep::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-.tablewrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 520px; }
-th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
-th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+#ltab { min-width: 520px; }
 td.mono { white-space: nowrap; }
-.scope-0 { color: var(--accent); } .scope-1 { color: var(--blue); } .scope-2 { color: var(--warn); }
-.foot { font-size: 12px; color: var(--faint); }
-.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
-.back a{color:var(--muted);text-decoration:none}
-.back a:hover{color:var(--accent)}
+.scope { display: inline-block; font: 500 12px/1 var(--sans); padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
+.scope-0 { color: var(--accent); background: var(--accent-soft); }
+.scope-1 { color: var(--tier1); background: color-mix(in srgb, var(--tier1) 12%, transparent); }
+.scope-2 { color: var(--warn); background: var(--warn-soft); }
 </style>
 
 <div class="wrap">
@@ -106,30 +165,32 @@ td.mono { white-space: nowrap; }
 
   <section class="panel" aria-labelledby="f-h">
     <h2 id="f-h">Fallas y checkpoints</h2>
-    <p class="small">Cada GPU falla una vez cada ~50.000 horas, la tasa que sale de Llama 3 (419 interrupciones inesperadas en 54 días con 16.384 GPUs). El entrenamiento es sincrónico: una GPU rota frena a todas, y se vuelve al último checkpoint.</p>
+    <p class="panel-intro">Cada GPU falla una vez cada ~50.000 horas, la tasa que sale de Llama 3 (419 interrupciones inesperadas en 54 días con 16.384 GPUs). El entrenamiento es sincrónico: una GPU rota frena a todas, y se vuelve al último checkpoint.</p>
     <div class="controls">
-      <div class="field"><span>GPUs · <b class="val" id="gpus-v">16.384</b></span><input type="range" id="gpus" min="0" max="7" step="1" value="4" aria-label="GPUs"></div>
-      <div class="field"><span>Checkpoint cada · <b class="val" id="tau-v">14 min</b></span><input type="range" id="tau" min="1" max="240" step="1" value="14" aria-label="Minutos entre checkpoints"></div>
-      <div class="field"><span>Guardar frena · <b class="val" id="c-v">30 s</b></span><input type="range" id="c" min="1" max="600" step="1" value="30" aria-label="Segundos que frena un checkpoint"></div>
-      <div class="field"><span>Reiniciar tarda · <b class="val" id="r-v">3 min</b></span><input type="range" id="r" min="0" max="60" step="1" value="3" aria-label="Minutos para reiniciar"></div>
-      <div class="field"><span>Atajos</span><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="opt">Ir al óptimo</button><button class="tog" id="async" aria-pressed="false"><i></i>Checkpoint asincrónico</button></div></div>
+      <div class="field"><span>GPUs · <b class="val" id="gpus-v">16.384</b></span><input type="range" id="gpus" min="0" max="7" step="1" value="4" aria-label="GPUs"><small class="hint">de 1.024 a 131.072</small></div>
+      <div class="field"><span>Checkpoint cada · <b class="val" id="tau-v">14 min</b></span><input type="range" id="tau" min="1" max="240" step="1" value="14" aria-label="Minutos entre checkpoints"><small class="hint">τ: cómputo entre dos guardados</small></div>
+      <div class="field"><span>Guardar frena · <b class="val" id="c-v">30 s</b></span><input type="range" id="c" min="1" max="600" step="1" value="30" aria-label="Segundos que frena un checkpoint"><small class="hint">C: el entrenamiento se detiene mientras guarda</small></div>
+      <div class="field"><span>Reiniciar tarda · <b class="val" id="r-v">3 min</b></span><input type="range" id="r" min="0" max="60" step="1" value="3" aria-label="Minutos para reiniciar"><small class="hint">R: cambiar la máquina y cargar el checkpoint</small></div>
+      <div class="field"><span>Atajos</span><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="opt">Ir al óptimo</button><button class="tog" id="async" aria-pressed="false" title="Copia el estado y lo escribe mientras se sigue entrenando: frena unos 3 s"><i></i>Checkpoint asincrónico</button><button class="btn" id="defaults">Valores iniciales</button></div></div>
     </div>
     <div class="gauges">
-      <div class="gauge"><b id="g-mtbf">–</b><span>una falla cada</span></div>
+      <div class="gauge"><b id="g-mtbf">–</b><span>entre dos fallas del clúster (en promedio)</span></div>
       <div class="gauge"><b id="g-day">–</b><span>fallas por día</span></div>
-      <div class="gauge"><b id="g-good">–</b><span>del tiempo se entrena de verdad</span></div>
-      <div class="gauge"><b id="g-opt">–</b><span>intervalo óptimo, √(2·C·M)</span></div>
+      <div class="gauge"><b id="g-good">–</b><span>del tiempo se entrena de verdad (goodput)</span></div>
+      <div class="gauge"><b id="g-opt">–</b><span>intervalo óptimo, √(2·C·M) (Young)</span></div>
     </div>
     <div class="two">
       <div class="box">
         <h3>Un día de entrenamiento</h3>
+        <p class="small">Una simulación con fallas al azar: 24 horas en cuatro filas de 6.</p>
         <svg id="timeline" viewBox="0 0 600 150" aria-label="Línea de tiempo de 24 horas con fallas y checkpoints"></svg>
-        <div class="legend"><span><i style="background:var(--accent)"></i>entrenando</span><span><i style="background:var(--warn)"></i>trabajo que se pierde</span><span><i style="background:var(--faint)"></i>reiniciando</span><span><i style="background:var(--blue)"></i>guardando</span><span><i style="background:var(--bad)"></i>falla</span></div>
-        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap"><span class="small" id="tl-sum"></span><button class="btn" id="reroll">Otro día</button></div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>entrenando</span><span><i style="background:var(--lost)"></i>trabajo que se pierde</span><span><i style="background:var(--faint)"></i>reiniciando</span><span><i style="background:var(--ckpt)"></i>guardando</span><span><i style="background:var(--bad)"></i>falla</span></div>
+        <div class="row-between"><span class="small" id="tl-sum"></span><button class="btn" id="reroll">Sortear otro día</button></div>
       </div>
       <div class="box">
         <h3>Tiempo útil según el intervalo</h3>
-        <svg id="curve" viewBox="0 0 400 220" aria-label="Tiempo útil en función del intervalo entre checkpoints"></svg>
+        <svg id="curve" viewBox="0 0 400 236" aria-label="Tiempo útil en función del intervalo entre checkpoints"></svg>
+        <div class="legend"><span><i class="line" style="background:var(--accent)"></i>tiempo útil esperado</span><span><i class="dash"></i>intervalo óptimo</span><span><i class="dot" style="background:var(--warn)"></i>tu intervalo</span></div>
         <p class="small">Valor esperado con fallas al azar: cada tramo de τ minutos de cómputo más C de guardado tarda (M + R)·(e^((τ+C)/M) − 1). Muy seguido, se pierde el tiempo guardando; muy espaciado, rehaciendo.</p>
       </div>
     </div>
@@ -138,18 +199,18 @@ td.mono { white-space: nowrap; }
 
   <section class="panel" aria-labelledby="l-h">
     <h2 id="l-h">Dónde cae cada dimensión</h2>
-    <p class="small">Un clúster chico, a escala: 64 GPUs en 16 servidores de 4, y pods de 4 servidores (en Llama 3 son 8 GPUs por servidor y 3.072 por pod). La GPU de rank r tiene una coordenada por dimensión, y la primera del orden varía más rápido: queda entre vecinas.</p>
+    <p class="panel-intro">Un clúster chico, a escala: 64 GPUs en 16 servidores de 4, y pods de 4 servidores (en Llama 3 son 8 GPUs por servidor y 3.072 por pod). La GPU de rank r tiene una coordenada por dimensión, y la primera del orden varía más rápido: queda entre vecinas.</p>
     <div class="controls">
       <div class="field"><span>Tensores (TP)</span><div class="seg" id="tp"><button data-v="1">1</button><button data-v="2">2</button><button data-v="4" aria-pressed="true">4</button><button data-v="8">8</button></div></div>
       <div class="field"><span>Contexto (CP)</span><div class="seg" id="cp"><button data-v="1" aria-pressed="true">1</button><button data-v="2">2</button></div></div>
       <div class="field"><span>Pipeline (PP)</span><div class="seg" id="pp"><button data-v="1">1</button><button data-v="2">2</button><button data-v="4" aria-pressed="true">4</button></div></div>
-      <div class="field"><span>Orden</span><div class="seg" id="order"><button data-v="tp,cp,pp,dp" aria-pressed="true">TP, CP, PP, DP</button><button data-v="dp,pp,cp,tp">DP, PP, CP, TP</button></div></div>
+      <div class="field"><span>Orden de los ranks</span><div class="seg" id="order"><button data-v="tp,cp,pp,dp" aria-pressed="true">TP, CP, PP, DP</button><button data-v="dp,pp,cp,tp">DP, PP, CP, TP</button></div></div>
       <div class="field"><span>Colorear grupos de</span><div class="seg" id="show"><button data-v="tp" aria-pressed="true">TP</button><button data-v="cp">CP</button><button data-v="pp">PP</button><button data-v="dp">DP</button></div></div>
     </div>
     <div class="cluster" id="cluster"></div>
-    <div class="tablewrap"><table id="ltab"><thead><tr><th>Dimensión</th><th>Tamaño</th><th>Un grupo queda</th><th>Se comunica</th></tr></thead><tbody></tbody></table></div>
+    <div class="tablewrap"><table id="ltab"><thead><tr><th>Dimensión</th><th>Tamaño</th><th>Un grupo queda</th><th>Qué se comunica</th></tr></thead><tbody></tbody></table></div>
     <p class="note" id="l-note"></p>
-    <p class="foot">El mismo cálculo, con la red de Llama 3 y 16.384 GPUs: <span class="mono">go run ./cmd/demo 4d</span> en el repositorio entrenamiento-distribuido. Las fallas: <span class="mono">go run ./cmd/demo fallas</span>.</p>
+    <p class="foot">El mismo cálculo, con la red de Llama 3 y 16.384 GPUs: <code>go run ./cmd/demo 4d</code> en el repositorio entrenamiento-distribuido. Las fallas: <code>go run ./cmd/demo fallas</code>.</p>
   </section>
 </div>
 
@@ -194,11 +255,11 @@ function renderFallas() {
 
   // Línea de tiempo: 24 h en 4 filas de 6 h.
   const day = simulateDay(M, tau, C, R, f.seed), W = 600, rowH = 24, gap = 12, x0 = 56;
-  const colors = { run: css("--accent"), lost: css("--warn"), restart: css("--faint"), ckpt: css("--blue"), fail: css("--bad") };
+  const colors = { run: css("--accent"), lost: css("--lost"), restart: css("--faint"), ckpt: css("--ckpt"), fail: css("--bad") };
   let s = "";
   for (let row = 0; row < 4; row++) {
     const y = row * (rowH + gap) + 4;
-    s += `<text x="0" y="${y + 16}" fill="${css("--faint")}" font-family="Geist Mono, monospace" font-size="10">${row * 6}–${row * 6 + 6} h</text>`;
+    s += `<text x="0" y="${y + 16}" fill="${css("--faint")}" font-family="IBM Plex Mono, monospace" font-size="10">${row * 6}–${row * 6 + 6} h</text>`;
     s += `<rect x="${x0}" y="${y}" width="${W - x0}" height="${rowH}" fill="${css("--cell")}" rx="3"/>`;
   }
   for (const [k, a, b] of day.segs) {
@@ -207,7 +268,7 @@ function renderFallas() {
       const y = row * (rowH + gap) + 4, sx = h => x0 + (h - lo) / 6 * (W - x0);
       if (k === "fail") { if (a >= lo && a < hi) s += `<rect x="${sx(a) - 1.5}" y="${y - 3}" width="3" height="${rowH + 6}" fill="${colors.fail}"/>`; continue; }
       if (bb <= aa) continue;
-      const w = Math.max(k === "ckpt" ? 1.2 : 0.6, sx(bb) - sx(aa));
+      const w = Math.max(k === "ckpt" ? 2 : 0.6, sx(bb) - sx(aa));
       s += `<rect x="${sx(aa)}" y="${y}" width="${w}" height="${rowH}" fill="${colors[k]}"/>`;
     }
   }
@@ -215,16 +276,17 @@ function renderFallas() {
   $("#tl-sum").textContent = `Este día: ${day.fails} ${day.fails === 1 ? "falla" : "fallas"}, ${(100 * day.useful / 24).toFixed(0)}% del tiempo entrenando.`;
 
   // Curva de tiempo útil.
-  const CW = 400, CH = 220, l = 44, b = 30, t = 10, rr = 10, maxT = 240;
+  const CW = 400, CH = 236, l = 44, b = 44, t = 10, rr = 10, maxT = 240;
   const X = m => l + (Math.log(m) / Math.log(maxT)) * (CW - l - rr), Y = v => t + (1 - v) * (CH - t - b);
   let c = "";
-  for (const v of [0, 0.25, 0.5, 0.75, 1]) c += `<line x1="${l}" x2="${CW - rr}" y1="${Y(v)}" y2="${Y(v)}" stroke="${css("--line")}"/><text x="${l - 6}" y="${Y(v) + 4}" text-anchor="end" font-size="10" fill="${css("--faint")}" font-family="Geist Mono, monospace">${v * 100}%</text>`;
-  for (const m of [1, 5, 15, 60, 240]) c += `<text x="${X(m)}" y="${CH - 10}" text-anchor="middle" font-size="10" fill="${css("--faint")}" font-family="Geist Mono, monospace">${m >= 60 ? m / 60 + " h" : m + " min"}</text>`;
+  for (const v of [0, 0.25, 0.5, 0.75, 1]) c += `<line x1="${l}" x2="${CW - rr}" y1="${Y(v)}" y2="${Y(v)}" stroke="${css("--line")}"/><text x="${l - 6}" y="${Y(v) + 4}" text-anchor="end" font-size="10" fill="${css("--faint")}" font-family="IBM Plex Mono, monospace">${v * 100}%</text>`;
+  for (const m of [1, 5, 15, 60, 240]) c += `<text x="${X(m)}" y="${CH - b + 16}" text-anchor="middle" font-size="10" fill="${css("--faint")}" font-family="IBM Plex Mono, monospace">${m >= 60 ? m / 60 + " h" : m + " min"}</text>`;
   let pts = []; for (let m = 1; m <= maxT; m *= 1.04) pts.push(`${X(m).toFixed(1)},${Y(Math.max(0, goodput(m / 60, C, M, R))).toFixed(1)}`);
   c += `<polyline fill="none" stroke="${css("--accent")}" stroke-width="2" points="${pts.join(" ")}"/>`;
   const om = Math.min(maxT, Math.max(1, opt * 60));
-  c += `<line x1="${X(om)}" x2="${X(om)}" y1="${t}" y2="${CH - b}" stroke="${css("--accent")}" stroke-dasharray="3 3"/><text x="${X(om) + 4}" y="${t + 10}" font-size="10" fill="${css("--accent")}" font-family="Geist Mono, monospace">óptimo</text>`;
+  c += `<line x1="${X(om)}" x2="${X(om)}" y1="${t}" y2="${CH - b}" stroke="${css("--accent")}" stroke-dasharray="3 3"/><text x="${X(om) + 4}" y="${t + 10}" font-size="10" fill="${css("--accent")}" font-family="IBM Plex Mono, monospace">óptimo</text>`;
   c += `<circle cx="${X(Math.max(1, f.tau))}" cy="${Y(Math.max(0, g))}" r="5" fill="${css("--warn")}" stroke="${css("--panel2")}" stroke-width="2"/>`;
+  c += `<text x="${(l + CW - rr) / 2}" y="${CH - 4}" text-anchor="middle" font-size="10" fill="${css("--muted")}" font-family="IBM Plex Mono, monospace">minutos entre checkpoints (escala log)</text>`;
   $("#curve").innerHTML = c;
 
   let note = `Con ${nf(f.gpus)} GPUs el clúster falla cada ${fmtH(M)}. `;
@@ -242,6 +304,11 @@ $("#r").addEventListener("input", e => { f.r = +e.target.value; renderFallas(); 
 $("#async").addEventListener("click", e => { f.async = !f.async; e.currentTarget.setAttribute("aria-pressed", String(f.async)); renderFallas(); });
 $("#opt").addEventListener("click", () => { const M = GPU_MTBF / f.gpus; f.tau = Math.max(1, Math.min(240, Math.round(Math.sqrt(2 * cost() * M) * 60))); $("#tau").value = f.tau; renderFallas(); });
 $("#reroll").addEventListener("click", () => { f.seed++; renderFallas(); });
+$("#defaults").addEventListener("click", () => {
+  Object.assign(f, { gpus: 16384, tau: 14, c: 30, r: 3, async: false, seed: 1 });
+  $("#gpus").value = 4; $("#tau").value = 14; $("#c").value = 30; $("#r").value = 3; $("#async").setAttribute("aria-pressed", "false");
+  renderFallas();
+});
 
 // ---------- 4D ----------
 const L = { tp: 4, cp: 1, pp: 4, order: "tp,cp,pp,dp", show: "tp" };
@@ -266,7 +333,7 @@ function renderLayout() {
     html += `<div class="server"><div class="lbl"><span>servidor ${s + 1}</span></div><div class="gpus">`;
     for (let k = 0; k < PER_SERVER; k++) {
       const r = s * PER_SERVER + k, gid = ids.get(groupOf(r));
-      const color = `hsl(${(gid * 47 + 150) % 360} 62% 62%)`;
+      const color = `hsl(${(gid * 47 + 188) % 360} 58% 64%)`;
       html += `<div class="gpu" style="background:${color}" title="GPU ${r}: TP ${coord(r, "tp")}, CP ${coord(r, "cp")}, PP ${coord(r, "pp")}, DP ${coord(r, "dp")}">${r}</div>`;
     }
     html += `</div></div>`;
@@ -277,7 +344,7 @@ function renderLayout() {
     for (let k = 0; k < size[d]; k++) { const r = k * stride[d], srv = Math.floor(r / PER_SERVER); servers.add(srv); pods.add(Math.floor(srv / SERVERS_PER_POD)); }
     return servers.size === 1 ? 0 : pods.size === 1 ? 1 : 2;
   };
-  $("#ltab tbody").innerHTML = order.map(d => { const sc = scope(d); return `<tr><td>${NAMES[d]}</td><td class="mono">${size[d]}</td><td class="scope-${sc}">${SCOPES[sc]}</td><td class="small">${WHEN[d]}</td></tr>`; }).join("");
+  $("#ltab tbody").innerHTML = order.map(d => { const sc = scope(d); return `<tr><td>${NAMES[d]}</td><td class="mono">${size[d]}</td><td><span class="scope scope-${sc}">${SCOPES[sc]}</span></td><td class="small">${WHEN[d]}</td></tr>`; }).join("");
   const tpScope = scope("tp");
   $("#l-note").textContent = tpScope === 0
     ? `Cada color es un grupo de ${NAMES[L.show].toLowerCase()}. Los tensores, que se comunican en cada capa, quedan adentro de un servidor; los datos, que se sincronizan una vez por paso, cruzan la red.`
@@ -285,6 +352,9 @@ function renderLayout() {
 }
 
 renderFallas(); renderLayout();
+// Los gráficos leen los colores del tema: se redibujan si cambia.
+new MutationObserver(renderFallas).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderFallas);
 </script>
 
 </html>

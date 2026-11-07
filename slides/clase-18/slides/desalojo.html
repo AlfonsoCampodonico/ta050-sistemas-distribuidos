@@ -1,21 +1,22 @@
-<section id="desalojo" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<section data-estilo="curso" id="desalojo" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Scheduling · §4.5</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Cuando la memoria se acaba, sale el último en llegar</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Scheduling · §4.5</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Cuando la memoria se acaba, sale el último en llegar</h2>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Orden de llegada (FCFS). Si las secuencias en curso crecen y no hay bloques, se desaloja la más reciente, entera: necesita todos sus bloques para cada paso.</p>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D">Orden de llegada (FCFS). Si las secuencias en curso crecen y no hay bloques, se desaloja la más reciente, entera: necesita todos sus bloques para cada paso.</p>
 <div style="display:flex;gap:40px">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:40px">
-<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Swapping</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Copiar sus bloques a la memoria de la CPU y traerlos después.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#0D0D0D;">Swapping</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">Copiar sus bloques a la memoria de la CPU y traerlos después.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:40px">
-<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Recomputación</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Tirarlos y recalcularlos con un prefill de prompt más lo generado.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#0D0D0D;">Recomputación</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">Tirarlos y recalcularlos con un prefill de prompt más lo generado.</p>
 </div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">La recomputación nunca cuesta más de un 20% sobre el swapping; con bloques de 16 a 64 andan parecido.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.5 y §7.3</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">La recomputación nunca cuesta más de un 20% sobre el swapping; con bloques de 16 a 64 andan parecido.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.5 y §7.3</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">23</p>
 <aside>Tiempo: 1:02–1:06 (4 min).
 Idea clave: como ya no se reserva el máximo, la memoria se puede acabar con secuencias en curso; vLLM desaloja la más reciente, entera, y la trae de vuelta después.
 Decir: los pedidos se atienden por orden de llegada. Como cada secuencia pide un bloque cuando lo necesita, puede pasar que todas crezcan a la vez y no haya bloques. Entonces vLLM desaloja las secuencias que llegaron último, para respetar FCFS. El desalojo es todo o nada: una secuencia sin parte de sus bloques no puede dar ni un paso, porque la atención necesita todos los tokens anteriores. Los grupos que comparten bloques, como las muestras de un mismo prompt, se desalojan juntos.

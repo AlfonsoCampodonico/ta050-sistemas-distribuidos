@@ -1,31 +1,37 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Clase 18 — Cómo se sirve un modelo</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap">
+<title>Clase 18 — Cómo se sirve un modelo</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
-body{margin:0;background:#0A0C0F;color:#F2F3EF;font-family:Geist,Arial,sans-serif}
-header{padding:24px 32px;font-family:'Geist Mono',monospace;color:#7D8892}
-.frame{width:min(1280px,96vw);aspect-ratio:16/9;margin:0 auto 24px;position:relative;overflow:hidden;border:1px solid #2A3138;border-radius:8px}
+body{margin:0;background:linear-gradient(180deg,#010101,#03181A) fixed;color:#F3F4F5;font-family:Rubik,Arial,sans-serif;font-weight:300}
+header{padding:24px 32px;font-family:'IBM Plex Mono',monospace;color:#ADB5BD}
+header b{font-family:'Chakra Petch',sans-serif;font-weight:700;color:#FFFFFF;text-transform:uppercase;letter-spacing:.02em;text-shadow:0 0 .6em rgba(37,246,254,.5)}
+header a{color:#25F6FE}
+.frame{width:min(1280px,96vw);aspect-ratio:16/9;margin:0 auto 24px;position:relative;overflow:hidden;border:1px solid #0B2E33;border-radius:8px;box-shadow:0 0 24px rgba(37,246,254,.08)}
 .stage{width:1920px;height:1080px;transform-origin:0 0;position:absolute}
 .stage section{width:1920px;height:1080px;box-sizing:border-box;position:relative}
 .stage *{margin:0;box-sizing:border-box}.stage aside{display:none}
 .stage x-shape{display:block;clip-path:polygon(0 30%,70% 30%,70% 0,100% 50%,70% 100%,70% 70%,0 70%)}
-table{border-collapse:collapse;width:100%} th,td{padding:12px 16px;border-bottom:1px solid #2A3138;text-align:left}
+.stage b,.stage strong{font-weight:500}
+.stage ol li::marker{color:#046B7D;font-family:'IBM Plex Mono',monospace;font-weight:500}
+.stage ul{list-style:none;padding-left:0}
+.stage ul li{position:relative;padding-left:1.1em}
+.stage ul li::before{content:"";position:absolute;left:0;top:.55em;width:.32em;height:.32em;background:#046B7D}
+table{border-collapse:collapse;width:100%} th,td{padding:12px 16px;border-bottom:1px solid #DEE2E6;text-align:left}
+th{font-weight:500;color:#046B7D;font-family:'IBM Plex Mono',monospace;font-size:.8em;text-transform:uppercase;letter-spacing:.04em}
 body.notes .frame::after{content:none}
-.note{width:min(1280px,96vw);margin:-12px auto 32px;white-space:pre-wrap;color:#A8B3BC;font-size:15px;line-height:1.5;display:none}
+.note{width:min(1280px,96vw);margin:-12px auto 32px;white-space:pre-wrap;color:#ADB5BD;font-size:15px;line-height:1.5;display:none}
 body.notes .note{display:block}
 </style></head><body>
-<header>Clase 18 — Cómo se sirve un modelo · 26 slides · <label><input type="checkbox" onchange="document.body.classList.toggle('notes',this.checked)"> notas</label></header>
-<div class="frame"><div class="stage"><section id="cover" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399">TA050 · Sistemas Distribuidos I</p>
-<p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#7D8892">Clase 18</p>
+<header><b>Clase 18 — Cómo se sirve un modelo</b> · 31 slides · <label><input type="checkbox" onchange="document.body.classList.toggle('notes',this.checked)"> notas</label></header>
+<div class="frame"><div class="stage"><section id="cover" data-estilo="curso" style="background:linear-gradient(180deg,#010101 0%,#03181A 100%);color:#FFFFFF;font-family:Rubik, Arial, sans-serif;font-weight:300;padding:128px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden">
+<div style="position:absolute;inset:0;background:radial-gradient(900px 600px at 30% 70%,rgba(37,246,254,.16),transparent 70%)"></div>
+<svg style="position:absolute;left:0;top:0" width="1100" height="1080" viewBox="0 0 1100 1080"><line x1="110" y1="300" x2="280" y2="190" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="110" y1="300" x2="230" y2="470" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="280" y1="190" x2="430" y2="360" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="230" y1="470" x2="430" y2="360" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="230" y1="470" x2="180" y2="700" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="430" y1="360" x2="560" y2="230" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="430" y1="360" x2="520" y2="600" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="180" y1="700" x2="520" y2="600" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="280" y1="190" x2="560" y2="230" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="520" y1="600" x2="620" y2="820" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="180" y1="700" x2="360" y2="880" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="360" y1="880" x2="620" y2="820" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="180" y1="700" x2="90" y2="960" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><line x1="360" y1="880" x2="90" y2="960" stroke="#25F6FE" stroke-opacity=".35" stroke-width="2"/><circle cx="110" cy="300" r="16" fill="#03181A" stroke="#25F6FE" stroke-width="3"/><circle cx="280" cy="190" r="10" fill="#03181A" stroke="#25F6FE" stroke-width="3"/><circle cx="230" cy="470" r="10" fill="#03181A" stroke="#25F6FE" stroke-width="3"/><circle cx="430" cy="360" r="16" fill="#03181A" stroke="#25F6FE" stroke-width="3"/><circle cx="180" cy="700" r="10" fill="#03181A" stroke="#25F6FE" stroke-width="3"/><circle cx="560" cy="230" r="10" fill="#03181A" stroke="#25F6FE" stroke-width="3"/><circle cx="520" cy="600" r="16" fill="#03181A" stroke="#25F6FE" stroke-width="3"/><circle cx="360" cy="880" r="10" fill="#03181A" stroke="#25F6FE" stroke-width="3"/><circle cx="620" cy="820" r="10" fill="#03181A" stroke="#25F6FE" stroke-width="3"/><circle cx="90" cy="960" r="16" fill="#03181A" stroke="#25F6FE" stroke-width="3"/></svg>
+<div style="position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:28px;text-align:right">
+<h1 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:128px;font-weight:700;line-height:.95;text-transform:uppercase;color:#FFFFFF;text-shadow:0 0 0.6em rgba(37,246,254,.5),0 0 0.22em rgba(37,246,254,.7),0.04em 0.04em 0 rgba(0,0,0,.7)">Sistemas<br>distribuidos</h1>
+<p style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#25F6FE;text-shadow:0 0 .6em rgba(37,246,254,.5),.03em .03em 0 rgba(0,0,0,.85)">Clase 18 — Cómo se sirve un modelo de lenguaje</p>
 </div>
-<div style="display:flex;flex-direction:column;gap:40px">
-<h1 style="font-size:120px;font-weight:600;line-height:1.05;letter-spacing:-4px;color:#F2F3EF">Cómo se sirve un modelo de lenguaje</h1>
-<p style="width:1400px;font-size:44px;line-height:1.3;color:#A8B3BC">Del pedido HTTP al loop de la GPU, y por qué todo depende de cómo se administra el KV cache</p>
-</div>
-<div style="display:flex;flex-direction:column;gap:24px">
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Paper: Kwon et al., <i>Efficient Memory Management for Large Language Model Serving with PagedAttention</i>, SOSP 2023</p>
-<div style="display:flex;gap:16px"><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #2A3138;background:#0E1114"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#7D8892">16</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC">Fundamentos del entrenamiento</p></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #2A3138;background:#0E1114"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#7D8892">17</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC">Entrenamiento a escala de frontera</p></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #34D399;background:#132A22"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#34D399">18</p><p style="font-size:24px;line-height:1.3;color:#F2F3EF">Cómo se sirve un modelo</p></div><div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px;border-radius:12px;border:1px solid #2A3138;background:#0E1114"><p style="font-family:'Geist Mono', 'Courier New', monospace;font-size:24px;font-weight:500;color:#7D8892">19</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC">Del motor al clúster</p></div></div>
+<div style="position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:24px;text-align:right">
+<p style="width:1100px;font-size:36px;line-height:1.35;color:#DEE2E6">Del pedido HTTP al loop de la GPU, y por qué todo depende de cómo se administra el KV cache</p>
+<p style="width:1100px;font-size:24px;line-height:1.4;color:#ADB5BD">Paper: Kwon et al., <i>Efficient Memory Management for Large Language Model Serving with PagedAttention</i>, SOSP 2023</p>
 </div>
 <aside>Tiempo: 0:00–0:02 (2 min).
 Idea clave: las dos clases pasadas entrenamos modelos; hoy los servimos, y el problema central es de administración de memoria.
@@ -34,57 +40,59 @@ El paper es el de vLLM (Kwon et al., SOSP 2023). La lectura complementaria es Or
 Es la tercera de cuatro clases: hoy, el motor de inferencia de una réplica; la próxima, cómo se arma un clúster de réplicas como los que usan hoy los laboratorios.
 Pasar a la siguiente: dónde encaja esto en la materia.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="mapa" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="mapa" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Dónde estamos</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">La otra mitad: después de entrenar, servir</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Dónde estamos</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">La otra mitad: después de entrenar, servir</h2>
 </div>
-<table style="font-size:32px;color:#F2F3EF;font-family:Geist, Arial, sans-serif">
+<table style="font-size:32px;color:#0D0D0D;font-family:Rubik, Arial, sans-serif">
 <tr><th style="width:50%">Idea de hoy</th><th style="width:50%">Dónde la vimos</th></tr>
 <tr><td>Paralelismo de tensores para servir</td><td>Megatron-LM (Clase 16)</td></tr>
 <tr><td>El pedido más lento no frena a todos</td><td>Pipeline y stragglers (Clase 16)</td></tr>
 <tr><td>Bloques, tabla de bloques, copy-on-write</td><td>Paginación (Sistemas Operativos)</td></tr>
 <tr><td>Un stream que queda abierto</td><td>Sistemas de mensajería (Clase 13)</td></tr>
 </table>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El paper de hoy toma la idea más vieja de la lista, la paginación, y la aplica a la memoria de una GPU.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">El paper de hoy toma la idea más vieja de la lista, la paginación, y la aplica a la memoria de una GPU.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">2</p>
 <aside>Tiempo: 0:02–0:04 (2 min).
 Idea clave: casi todo lo de hoy son ideas conocidas aplicadas a un recurso nuevo, la memoria de la GPU.
 Decir: recorrer la tabla. El paralelismo de tensores de la Clase 16 se usa también para servir, porque un modelo grande no entra en una GPU. La idea de que el pedido más lento no frene a todos es la misma que en el pipeline. Y la contribución central del paper, bloques con tabla de bloques y copy-on-write, es literalmente paginación.
 Preguntar a la clase: ¿qué problema resolvía la paginación en un sistema operativo? (Fragmentación externa y tener que reservar memoria contigua por adelantado.) Ese es exactamente el problema de hoy.
 Pasar a la siguiente: antes de llegar a la GPU, el viaje del pedido.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="viaje" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="viaje" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El viaje de un pedido</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">La red es rápida y aburrida; el tiempo se va en la GPU</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El viaje de un pedido</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">La red es rápida y aburrida; el tiempo se va en la GPU</h2>
 </div>
 <div style="display:flex;align-items:stretch;gap:20px">
-<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:32px">
-<h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Edge</h3>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Termina TLS, filtra tráfico, elige un backend sano.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:32px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#0D0D0D;">Edge</h3>
+<p style="font-size:24px;line-height:1.4;color:#33393E">Termina TLS, filtra tráfico, elige un backend sano.</p>
 </div>
-<x-shape kind="arrow-right" style="width:48px;height:24px;background:#4A5560;align-self:center"></x-shape>
-<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:32px">
-<h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Gateway</h3>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Autentica y cuenta cuotas en tokens.</p>
+<x-shape kind="arrow-right" style="width:48px;height:24px;background:#ADB5BD;align-self:center"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:32px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#0D0D0D;">Gateway</h3>
+<p style="font-size:24px;line-height:1.4;color:#33393E">Autentica y cuenta cuotas en tokens.</p>
 </div>
-<x-shape kind="arrow-right" style="width:48px;height:24px;background:#4A5560;align-self:center"></x-shape>
-<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:32px">
-<h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Router</h3>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Elige réplica y región.</p>
+<x-shape kind="arrow-right" style="width:48px;height:24px;background:#ADB5BD;align-self:center"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:32px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#0D0D0D;">Router</h3>
+<p style="font-size:24px;line-height:1.4;color:#33393E">Elige réplica y región.</p>
 </div>
-<x-shape kind="arrow-right" style="width:48px;height:24px;background:#4A5560;align-self:center"></x-shape>
-<div style="flex:1.3;display:flex;flex-direction:column;gap:12px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:32px">
-<h3 style="font-size:32px;font-weight:600;color:#34D399;letter-spacing:-0.5px">Servidor de inferencia</h3>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">8 GPUs, el modelo partido con tensores. El tema de hoy.</p>
+<x-shape kind="arrow-right" style="width:48px;height:24px;background:#ADB5BD;align-self:center"></x-shape>
+<div style="flex:1.3;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:32px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#046B7D;">Servidor de inferencia</h3>
+<p style="font-size:24px;line-height:1.4;color:#33393E">8 GPUs, el modelo partido con tensores. El tema de hoy.</p>
 </div>
 </div>
 <div style="display:flex;gap:48px">
-<div style="flex:1;display:flex;flex-direction:column;gap:8px"><p style="font-size:72px;font-weight:600;color:#F2F3EF">decenas de ms</p><p style="font-size:32px;color:#A8B3BC">la red, ida y vuelta</p></div>
-<div style="flex:1;display:flex;flex-direction:column;gap:8px"><p style="font-size:72px;font-weight:600;color:#34D399">segundos</p><p style="font-size:32px;color:#A8B3BC">la GPU, un token por vez</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px"><p style="font-size:72px;font-weight:600;color:#0D0D0D">decenas de ms</p><p style="font-size:32px;color:#33393E">la red, ida y vuelta</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px"><p style="font-size:72px;font-weight:600;color:#046B7D">segundos</p><p style="font-size:32px;color:#33393E">la GPU, un token por vez</p></div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Campodónico, "What happens after you hit send"</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Campodónico, "What happens after you hit send"</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">3</p>
 <aside>Tiempo: 0:04–0:08 (4 min).
 Idea clave: la primera mitad del viaje es infraestructura conocida y rápida; casi todo el tiempo está en el servidor de inferencia.
 Decir: el chat arma un JSON con la conversación, hace un POST por HTTPS y pide la respuesta como stream, con Accept: text/event-stream. La conexión queda abierta porque la respuesta no llega de una vez.
@@ -93,29 +101,30 @@ El servidor: un modelo de 70B son unos 140 GB de pesos en 16 bits, más que una 
 Si preguntan por los detalles de cada salto: el post de la lectura complementaria tiene un simulador por salto.
 Pasar a la siguiente: ¿qué hace el servidor con el pedido?</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="loop" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:64px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="loop" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:64px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El loop</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Una pasada del modelo, un token</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El loop</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Una pasada del modelo, un token</h2>
 </div>
 <div style="display:flex;align-items:center;gap:32px">
-<div style="flex:1.4;display:flex;flex-direction:column;gap:12px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:40px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#A8B3BC;font-family:'Geist Mono', 'Courier New', monospace">Secuencia</p>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">¿Por qué el cielo es azul? La luz del</p>
+<div style="flex:1.4;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#33393E;font-family:'IBM Plex Mono', monospace">Secuencia</p>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">¿Por qué el cielo es azul? La luz del</p>
 </div>
-<x-shape kind="arrow-right" style="width:64px;height:32px;background:#4A5560"></x-shape>
-<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:40px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Modelo</p>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Todas las capas, una vez</p>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#ADB5BD"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Modelo</p>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D">Todas las capas, una vez</p>
 </div>
-<x-shape kind="arrow-right" style="width:64px;height:32px;background:#4A5560"></x-shape>
-<div style="flex:0.8;display:flex;flex-direction:column;gap:12px;background:#161B20;border:2px solid #F5A524;border-radius:16px;padding:40px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#F5A524;font-family:'Geist Mono', 'Courier New', monospace">Token</p>
-<p style="font-size:44px;font-weight:600;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">sol</p>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#ADB5BD"></x-shape>
+<div style="flex:0.8;display:flex;flex-direction:column;gap:12px;background:#FFFFFF;border:2px solid #B45309;border-radius:16px;padding:40px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#B45309;font-family:'IBM Plex Mono', monospace">Token</p>
+<p style="font-size:44px;font-weight:600;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">sol</p>
 </div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El token se agrega al final de la secuencia y se vuelve a correr el modelo, hasta un token de fin o un límite de largo. Cada vuelta depende de la anterior: una respuesta no se puede paralelizar en el tiempo.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">El token se agrega al final de la secuencia y se vuelve a correr el modelo, hasta un token de fin o un límite de largo. Cada vuelta depende de la anterior: una respuesta no se puede paralelizar en el tiempo.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">4</p>
 <aside>Tiempo: 0:08–0:11 (3 min).
 Idea clave: generar texto es un loop secuencial: una pasada completa del modelo por cada token.
 Decir: el texto se parte en tokens, cada token es un número de un vocabulario fijo y cada número se convierte en un vector. El modelo recibe la secuencia, la pasa por todas sus capas y al final da una distribución sobre el vocabulario; se elige un token, por ejemplo "sol". Ese token se agrega al final y se vuelve a correr.
@@ -123,20 +132,21 @@ Remarcar: no hay forma de calcular el token 50 antes del 49, porque el 50 depend
 Si preguntan por cómo se elige el token: temperatura y top-p cambian la distribución antes de muestrear; no hace falta para la clase.
 Pasar a la siguiente: la primera pasada y las siguientes son trabajos muy distintos.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="fases" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="fases" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Prefill y decode</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">El mismo modelo, dos trabajos muy distintos</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Prefill y decode</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">El mismo modelo, dos trabajos muy distintos</h2>
 </div>
-<table style="font-size:32px;color:#F2F3EF;font-family:Geist, Arial, sans-serif">
+<table style="font-size:32px;color:#0D0D0D;font-family:Rubik, Arial, sans-serif">
 <tr><th style="width:30%"></th><th style="width:35%">Prefill</th><th style="width:35%">Decode</th></tr>
 <tr><td>Cuántas veces</td><td>Una por pedido</td><td>Una por token de salida</td></tr>
 <tr><td>Tokens por pasada</td><td>Todo el prompt</td><td>Uno por secuencia</td></tr>
 <tr><td>Cuello de botella</td><td>Cómputo</td><td>Ancho de banda de memoria</td></tr>
 <tr><td>Se nota como</td><td>Tiempo al primer token</td><td>Tiempo entre tokens</td></tr>
-<tr style="background:#232A31"><td><b>Qué gana con batching</b></td><td>Poco: ya es paralelo</td><td><b>Casi todo</b></td></tr>
+<tr style="background:#E9ECEF"><td><b>Qué gana con batching</b></td><td>Poco: ya es paralelo</td><td><b>Casi todo</b></td></tr>
 </table>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §2.2 y §2.3</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §2.2 y §2.3</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">5</p>
 <aside>Tiempo: 0:11–0:16 (5 min).
 Idea clave: el prefill está limitado por el cómputo; el decode, por el ancho de banda de memoria. Eso hace que el batching sea casi gratis en decode.
 Decir: el prefill procesa todo el prompt de una vez: todos los tokens atraviesan todas las capas en paralelo. Son multiplicaciones de matrices grandes y la GPU está ocupada haciendo cuentas. Termina con el primer token.
@@ -145,15 +155,16 @@ Remarcar la última fila: si leer los pesos es lo caro, y se leen una vez por pa
 Preguntar a la clase: ¿qué métrica ve el usuario en cada fase? Prefill es el tiempo hasta que aparece el primer token (TTFT); decode es la velocidad a la que aparecen los siguientes (TPOT).
 Pasar a la siguiente: la consecuencia, en una frase.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section data-transition="fade" id="batching" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:56px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">La consecuencia</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:96px;font-weight:600;line-height:1.05;color:#0E1114;width:1600px;letter-spacing:-2px">El throughput es cuántas secuencias entran en el lote</h2>
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" data-transition="fade" id="batching" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:56px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">La consecuencia</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.05;color:#0D0D0D;width:1600px;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">El throughput es cuántas secuencias entran en el lote</h2>
 <div style="display:flex;gap:96px">
-<div style="display:flex;flex-direction:column;gap:8px"><p style="font-size:72px;font-weight:600;color:#48525C;font-family:'Geist Mono', 'Courier New', monospace">1 → 49</p><p style="font-size:32px;color:#48525C">secuencia · tokens/s</p></div>
-<div style="display:flex;flex-direction:column;gap:8px"><p style="font-size:72px;font-weight:600;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">32 → 1.143</p><p style="font-size:32px;color:#48525C">secuencias · tokens/s</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-size:72px;font-weight:600;color:#33393E;font-family:'IBM Plex Mono', monospace">1 → 49</p><p style="font-size:32px;color:#33393E">secuencia · tokens/s</p></div>
+<div style="display:flex;flex-direction:column;gap:8px"><p style="font-size:72px;font-weight:600;color:#046B7D;font-family:'IBM Plex Mono', monospace">32 → 1.143</p><p style="font-size:32px;color:#33393E">secuencias · tokens/s</p></div>
 </div>
-<p style="font-size:24px;line-height:1.4;color:#66707A">Modelo de costo del repositorio: cada pasada de decode cuesta 20 ms de leer los pesos más 0,25 ms por secuencia. Números ilustrativos.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<p style="font-size:24px;line-height:1.4;color:#6C757D">Modelo de costo del repositorio: cada pasada de decode cuesta 20 ms de leer los pesos más 0,25 ms por secuencia. Números ilustrativos.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">6</p>
 <aside>Tiempo: 0:16–0:19 (3 min).
 Idea clave: como lo caro de una pasada de decode es leer los pesos, y se leen una vez por pasada, el throughput crece casi lineal con el tamaño del lote.
 Decir: hacer la cuenta en el pizarrón con el modelo de costo del repositorio. Con una secuencia, cada pasada dura 20,25 ms y produce un token: unos 49 tokens por segundo. Con 32 secuencias, la pasada dura 20 + 0,25·32 = 28 ms y produce 32 tokens: unos 1.143 tokens por segundo. 23 veces más con la misma GPU.
@@ -161,23 +172,30 @@ Los números son ilustrativos, pero la forma es real: es por eso que todo servid
 Preguntar a la clase: entonces, ¿qué limita el tamaño del lote? Dejar que lo piensen; la respuesta es la próxima slide.
 Pasar a la siguiente: lo que limita el lote es la memoria, y en particular una estructura.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="kvcache" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section id="div-kvcache" data-estilo="curso" style="background:linear-gradient(180deg,#010101 0%,#03181A 100%);color:#FFFFFF;font-family:Rubik, Arial, sans-serif;font-weight:300;padding:128px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:40px;text-align:center">
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.1;text-transform:uppercase;color:#FFFFFF;text-shadow:3px 3px 0 #000;max-width:1600px">El KV cache</h2>
+
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#6C757D">7</p>
+<aside>Separador de sección. El KV cache: </aside>
+</section>
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="kvcache" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El KV cache</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Cada token deja una key y un value en cada capa</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El KV cache</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Cada token deja una key y un value en cada capa</h2>
 </div>
 <div style="display:flex;gap:64px;align-items:center">
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF">La atención compara cada token nuevo con todos los anteriores. Para eso necesita de cada uno su key y su value.</p>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Se calculan una vez y se guardan: es el estado de cada secuencia en curso, y crece con cada token.</p>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D">La atención compara cada token nuevo con todos los anteriores. Para eso necesita de cada uno su key y su value.</p>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D">Se calculan una vez y se guardan: es el estado de cada secuencia en curso, y crece con cada token.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:48px">
-<p style="font-size:24px;color:#A8B3BC">Bytes por token</p>
-<p style="font-size:32px;font-weight:600;line-height:1.5;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">2 × capas × cabezas KV × dimensión × bytes</p>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">El 2 es una key y un value.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:48px">
+<p style="font-size:24px;color:#33393E">Bytes por token</p>
+<p style="font-size:32px;font-weight:600;line-height:1.5;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">2 × capas × cabezas KV × dimensión × bytes</p>
+<p style="font-size:24px;line-height:1.4;color:#33393E">El 2 es una key y un value.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §2 y §3</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §2 y §3</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">8</p>
 <aside>Tiempo: 0:19–0:23 (4 min).
 Idea clave: el KV cache es el estado de cada secuencia: las keys y values de todos sus tokens en todas las capas. Se guarda para no recalcularlo en cada paso.
 Decir: en cada capa, la atención compara el token actual (su query) con las keys de todos los anteriores y mezcla sus values. Si no se guardaran, en cada paso habría que recalcular las keys y values de todo el prompt y de todo lo generado: rehacer el prefill por cada token. En lugar de eso se calculan una vez, en el prefill para el prompt y en cada paso para el token nuevo, y se guardan.
@@ -185,26 +203,27 @@ La fórmula: 2 (key y value) por capas por cabezas KV por dimensión de cada cab
 Remarcar: el KV cache crece un token a la vez mientras la secuencia se genera, y nadie sabe de antemano hasta dónde va a crecer. Eso va a ser el problema.
 Pasar a la siguiente: cuánto ocupa en modelos reales.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="kvnumeros" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="kvnumeros" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Cuánto ocupa</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Una sola conversación ocupa gigabytes</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Cuánto ocupa</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Una sola conversación ocupa gigabytes</h2>
 </div>
-<table style="font-size:32px;color:#F2F3EF;font-family:Geist, Arial, sans-serif">
+<table style="font-size:32px;color:#0D0D0D;font-family:Rubik, Arial, sans-serif">
 <tr><th style="width:32%">Modelo</th><th style="width:22%;text-align:right">Por token</th><th style="width:46%;text-align:right">Una secuencia</th></tr>
 <tr><td>OPT-13B (el del paper)</td><td style="text-align:right">≈ 800 KB</td><td style="text-align:right">≈ 1,6 GB con 2.048 tokens</td></tr>
 <tr><td>Llama 3 70B</td><td style="text-align:right">320 KiB</td><td style="text-align:right">≈ 2,6 GB con 8.000 tokens</td></tr>
 </table>
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;color:#A8B3BC">Memoria de una A100 de 40 GB sirviendo un modelo de 13B</p>
+<p style="font-size:24px;color:#33393E">Memoria de una A100 de 40 GB sirviendo un modelo de 13B</p>
 <div style="display:flex;height:72px;border-radius:12px;overflow:hidden">
-<div style="width:65%;background:#4A5560;display:flex;align-items:center;padding:0 24px"><p style="font-size:28px;font-weight:600;color:#F2F3EF">Pesos ≈ 65%</p></div>
-<div style="width:30%;background:#34D399;display:flex;align-items:center;padding:0 24px"><p style="font-size:28px;font-weight:600;color:#0E1114">KV cache ≈ 30%</p></div>
-<div style="width:5%;background:#232A31"></div>
+<div style="width:65%;background:#ADB5BD;display:flex;align-items:center;padding:0 24px"><p style="font-size:28px;font-weight:600;color:#0D0D0D">Pesos ≈ 65%</p></div>
+<div style="width:30%;background:#046B7D;display:flex;align-items:center;padding:0 24px"><p style="font-size:28px;font-weight:600;color:#FFFFFF">KV cache ≈ 30%</p></div>
+<div style="width:5%;background:#E9ECEF"></div>
 </div>
-<p style="font-size:24px;color:#A8B3BC">Los pesos son fijos. Lo único que se puede administrar es el KV cache, y es lo que limita el lote.</p>
+<p style="font-size:24px;color:#33393E">Los pesos son fijos. Lo único que se puede administrar es el KV cache, y es lo que limita el lote.</p>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §1 y §3</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §1 y §3</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">9</p>
 <aside>Tiempo: 0:23–0:26 (3 min).
 Idea clave: el KV cache es enorme, y es la única parte de la memoria que se puede administrar.
 Decir: OPT-13B, el modelo del paper: 2 × 5120 × 40 capas × 2 bytes, unos 800 KB por token; una secuencia de 2.048 tokens llega a 1,6 GB (§3). Llama 3 70B: 2 × 80 capas × 8 cabezas KV × 128 × 2 bytes = 320 KiB por token; una conversación de 8.000 tokens son unos 2,6 GB.
@@ -212,22 +231,29 @@ Si preguntan por qué el modelo más grande ocupa menos por token: Llama 3 usa g
 La barra es la figura 1 del paper: un modelo de 13B en una A100 de 40 GB usa alrededor del 65% para los pesos y casi el 30% para el KV cache; el resto son activaciones. Los pesos están fijos; ese 30% es lo único que se puede administrar, y cuántas secuencias entran ahí es el tamaño del lote. El paper lo resume en §3: el throughput está limitado por la memoria.
 Pasar a la siguiente: antes de la memoria, hay un problema más simple en cómo se arma el lote.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="estatico" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+</div></div><div class="frame"><div class="stage"><section id="div-estatico" data-estilo="curso" style="background:linear-gradient(180deg,#010101 0%,#03181A 100%);color:#FFFFFF;font-family:Rubik, Arial, sans-serif;font-weight:300;padding:128px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:40px;text-align:center">
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.1;text-transform:uppercase;color:#FFFFFF;text-shadow:3px 3px 0 #000;max-width:1600px">Batching por iteración</h2>
+
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#6C757D">10</p>
+<aside>Separador de sección. Batching por iteración: </aside>
+</section>
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="estatico" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Batching por pedido</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">El lote espera a su respuesta más larga</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Batching por pedido</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">El lote espera a su respuesta más larga</h2>
 </div>
 <div style="display:flex;flex-direction:column;gap:12px">
-<div style="display:flex;align-items:center;gap:24px"><p style="width:160px;font-size:24px;font-weight:600;color:#A8B3BC">Pedido 1</p><div style="display:flex;gap:4px"><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div></div></div>
-<div style="display:flex;align-items:center;gap:24px"><p style="width:160px;font-size:24px;font-weight:600;color:#A8B3BC">Pedido 2</p><div style="display:flex;gap:4px"><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div></div></div>
-<div style="display:flex;align-items:center;gap:24px"><p style="width:160px;font-size:24px;font-weight:600;color:#A8B3BC">Pedido 3</p><div style="display:flex;gap:4px"><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#34D399;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div><div style="width:76px;height:52px;background:#232A31;border:2px dashed #3A434C;border-radius:6px"></div></div></div>
-<div style="display:flex;align-items:center;gap:24px"><p style="width:160px;font-size:24px;font-weight:600;color:#F5A524">Pedido 4</p><div style="display:flex;align-items:center;height:52px;padding:0 24px;border:2px dashed #F5A524;border-radius:6px"><p style="font-size:24px;color:#F5A524">llegó en la iteración 2 y espera afuera hasta la 10</p></div></div>
+<div style="display:flex;align-items:center;gap:24px"><p style="width:160px;font-size:24px;font-weight:600;color:#33393E">Pedido 1</p><div style="display:flex;gap:4px"><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div></div></div>
+<div style="display:flex;align-items:center;gap:24px"><p style="width:160px;font-size:24px;font-weight:600;color:#33393E">Pedido 2</p><div style="display:flex;gap:4px"><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div></div></div>
+<div style="display:flex;align-items:center;gap:24px"><p style="width:160px;font-size:24px;font-weight:600;color:#33393E">Pedido 3</p><div style="display:flex;gap:4px"><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#046B7D;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div><div style="width:76px;height:52px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:6px"></div></div></div>
+<div style="display:flex;align-items:center;gap:24px"><p style="width:160px;font-size:24px;font-weight:600;color:#B45309">Pedido 4</p><div style="display:flex;align-items:center;height:52px;padding:0 24px;border:2px dashed #B45309;border-radius:6px"><p style="font-size:24px;color:#B45309">llegó en la iteración 2 y espera afuera hasta la 10</p></div></div>
 </div>
 <div style="display:flex;gap:40px;align-items:center">
-<div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:28px;background:#34D399;border-radius:4px"></div><p style="font-size:24px;color:#A8B3BC">genera un token</p></div>
-<div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:28px;background:#232A31;border:2px dashed #3A434C;border-radius:4px"></div><p style="font-size:24px;color:#A8B3BC">terminó, pero ocupa su lugar y no puede volver</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:28px;background:#046B7D;border-radius:4px"></div><p style="font-size:24px;color:#33393E">genera un token</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:28px;background:#E9ECEF;border:2px dashed #C3CAD0;border-radius:4px"></div><p style="font-size:24px;color:#33393E">terminó, pero ocupa su lugar y no puede volver</p></div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Yu et al., OSDI 2022</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Yu et al., OSDI 2022</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">11</p>
 <aside>Tiempo: 0:26–0:30 (4 min).
 Idea clave: con batching a nivel de pedido, las respuestas cortas quedan atrapadas detrás de la más larga, y los pedidos nuevos esperan aunque haya lugar.
 Decir: así trabajaban los sistemas anteriores a Orca, como FasterTransformer de NVIDIA: se juntan varios pedidos, se corre el modelo sobre el lote hasta que todos terminan, y recién ahí se arma el siguiente. Cada columna del dibujo es una iteración del modelo.
@@ -236,26 +262,27 @@ Con generación de texto los largos varían muchísimo, así que esto pasa todo 
 Preguntar a la clase: ¿qué cambiarían? Dejar que propongan "dejar salir y entrar entre iteraciones": es exactamente Orca.
 Pasar a la siguiente: Orca.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="orca" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="orca" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Orca · OSDI 2022</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Decidir el lote de nuevo en cada iteración</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Orca · OSDI 2022</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Decidir el lote de nuevo en cada iteración</h2>
 </div>
 <div style="display:flex;gap:48px">
-<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:48px">
-<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Scheduling por iteración</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El motor corre una sola iteración. Entre una y otra, las terminadas salen y vuelven al cliente, y las que esperan entran. Hoy se llama continuous batching.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:48px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#0D0D0D;">Scheduling por iteración</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">El motor corre una sola iteración. Entre una y otra, las terminadas salen y vuelven al cliente, y las que esperan entran. Hoy se llama continuous batching.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
-<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Selective batching</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">En una iteración conviven prefills largos y decodes de un token. Se batchean las capas lineales; la atención se hace por secuencia.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:48px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#0D0D0D;">Selective batching</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">En una iteración conviven prefills largos y decodes de un token. Se batchean las capas lineales; la atención se hace por secuencia.</p>
 </div>
 </div>
 <div style="display:flex;gap:32px;align-items:baseline">
-<p style="font-size:96px;font-weight:600;line-height:1;color:#34D399">36,9×</p>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">más throughput que FasterTransformer con la misma latencia, sobre GPT-3 de 175B.</p>
+<p style="font-size:96px;font-weight:600;line-height:1;color:#046B7D">36,9×</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">más throughput que FasterTransformer con la misma latencia, sobre GPT-3 de 175B.</p>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Yu et al., OSDI 2022</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Yu et al., OSDI 2022</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">12</p>
 <aside>Tiempo: 0:30–0:34 (4 min).
 Idea clave: Orca cambia la granularidad del scheduling, de pedido a iteración.
 Decir: el scheduler le pide al motor que corra una sola iteración del modelo sobre el lote actual. Entre iteración e iteración vuelve a decidir: las secuencias que terminaron salen y su respuesta vuelve al cliente; las que esperan entran si hay lugar. Así las cortas no esperan a las largas, y los pedidos nuevos no esperan a que termine un lote. Hoy esto se llama continuous batching y lo hace cualquier servidor de inferencia.
@@ -264,18 +291,19 @@ El número: sobre GPT-3 de 175B, 36,9 veces más throughput que FasterTransforme
 Conectar con la Clase 16: es la misma idea de no dejar que el pedido más lento frene a todos.
 Pasar a la siguiente: verlo en el simulador.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section data-transition="fade" id="demobatch" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" data-transition="fade" id="demobatch" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">Demo · batching</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#0E1114;letter-spacing:-2px">Con 4 pedidos por segundo, el estático no da abasto</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Demo · batching</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Con 4 pedidos por segundo, el estático no da abasto</h2>
 </div>
-<table style="font-size:32px;color:#0E1114;font-family:Geist, Arial, sans-serif">
+<table style="font-size:32px;color:#0D0D0D;font-family:Rubik, Arial, sans-serif">
 <tr><th style="width:28%"></th><th style="width:20%;text-align:right">tokens/s</th><th style="width:26%;text-align:right">primer token</th><th style="width:26%;text-align:right">respuesta completa</th></tr>
 <tr><td>Estático</td><td style="text-align:right">225</td><td style="text-align:right">158 s</td><td style="text-align:right">158 s</td></tr>
 <tr><td><b>Continuo</b></td><td style="text-align:right"><b>756</b></td><td style="text-align:right"><b>0,1 s</b></td><td style="text-align:right"><b>5,6 s</b></td></tr>
 </table>
-<p style="font-size:32px;line-height:1.4;color:#48525C">El estático no puede atender más de unos 225 tokens/s, así que la cola crece sin límite. El continuo atiende todo lo que llega.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/sim batching · y en el simulador, el botón Estático / Continuo</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">El estático no puede atender más de unos 225 tokens/s, así que la cola crece sin límite. El continuo atiende todo lo que llega.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim batching · y en el simulador, el botón Estático / Continuo</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">13</p>
 <aside>Tiempo: 0:34–0:37 (3 min, con demo).
 Idea clave: con la misma GPU y la misma carga, el batching continuo atiende todo lo que llega y el estático no.
 Demo: abrir el simulador Motor de inferencia y cambiar de Continuo a Estático. Mirar el lote: en estático aparecen secuencias en estado "espera", terminadas pero ocupando lugar, y la cola crece. Mirar el primer token: en estático llega con la respuesta completa, porque nadie ve nada hasta que termina el lote.
@@ -283,24 +311,31 @@ La tabla es la salida de go run ./cmd/sim batching: 400 pedidos a 4 por segundo,
 Remarcar: los números son de un modelo de costo ilustrativo, no una medición de hardware. La forma es la que importa.
 Pasar a la siguiente: Orca decide cuándo entra cada secuencia. Lo que no decide es cuántas entran.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="desperdicio" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+</div></div><div class="frame"><div class="stage"><section id="div-desperdicio" data-estilo="curso" style="background:linear-gradient(180deg,#010101 0%,#03181A 100%);color:#FFFFFF;font-family:Rubik, Arial, sans-serif;font-weight:300;padding:128px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:40px;text-align:center">
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.1;text-transform:uppercase;color:#FFFFFF;text-shadow:3px 3px 0 #000;max-width:1600px">PagedAttention</h2>
+<p style="font-size:36px;line-height:1.4;color:#ADB5BD;max-width:1300px">El KV cache como memoria virtual.</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#6C757D">14</p>
+<aside>Separador de sección. PagedAttention: El KV cache como memoria virtual.</aside>
+</section>
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="desperdicio" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El problema de la memoria</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Reservar el máximo contiguo desperdicia de tres formas</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El problema de la memoria</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Reservar el máximo contiguo desperdicia de tres formas</h2>
 </div>
 <div style="display:flex;height:72px;gap:0">
-<div style="width:320px;background:#34D399;border-radius:10px 0 0 10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#0E1114">tokens</p></div>
-<div style="width:200px;background:#1F7A5C;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#F2F3EF">1 · reserva</p></div>
-<div style="width:520px;background:#173B2F;border-radius:0 10px 10px 0;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#F2F3EF">2 · fragmentación interna</p></div>
-<div style="width:180px;border:3px dashed #F5A524;border-radius:10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#F5A524">3 · externa</p></div>
-<div style="width:440px;background:#F5A524;border-radius:10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#0E1114">otro pedido</p></div>
+<div style="width:320px;background:#046B7D;border-radius:10px 0 0 10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#FFFFFF">tokens</p></div>
+<div style="width:200px;background:#035A69;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#0D0D0D">1 · reserva</p></div>
+<div style="width:520px;background:#E3EFF1;border-radius:0 10px 10px 0;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#0D0D0D">2 · fragmentación interna</p></div>
+<div style="width:180px;border:3px dashed #B45309;border-radius:10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#B45309">3 · externa</p></div>
+<div style="width:440px;background:#B45309;border-radius:10px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#FFFFFF">otro pedido</p></div>
 </div>
 <div style="display:flex;gap:40px">
-<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">1 · Reserva</h3><p style="font-size:24px;line-height:1.4;color:#A8B3BC">Lugar para tokens que todavía no se generaron. Se va a usar, pero mientras tanto nadie más puede.</p></div>
-<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">2 · Fragmentación interna</h3><p style="font-size:24px;line-height:1.4;color:#A8B3BC">Lugar que nunca se va a usar, porque la respuesta terminó antes del máximo. Se sabe recién al final.</p></div>
-<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-size:32px;font-weight:600;color:#F5A524;letter-spacing:-0.5px">3 · Fragmentación externa</h3><p style="font-size:24px;line-height:1.4;color:#A8B3BC">Huecos entre tramos: suman mucho, pero por separado no le sirven a un pedido nuevo.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#0D0D0D;">1 · Reserva</h3><p style="font-size:24px;line-height:1.4;color:#33393E">Lugar para tokens que todavía no se generaron. Se va a usar, pero mientras tanto nadie más puede.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#0D0D0D;">2 · Fragmentación interna</h3><p style="font-size:24px;line-height:1.4;color:#33393E">Lugar que nunca se va a usar, porque la respuesta terminó antes del máximo. Se sabe recién al final.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#B45309;">3 · Fragmentación externa</h3><p style="font-size:24px;line-height:1.4;color:#33393E">Huecos entre tramos: suman mucho, pero por separado no le sirven a un pedido nuevo.</p></div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §3.1</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §3.1</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">15</p>
 <aside>Tiempo: 0:37–0:41 (4 min).
 Idea clave: guardar el KV cache de cada pedido en un tramo contiguo del tamaño máximo produce tres desperdicios.
 Decir: los sistemas previos guardaban el KV cache de cada pedido en un tramo contiguo, porque los kernels de atención esperaban los datos uno al lado del otro. Cuando llega un pedido nadie sabe cuánto va a generar, así que la única opción segura es reservar el máximo, por ejemplo 2.048 tokens.
@@ -308,12 +343,13 @@ Recorrer la barra de izquierda a derecha. Azul fuerte: los tokens que ya tiene. 
 Preguntar a la clase: ¿dónde vieron estos tres nombres antes? en Sistemas Operativos, en la asignación de memoria contigua antes de la paginación: first-fit, huecos que no sirven, memoria que sobra en total pero no en un solo lugar.
 Pasar a la siguiente: cuánto suman.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section data-transition="fade" id="medicion" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:48px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">Lo que midió el paper</p>
-<p style="font-size:160px;font-weight:600;line-height:1;color:#08724F">20,4% – 38,2%</p>
-<p style="font-size:44px;line-height:1.3;color:#0E1114;width:1500px">de la memoria del KV cache guardaba tokens de verdad en los sistemas existentes. El resto se desperdiciaba.</p>
-<p style="font-size:32px;line-height:1.4;color:#48525C">En el repositorio, la reserva del máximo da 28%.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">Kwon et al., §1 y §3 · go run ./cmd/sim memoria</p>
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" data-transition="fade" id="medicion" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Lo que midió el paper</p>
+<p style="font-size:160px;font-weight:600;line-height:1;color:#046B7D">20,4% – 38,2%</p>
+<p style="font-size:44px;line-height:1.3;color:#0D0D0D;width:1500px">de la memoria del KV cache guardaba tokens de verdad en los sistemas existentes. El resto se desperdiciaba.</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">En el repositorio, la reserva del máximo da 28%.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">Kwon et al., §1 y §3 · go run ./cmd/sim memoria</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">16</p>
 <aside>Tiempo: 0:41–0:43 (2 min).
 Idea clave: entre el 60% y el 80% de la memoria que limita el throughput se desperdiciaba.
 Decir: el paper midió cuánto de la memoria del KV cache guardaba tokens de verdad en los sistemas existentes: entre 20,4% y 38,2%. Dicho al revés: entre el 60% y el 80% de la memoria más valiosa de la GPU estaba reservada para nada.
@@ -321,25 +357,26 @@ El simulador del repositorio, con una carga de largos de cola pesada, da 28% par
 Pausa. Dejar que el número pese antes de seguir: si se pudiera usar toda esa memoria, entrarían tres o cuatro veces más secuencias en el lote, y ya vimos que el throughput es el tamaño del lote.
 Pasar a la siguiente: la solución ya la conocen.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="analogia" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="analogia" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">PagedAttention · vLLM, SOSP 2023</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">El KV cache como memoria virtual</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">PagedAttention · vLLM, SOSP 2023</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">El KV cache como memoria virtual</h2>
 </div>
 <div style="display:flex;gap:64px;align-items:start">
-<table style="width:1000px;font-size:32px;color:#F2F3EF;font-family:Geist, Arial, sans-serif">
+<table style="width:1000px;font-size:32px;color:#0D0D0D;font-family:Rubik, Arial, sans-serif">
 <tr><th style="width:50%">Sistema operativo</th><th style="width:50%">vLLM</th></tr>
 <tr><td>Página</td><td><b>Bloque</b> de KV cache</td></tr>
 <tr><td>Byte</td><td>Token</td></tr>
 <tr><td>Proceso</td><td>Secuencia</td></tr>
 <tr><td>Tabla de páginas</td><td><b>Tabla de bloques</b></td></tr>
 </table>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:40px">
-<p style="font-size:96px;font-weight:600;line-height:1;color:#34D399">16</p>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF">tokens por bloque, por defecto</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:40px">
+<p style="font-size:96px;font-weight:600;line-height:1;color:#046B7D">16</p>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D">tokens por bloque, por defecto</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §1, §4.2 y §7.2</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §1, §4.2 y §7.2</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">17</p>
 <aside>Tiempo: 0:43–0:46 (3 min).
 Idea clave: la solución de vLLM es paginar el KV cache, y el paper hace la analogía con el sistema operativo de forma explícita.
 Decir: la memoria del KV cache se parte en bloques de tamaño fijo, 16 tokens por defecto. Cada secuencia ve sus tokens como si estuvieran contiguos, en bloques lógicos 0, 1, 2… Una tabla de bloques por secuencia traduce cada bloque lógico a un bloque físico, que puede estar en cualquier lugar de la GPU. Cada entrada anota además cuántas posiciones del bloque están llenas (§4.2).
@@ -347,40 +384,41 @@ La tabla de la slide es la analogía del paper (§1): bloques como páginas, tok
 Si preguntan por qué 16 y no 1: bloques muy chicos no aprovechan el paralelismo de la GPU al leer y la tabla crece; el paper lo estudia en §7.2 y elige 16. Es el mismo compromiso del tamaño de página.
 Pasar a la siguiente: cómo se ve una tabla de bloques.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="tabla" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="tabla" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">La tabla de bloques · bloques de 4 tokens para el dibujo</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Contiguo para la secuencia, desparramado en la GPU</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">La tabla de bloques · bloques de 4 tokens para el dibujo</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Contiguo para la secuencia, desparramado en la GPU</h2>
 </div>
 <div style="display:flex;gap:56px;align-items:start">
 <div style="display:flex;flex-direction:column;gap:12px">
-<p style="font-size:24px;font-weight:600;color:#A8B3BC">Lo que ve la secuencia</p>
-<p style="font-size:24px;font-weight:600;color:#34D399">Secuencia A</p>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:32px;font-size:24px;color:#A8B3BC">0</p><div style="width:88px;height:52px;background:#173B2F;border:2px solid #34D399;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">¿Por</p></div><div style="width:88px;height:52px;background:#173B2F;border:2px solid #34D399;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">qué</p></div><div style="width:88px;height:52px;background:#173B2F;border:2px solid #34D399;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">el</p></div><div style="width:88px;height:52px;background:#173B2F;border:2px solid #34D399;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">cielo</p></div></div>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:32px;font-size:24px;color:#A8B3BC">1</p><div style="width:88px;height:52px;background:#173B2F;border:2px solid #34D399;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">es</p></div><div style="width:88px;height:52px;background:#173B2F;border:2px solid #34D399;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">azul</p></div><div style="width:88px;height:52px;background:#173B2F;border:2px solid #34D399;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">?</p></div><div style="width:88px;height:52px;border:2px dashed #2A3138;border-radius:8px"></div></div>
-<p style="font-size:24px;font-weight:600;color:#F5A524">Secuencia B</p>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:32px;font-size:24px;color:#A8B3BC">0</p><div style="width:88px;height:52px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">La</p></div><div style="width:88px;height:52px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">luz</p></div><div style="width:88px;height:52px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">del</p></div><div style="width:88px;height:52px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">sol</p></div></div>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:32px;font-size:24px;color:#A8B3BC">1</p><div style="width:88px;height:52px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">es</p></div><div style="width:88px;height:52px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#F2F3EF">blanca</p></div><div style="width:88px;height:52px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:52px;border:2px dashed #2A3138;border-radius:8px"></div></div>
+<p style="font-size:24px;font-weight:600;color:#33393E">Lo que ve la secuencia</p>
+<p style="font-size:24px;font-weight:600;color:#046B7D">Secuencia A</p>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:32px;font-size:24px;color:#33393E">0</p><div style="width:88px;height:52px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">¿Por</p></div><div style="width:88px;height:52px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">qué</p></div><div style="width:88px;height:52px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">el</p></div><div style="width:88px;height:52px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">cielo</p></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:32px;font-size:24px;color:#33393E">1</p><div style="width:88px;height:52px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">es</p></div><div style="width:88px;height:52px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">azul</p></div><div style="width:88px;height:52px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">?</p></div><div style="width:88px;height:52px;border:2px dashed #DEE2E6;border-radius:8px"></div></div>
+<p style="font-size:24px;font-weight:600;color:#B45309">Secuencia B</p>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:32px;font-size:24px;color:#33393E">0</p><div style="width:88px;height:52px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">La</p></div><div style="width:88px;height:52px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">luz</p></div><div style="width:88px;height:52px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">del</p></div><div style="width:88px;height:52px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">sol</p></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:32px;font-size:24px;color:#33393E">1</p><div style="width:88px;height:52px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">es</p></div><div style="width:88px;height:52px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;color:#0D0D0D">blanca</p></div><div style="width:88px;height:52px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:52px;border:2px dashed #DEE2E6;border-radius:8px"></div></div>
 </div>
 <div style="display:flex;flex-direction:column;gap:12px;width:300px">
-<p style="font-size:24px;font-weight:600;color:#A8B3BC">Tablas de bloques</p>
-<div style="display:flex;flex-direction:column;gap:8px;background:#161B20;border:2px solid #34D399;border-radius:12px;padding:20px 24px"><p style="font-size:24px;font-weight:600;color:#34D399">A</p><p style="font-size:28px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">0 → 7 · 4/4</p><p style="font-size:28px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">1 → 1 · 3/4</p></div>
-<div style="display:flex;flex-direction:column;gap:8px;background:#161B20;border:2px solid #F5A524;border-radius:12px;padding:20px 24px"><p style="font-size:24px;font-weight:600;color:#F5A524">B</p><p style="font-size:28px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">0 → 3 · 4/4</p><p style="font-size:28px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">1 → 6 · 2/4</p></div>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">lógico → físico · llenos</p>
+<p style="font-size:24px;font-weight:600;color:#33393E">Tablas de bloques</p>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:2px solid #046B7D;border-radius:12px;padding:20px 24px"><p style="font-size:24px;font-weight:600;color:#046B7D">A</p><p style="font-size:28px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">0 → 7 · 4/4</p><p style="font-size:28px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">1 → 1 · 3/4</p></div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:2px solid #B45309;border-radius:12px;padding:20px 24px"><p style="font-size:24px;font-weight:600;color:#B45309">B</p><p style="font-size:28px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">0 → 3 · 4/4</p><p style="font-size:28px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">1 → 6 · 2/4</p></div>
+<p style="font-size:24px;line-height:1.4;color:#33393E">lógico → físico · llenos</p>
 </div>
 <div style="display:flex;flex-direction:column;gap:8px">
-<p style="font-size:24px;font-weight:600;color:#A8B3BC">Memoria física</p>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#A8B3BC">bloque 0</p><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div></div>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#34D399">bloque 1</p><div style="width:88px;height:44px;background:#173B2F;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:44px;background:#173B2F;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:44px;background:#173B2F;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div></div>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#A8B3BC">bloque 2</p><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div></div>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#F5A524">bloque 3</p><div style="width:88px;height:44px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px"></div><div style="width:88px;height:44px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px"></div><div style="width:88px;height:44px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px"></div><div style="width:88px;height:44px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px"></div></div>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#A8B3BC">bloque 4</p><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div></div>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#A8B3BC">bloque 5</p><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div></div>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#F5A524">bloque 6</p><div style="width:88px;height:44px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px"></div><div style="width:88px;height:44px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #2A3138;border-radius:8px"></div></div>
-<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#34D399">bloque 7</p><div style="width:88px;height:44px;background:#173B2F;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:44px;background:#173B2F;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:44px;background:#173B2F;border:2px solid #34D399;border-radius:8px"></div><div style="width:88px;height:44px;background:#173B2F;border:2px solid #34D399;border-radius:8px"></div></div>
+<p style="font-size:24px;font-weight:600;color:#33393E">Memoria física</p>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#33393E">bloque 0</p><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#046B7D">bloque 1</p><div style="width:88px;height:44px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px"></div><div style="width:88px;height:44px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px"></div><div style="width:88px;height:44px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#33393E">bloque 2</p><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#B45309">bloque 3</p><div style="width:88px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><div style="width:88px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><div style="width:88px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><div style="width:88px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#33393E">bloque 4</p><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#33393E">bloque 5</p><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#B45309">bloque 6</p><div style="width:88px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><div style="width:88px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div><div style="width:88px;height:44px;border:2px dashed #DEE2E6;border-radius:8px"></div></div>
+<div style="display:flex;gap:8px;align-items:center"><p style="width:120px;font-size:24px;color:#046B7D">bloque 7</p><div style="width:88px;height:44px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px"></div><div style="width:88px;height:44px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px"></div><div style="width:88px;height:44px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px"></div><div style="width:88px;height:44px;background:#E3EFF1;border:2px solid #046B7D;border-radius:8px"></div></div>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.2 y §4.3</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.2 y §4.3</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">18</p>
 <aside>Tiempo: 0:46–0:51 (5 min). Es la slide central de la clase.
 Idea clave: la tabla de bloques separa lo que ve la secuencia de dónde están los datos.
 Decir: a la izquierda, lo que ve cada secuencia: sus tokens en bloques lógicos 0 y 1, contiguos. En el dibujo los bloques son de 4 tokens para que entren; vLLM usa 16.
@@ -390,30 +428,31 @@ Recorrer qué pasa cuando A genera un token más: va a la cuarta posición del b
 Si preguntan cómo hace la atención si los datos no están contiguos: el kernel PagedAttention lee las keys y values bloque por bloque siguiendo la tabla. Por eso el nombre.
 Pasar a la siguiente: qué ganamos.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="propiedades" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="propiedades" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Qué cambia</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Los tres desperdicios, resueltos</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Qué cambia</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Los tres desperdicios, resueltos</h2>
 </div>
 <div style="display:flex;gap:40px">
-<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#A8B3BC;font-family:'Geist Mono', 'Courier New', monospace">1 · Reserva</p>
-<h3 style="font-size:44px;font-weight:600;line-height:1.2;color:#F2F3EF;letter-spacing:-0.5px">Desaparece</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Un bloque se asigna recién cuando el anterior se llena.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#33393E;font-family:'IBM Plex Mono', monospace">1 · Reserva</p>
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;line-height:1.2;color:#0D0D0D;">Desaparece</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">Un bloque se asigna recién cuando el anterior se llena.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:48px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">2 · Fragmentación interna</p>
-<h3 style="font-size:44px;font-weight:600;line-height:1.2;color:#F2F3EF;letter-spacing:-0.5px">Menos de un bloque</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Sólo queda sin usar el final del último bloque de cada secuencia.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">2 · Fragmentación interna</p>
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;line-height:1.2;color:#0D0D0D;">Menos de un bloque</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">Sólo queda sin usar el final del último bloque de cada secuencia.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#A8B3BC;font-family:'Geist Mono', 'Courier New', monospace">3 · Fragmentación externa</p>
-<h3 style="font-size:44px;font-weight:600;line-height:1.2;color:#F2F3EF;letter-spacing:-0.5px">Desaparece</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Todos los bloques son iguales: cualquier libre sirve.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:48px">
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#33393E;font-family:'IBM Plex Mono', monospace">3 · Fragmentación externa</p>
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;line-height:1.2;color:#0D0D0D;">Desaparece</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">Todos los bloques son iguales: cualquier libre sirve.</p>
 </div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El precio: las keys y values ya no están contiguos, así que el kernel de atención los lee bloque por bloque siguiendo la tabla. Eso es PagedAttention.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.1 a §4.3</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">El precio: las keys y values ya no están contiguos, así que el kernel de atención los lee bloque por bloque siguiendo la tabla. Eso es PagedAttention.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.1 a §4.3</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">19</p>
 <aside>Tiempo: 0:51–0:54 (3 min).
 Idea clave: la paginación elimina la reserva y la fragmentación externa, y reduce la interna a menos de un bloque por secuencia.
 Decir: volver a la barra de los tres desperdicios. Reserva: ya no se aparta lugar para el futuro; al admitir una secuencia se le dan los bloques justos para el prompt, y uno más cada vez que el último se llena. Fragmentación interna: lo único que puede quedar sin usar es el final del último bloque, a lo sumo 15 tokens por secuencia, sea cual sea su largo. Fragmentación externa: como todos los bloques son del mismo tamaño, cualquier bloque libre le sirve a cualquier secuencia; no hay huecos inútiles.
@@ -421,19 +460,20 @@ El precio está en el kernel: la atención tiene que leer las keys y values sigu
 Preguntar a la clase: con bloques de 16 y secuencias de unos 400 tokens en promedio, ¿qué fracción se desperdicia como mucho? Menos de 16/400, alrededor del 4%.
 Pasar a la siguiente: verlo en el simulador.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section data-transition="fade" id="demomem" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" data-transition="fade" id="demomem" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">Demo · memoria</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#0E1114;letter-spacing:-2px">Misma memoria, más del doble de secuencias</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Demo · memoria</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Misma memoria, más del doble de secuencias</h2>
 </div>
-<table style="font-size:32px;color:#0E1114;font-family:Geist, Arial, sans-serif">
+<table style="font-size:32px;color:#0D0D0D;font-family:Rubik, Arial, sans-serif">
 <tr><th style="width:32%"></th><th style="width:17%;text-align:right">tokens/s</th><th style="width:17%;text-align:right">lote prom.</th><th style="width:17%;text-align:right">uso KV</th><th style="width:17%;text-align:right">desalojos</th></tr>
 <tr><td>Contiguo, reserva máx</td><td style="text-align:right">562</td><td style="text-align:right">13,6</td><td style="text-align:right">28%</td><td style="text-align:right">0</td></tr>
 <tr><td>Contiguo, oráculo</td><td style="text-align:right">915</td><td style="text-align:right">25,3</td><td style="text-align:right">70%</td><td style="text-align:right">0</td></tr>
 <tr><td><b>Paginado, bloque 16</b></td><td style="text-align:right"><b>1.079</b></td><td style="text-align:right"><b>32,9</b></td><td style="text-align:right"><b>99%</b></td><td style="text-align:right"><b>234</b></td></tr>
 </table>
-<p style="font-size:32px;line-height:1.4;color:#48525C">El oráculo sabe de antemano cuánto va a generar cada pedido, y aun así pierde contra los bloques.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/sim memoria · y en el simulador, Contigua / Paginada</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">El oráculo sabe de antemano cuánto va a generar cada pedido, y aun así pierde contra los bloques.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim memoria · y en el simulador, Contigua / Paginada</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">20</p>
 <aside>Tiempo: 0:54–0:58 (4 min, con demo).
 Idea clave: con la misma memoria, la paginación mete más del doble de secuencias en el lote, y eso se traduce en throughput.
 Demo: en el simulador, cambiar entre Contigua (reserva 512) y Paginada. Con memoria contigua el mapa queda casi todo pálido: reservado sin usar. El lote no pasa de 4 secuencias, porque 2.048 slots divididos por reservas de 512 son 4. Con paginada el mapa se llena de color, los bloques de cada pedido quedan desparramados y el lote crece.
@@ -441,30 +481,37 @@ La tabla es la salida de go run ./cmd/sim memoria: 400 pedidos a 40 por segundo,
 Remarcar la última columna: con memoria paginada sí hay desalojos, porque se admite más de lo que podría llegar a necesitarse. Es la próxima parte.
 Pasar a la siguiente: lo que habilita tener una tabla en el medio.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="cow" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+</div></div><div class="frame"><div class="stage"><section id="div-cow" data-estilo="curso" style="background:linear-gradient(180deg,#010101 0%,#03181A 100%);color:#FFFFFF;font-family:Rubik, Arial, sans-serif;font-weight:300;padding:128px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:40px;text-align:center">
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.1;text-transform:uppercase;color:#FFFFFF;text-shadow:3px 3px 0 #000;max-width:1600px">Compartir y desalojar</h2>
+<p style="font-size:36px;line-height:1.4;color:#ADB5BD;max-width:1300px">Compartir, desalojar, distribuir y resultados.</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#6C757D">21</p>
+<aside>Separador de sección. Compartir y desalojar: Compartir, desalojar, distribuir y resultados.</aside>
+</section>
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="cow" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Compartir · §4.4</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Varias muestras, un solo prompt: copy-on-write</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Compartir · §4.4</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Varias muestras, un solo prompt: copy-on-write</h2>
 </div>
 <div style="display:flex;gap:64px;align-items:center">
 <div style="flex:1.2;display:flex;flex-direction:column;gap:12px">
 <div style="display:flex;gap:12px;align-items:stretch">
-<div style="width:420px;background:#173B2F;border:2px solid #34D399;border-radius:12px;display:flex;flex-direction:column;justify-content:center;padding:24px"><p style="font-size:28px;font-weight:600;color:#F2F3EF">Prompt compartido</p><p style="font-size:24px;color:#F2F3EF">cada bloque con 4 referencias</p></div>
+<div style="width:420px;background:#E3EFF1;border:2px solid #046B7D;border-radius:12px;display:flex;flex-direction:column;justify-content:center;padding:24px"><p style="font-size:28px;font-weight:600;color:#0D0D0D">Prompt compartido</p><p style="font-size:24px;color:#0D0D0D">cada bloque con 4 referencias</p></div>
 <div style="display:flex;flex-direction:column;gap:12px">
-<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px"></div><p style="font-size:24px;color:#A8B3BC">muestra 1</p></div>
-<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px"></div><p style="font-size:24px;color:#A8B3BC">muestra 2</p></div>
-<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px"></div><p style="font-size:24px;color:#A8B3BC">muestra 3</p></div>
-<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#3D2C10;border:2px solid #F5A524;border-radius:8px"></div><p style="font-size:24px;color:#A8B3BC">muestra 4</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><p style="font-size:24px;color:#33393E">muestra 1</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><p style="font-size:24px;color:#33393E">muestra 2</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><p style="font-size:24px;color:#33393E">muestra 3</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:44px;background:#FDF3E0;border:2px solid #B45309;border-radius:8px"></div><p style="font-size:24px;color:#33393E">muestra 4</p></div>
 </div>
 </div>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Cuando una muestra escribe en un bloque compartido, recién ahí se copia ese bloque. Es el fork() de Unix.</p>
+<p style="font-size:24px;line-height:1.4;color:#33393E">Cuando una muestra escribe en un bloque compartido, recién ahí se copia ese bloque. Es el fork() de Unix.</p>
 </div>
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:96px;font-weight:600;line-height:1;color:#34D399">152 → 59</p><p style="font-size:24px;color:#A8B3BC">bloques para 4 muestras de un prompt de 500 tokens (repositorio)</p></div>
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:44px;font-weight:600;color:#F2F3EF">hasta 66%</p><p style="font-size:24px;color:#A8B3BC">menos memoria con beam search en ShareGPT (paper)</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:96px;font-weight:600;line-height:1;color:#046B7D">152 → 59</p><p style="font-size:24px;color:#33393E">bloques para 4 muestras de un prompt de 500 tokens (repositorio)</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:44px;font-weight:600;color:#0D0D0D">hasta 66%</p><p style="font-size:24px;color:#33393E">menos memoria con beam search en ShareGPT (paper)</p></div>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.4 y §6.3 · go run ./cmd/sim cow</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.4 y §6.3 · go run ./cmd/sim cow</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">22</p>
 <aside>Tiempo: 0:58–1:02 (4 min).
 Idea clave: con una tabla de por medio, varias secuencias pueden compartir bloques físicos, y se copia recién cuando alguna escribe.
 Decir: cuando se piden varias respuestas para el mismo prompt (muestreo paralelo) o se hace beam search, todas las secuencias empiezan con el mismo prompt. vLLM no lo copia: las tablas de bloques de todas apuntan a los mismos bloques físicos, y cada bloque físico lleva un contador de referencias.
@@ -473,24 +520,25 @@ Números del repositorio (go run ./cmd/sim cow): 4 muestras de un prompt de 500 
 Preguntar a la clase: ¿por qué se copian 3 bloques y no 4? Porque cuando las otras tres ya copiaron, la cuarta queda sola con el original: su contador vale 1 y puede escribir.
 Pasar a la siguiente: qué pasa cuando la memoria se acaba.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="desalojo" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="desalojo" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Scheduling · §4.5</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Cuando la memoria se acaba, sale el último en llegar</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Scheduling · §4.5</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Cuando la memoria se acaba, sale el último en llegar</h2>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Orden de llegada (FCFS). Si las secuencias en curso crecen y no hay bloques, se desaloja la más reciente, entera: necesita todos sus bloques para cada paso.</p>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D">Orden de llegada (FCFS). Si las secuencias en curso crecen y no hay bloques, se desaloja la más reciente, entera: necesita todos sus bloques para cada paso.</p>
 <div style="display:flex;gap:40px">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:40px">
-<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Swapping</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Copiar sus bloques a la memoria de la CPU y traerlos después.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#0D0D0D;">Swapping</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">Copiar sus bloques a la memoria de la CPU y traerlos después.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:40px">
-<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Recomputación</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Tirarlos y recalcularlos con un prefill de prompt más lo generado.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#0D0D0D;">Recomputación</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">Tirarlos y recalcularlos con un prefill de prompt más lo generado.</p>
 </div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">La recomputación nunca cuesta más de un 20% sobre el swapping; con bloques de 16 a 64 andan parecido.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.5 y §7.3</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">La recomputación nunca cuesta más de un 20% sobre el swapping; con bloques de 16 a 64 andan parecido.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.5 y §7.3</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">23</p>
 <aside>Tiempo: 1:02–1:06 (4 min).
 Idea clave: como ya no se reserva el máximo, la memoria se puede acabar con secuencias en curso; vLLM desaloja la más reciente, entera, y la trae de vuelta después.
 Decir: los pedidos se atienden por orden de llegada. Como cada secuencia pide un bloque cuando lo necesita, puede pasar que todas crezcan a la vez y no haya bloques. Entonces vLLM desaloja las secuencias que llegaron último, para respetar FCFS. El desalojo es todo o nada: una secuencia sin parte de sus bloques no puede dar ni un paso, porque la atención necesita todos los tokens anteriores. Los grupos que comparten bloques, como las muestras de un mismo prompt, se desalojan juntos.
@@ -500,26 +548,27 @@ Conectar con la demo: la columna de desalojos de la tabla anterior. El repositor
 Preguntar a la clase: ¿por qué no se pierden tokens que ya se mandaron al cliente? Porque recomputar regenera el KV cache de lo ya generado, no lo vuelve a generar.
 Pasar a la siguiente: cómo funciona todo esto con varias GPUs.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="distribuido" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="distribuido" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Ejecución distribuida · §4.6</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Un solo administrador de bloques para todas las GPUs</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Ejecución distribuida · §4.6</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Un solo administrador de bloques para todas las GPUs</h2>
 </div>
 <div style="display:flex;flex-direction:column;gap:20px;align-items:center">
-<div style="width:900px;display:flex;flex-direction:column;gap:8px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:32px;align-items:center">
-<h3 style="font-size:32px;font-weight:600;color:#34D399;letter-spacing:-0.5px">Scheduler centralizado</h3>
-<p style="font-size:24px;color:#A8B3BC">administra el KV cache: una tabla de bloques por secuencia</p>
+<div style="width:900px;display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:32px;align-items:center">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#046B7D;">Scheduler centralizado</h3>
+<p style="font-size:24px;color:#33393E">administra el KV cache: una tabla de bloques por secuencia</p>
 </div>
-<div style="display:flex;gap:226px"><x-shape kind="arrow-down" style="width:28px;height:48px;background:#4A5560"></x-shape><x-shape kind="arrow-down" style="width:28px;height:48px;background:#4A5560"></x-shape><x-shape kind="arrow-down" style="width:28px;height:48px;background:#4A5560"></x-shape><x-shape kind="arrow-down" style="width:28px;height:48px;background:#4A5560"></x-shape></div>
+<div style="display:flex;gap:226px"><x-shape kind="arrow-down" style="width:28px;height:48px;background:#ADB5BD"></x-shape><x-shape kind="arrow-down" style="width:28px;height:48px;background:#ADB5BD"></x-shape><x-shape kind="arrow-down" style="width:28px;height:48px;background:#ADB5BD"></x-shape><x-shape kind="arrow-down" style="width:28px;height:48px;background:#ADB5BD"></x-shape></div>
 <div style="display:flex;gap:24px">
-<div style="width:230px;display:flex;flex-direction:column;gap:8px;background:#161B20;border:1px solid #2A3138;border-radius:12px;padding:24px"><h3 style="font-size:28px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">GPU 0</h3><p style="font-size:24px;line-height:1.3;color:#A8B3BC">cabezas 0–7</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC;white-space:nowrap">y sus keys y values</p></div>
-<div style="width:230px;display:flex;flex-direction:column;gap:8px;background:#161B20;border:1px solid #2A3138;border-radius:12px;padding:24px"><h3 style="font-size:28px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">GPU 1</h3><p style="font-size:24px;line-height:1.3;color:#A8B3BC">cabezas 8–15</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC;white-space:nowrap">y sus keys y values</p></div>
-<div style="width:230px;display:flex;flex-direction:column;gap:8px;background:#161B20;border:1px solid #2A3138;border-radius:12px;padding:24px"><h3 style="font-size:28px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">GPU 2</h3><p style="font-size:24px;line-height:1.3;color:#A8B3BC">cabezas 16–23</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC;white-space:nowrap">y sus keys y values</p></div>
-<div style="width:230px;display:flex;flex-direction:column;gap:8px;background:#161B20;border:1px solid #2A3138;border-radius:12px;padding:24px"><h3 style="font-size:28px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">GPU 3</h3><p style="font-size:24px;line-height:1.3;color:#A8B3BC">cabezas 24–31</p><p style="font-size:24px;line-height:1.3;color:#A8B3BC;white-space:nowrap">y sus keys y values</p></div>
+<div style="width:230px;display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:12px;padding:24px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:28px;font-weight:700;color:#0D0D0D;">GPU 0</h3><p style="font-size:24px;line-height:1.3;color:#33393E">cabezas 0–7</p><p style="font-size:24px;line-height:1.3;color:#33393E;white-space:nowrap">y sus keys y values</p></div>
+<div style="width:230px;display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:12px;padding:24px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:28px;font-weight:700;color:#0D0D0D;">GPU 1</h3><p style="font-size:24px;line-height:1.3;color:#33393E">cabezas 8–15</p><p style="font-size:24px;line-height:1.3;color:#33393E;white-space:nowrap">y sus keys y values</p></div>
+<div style="width:230px;display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:12px;padding:24px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:28px;font-weight:700;color:#0D0D0D;">GPU 2</h3><p style="font-size:24px;line-height:1.3;color:#33393E">cabezas 16–23</p><p style="font-size:24px;line-height:1.3;color:#33393E;white-space:nowrap">y sus keys y values</p></div>
+<div style="width:230px;display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:12px;padding:24px"><h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:28px;font-weight:700;color:#0D0D0D;">GPU 3</h3><p style="font-size:24px;line-height:1.3;color:#33393E">cabezas 24–31</p><p style="font-size:24px;line-height:1.3;color:#33393E;white-space:nowrap">y sus keys y values</p></div>
 </div>
-<p style="font-size:24px;color:#A8B3BC">paralelismo de tensores (Megatron-LM): all-reduce entre las GPUs en cada capa</p>
+<p style="font-size:24px;color:#33393E">paralelismo de tensores (Megatron-LM): all-reduce entre las GPUs en cada capa</p>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.6</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §4.6</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">24</p>
 <aside>Tiempo: 1:06–1:09 (3 min).
 Idea clave: con varias GPUs, la tabla de bloques sigue siendo una sola, en el scheduler; cada GPU guarda en esos bloques sólo los datos de sus cabezas de atención.
 Decir: un modelo grande no entra en una GPU, así que vLLM lo parte con paralelismo de tensores al estilo Megatron-LM, como la Clase 16: cada GPU tiene una parte de las cabezas de atención y se sincronizan con all-reduce.
@@ -528,19 +577,20 @@ En cada iteración el scheduler manda a todos los workers los tokens de entrada 
 Conectar con la materia: es un coordinador central con estado, como el master de GFS o de MapReduce. Funciona porque está en el mismo nodo que las GPUs y sólo decide metadatos.
 Pasar a la siguiente: los números del paper.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section data-transition="fade" id="resultados" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" data-transition="fade" id="resultados" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">Resultados · §6</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#0E1114;letter-spacing:-2px">2 a 4 veces más throughput con la misma latencia</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Resultados · §6</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">2 a 4 veces más throughput con la misma latencia</h2>
 </div>
-<table style="font-size:32px;color:#0E1114;font-family:Geist, Arial, sans-serif">
+<table style="font-size:32px;color:#0D0D0D;font-family:Rubik, Arial, sans-serif">
 <tr><th style="width:30%">Contra</th><th style="width:40%">Qué reserva</th><th style="width:30%;text-align:right">Pedidos/s que sostiene vLLM</th></tr>
 <tr><td>Orca (Max)</td><td>Siempre 2.048 tokens</td><td style="text-align:right">2,7× a 8× más</td></tr>
 <tr><td>Orca (Oracle)</td><td>Lo justo, sabiéndolo antes</td><td style="text-align:right">1,7× a 2,7× más</td></tr>
 <tr><td>FasterTransformer</td><td>Batching por pedido</td><td style="text-align:right">hasta 22× más</td></tr>
 </table>
-<p style="font-size:32px;line-height:1.4;color:#48525C">OPT 13B, 66B y 175B y LLaMA 13B en A100, con cargas de ShareGPT. Ganarle al oráculo muestra que el problema no era sólo la reserva.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">Kwon et al., abstract, §6.1 y §6.2 · ShareGPT</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">OPT 13B, 66B y 175B y LLaMA 13B en A100, con cargas de ShareGPT. Ganarle al oráculo muestra que el problema no era sólo la reserva.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">Kwon et al., abstract, §6.1 y §6.2 · ShareGPT</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">25</p>
 <aside>Tiempo: 1:09–1:13 (4 min).
 Idea clave: vLLM sostiene entre 2 y 4 veces más pedidos por segundo que los sistemas del estado del arte con la misma latencia, y le gana incluso a un Orca que sabe de antemano el largo de cada respuesta.
 Decir: la evaluación (§6.1) usa OPT de 13B, 66B y 175B y LLaMA de 13B en A100 de Google Cloud: una GPU de 40 GB para 13B, cuatro para 66B y ocho de 80 GB para 175B. Las cargas salen de dos conjuntos de datos: ShareGPT, conversaciones reales que usuarios compartieron de ChatGPT, y Alpaca, instrucciones generadas por un modelo. ShareGPT tiene prompts unas 8,4 veces más largos y respuestas unas 5,8 veces más largas que Alpaca.
@@ -548,23 +598,30 @@ La comparación es contra tres versiones de Orca que difieren en cuánto reserva
 Remarcar: ganarle al oráculo dice que el problema no era sólo no saber el largo, sino también la fragmentación. Coincide con nuestra demo: el oráculo usaba el 70% de lo asignado y los bloques el 99%.
 Pasar a la siguiente: volvemos al principio, a cómo llegan los tokens al usuario.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="sse" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+</div></div><div class="frame"><div class="stage"><section id="div-sse" data-estilo="curso" style="background:linear-gradient(180deg,#010101 0%,#03181A 100%);color:#FFFFFF;font-family:Rubik, Arial, sans-serif;font-weight:300;padding:128px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:40px;text-align:center">
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.1;text-transform:uppercase;color:#FFFFFF;text-shadow:3px 3px 0 #000;max-width:1600px">El stream de vuelta</h2>
+
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#6C757D">26</p>
+<aside>Separador de sección. El stream de vuelta: </aside>
+</section>
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="sse" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El stream de vuelta</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Un evento por token, y un proxy que puede arruinarlo</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El stream de vuelta</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Un evento por token, y un proxy que puede arruinarlo</h2>
 </div>
 <div style="display:flex;gap:56px;align-items:start">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#1A2027;border-radius:16px;padding:40px">
-<p style="font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">Content-Type: text/event-stream</p>
-<p style="font-size:28px;line-height:1.6;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">data: {"delta":"La "}<br/><br/>data: {"delta":"luz "}<br/><br/>data: [DONE]</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#EEF0F2;border-radius:16px;padding:40px">
+<p style="font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">Content-Type: text/event-stream</p>
+<p style="font-size:28px;line-height:1.6;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">data: {"delta":"La "}<br/><br/>data: {"delta":"luz "}<br/><br/>data: [DONE]</p>
 </div>
 <div style="flex:1;display:flex;flex-direction:column;gap:24px">
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;color:#A8B3BC">directo o con un proxy que reenvía</p><p style="font-size:44px;font-weight:600;color:#34D399">un token cada 40 ms</p></div>
-<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;color:#A8B3BC">con un proxy que junta la respuesta</p><p style="font-size:44px;font-weight:600;color:#F5A524">los 60 tokens juntos a los 2,5 s</p></div>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">En nginx: proxy_buffering off, o el header X-Accel-Buffering: no.</p>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;color:#33393E">directo o con un proxy que reenvía</p><p style="font-size:44px;font-weight:600;color:#046B7D">un token cada 40 ms</p></div>
+<div style="display:flex;flex-direction:column;gap:4px"><p style="font-size:24px;color:#33393E">con un proxy que junta la respuesta</p><p style="font-size:44px;font-weight:600;color:#B45309">los 60 tokens juntos a los 2,5 s</p></div>
+<p style="font-size:24px;line-height:1.4;color:#33393E">En nginx: proxy_buffering off, o el header X-Accel-Buffering: no.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/servidor · go run ./cmd/proxy -buffer · medido con curl</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">go run ./cmd/servidor · go run ./cmd/proxy -buffer · medido con curl</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">27</p>
 <aside>Tiempo: 1:13–1:18 (5 min, con demo).
 Idea clave: cada token sale apenas existe, como un evento en una respuesta HTTP que queda abierta; cualquier salto que junte la respuesta rompe el streaming.
 Decir: la respuesta es server-sent events: Content-Type text/event-stream, y cada evento es una línea data: seguida de una línea vacía. El formato exacto cambia según el proveedor. En el camino de vuelta, el gateway cuenta los tokens de salida y el navegador agrega cada fragmento.
@@ -572,23 +629,24 @@ Demo en vivo. En una terminal: go run ./cmd/servidor -speed 2 (puerto 8080), go 
 El caso real es nginx con proxy_buffering activado, el valor por defecto. Se arregla desde el proxy, con proxy_buffering off, o desde el servidor, mandando el header X-Accel-Buffering: no; el servidor del repositorio lo manda.
 Pasar a la siguiente: el otro problema del stream, el cliente que se va.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="desconexion" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="desconexion" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El cliente que se va</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Si nadie lee, hay que dejar de generar</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El cliente que se va</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Si nadie lee, hay que dejar de generar</h2>
 </div>
 <div style="display:flex;gap:48px">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:48px">
-<h3 style="font-size:44px;font-weight:600;color:#F5A524;letter-spacing:-0.5px">Sin cancelar</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El pedido sigue en el lote, ocupa bloques de KV cache y genera tokens que nadie va a leer.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:48px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#B45309;">Sin cancelar</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">El pedido sigue en el lote, ocupa bloques de KV cache y genera tokens que nadie va a leer.</p>
 </div>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:48px">
-<h3 style="font-size:44px;font-weight:600;color:#34D399;letter-spacing:-0.5px">Cancelando</h3>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">El handler ve que la conexión se cerró, saca el pedido del lote y libera sus bloques.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:48px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#046B7D;">Cancelando</h3>
+<p style="font-size:32px;line-height:1.4;color:#33393E">El handler ve que la conexión se cerró, saca el pedido del lote y libera sus bloques.</p>
 </div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">case &lt;-r.Context().Done(): engine.Cancel(id)</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">server/server.go · curl localhost:8080/estado después de cortar el curl</p>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">case &lt;-r.Context().Done(): engine.Cancel(id)</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">server/server.go · curl localhost:8080/estado después de cortar el curl</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">28</p>
 <aside>Tiempo: 1:18–1:21 (3 min, con demo).
 Idea clave: el servidor tiene que enterarse cuando el cliente se va y liberar lo que ocupaba; si no, regala lugar en el lote y KV cache a nadie.
 Decir: si el usuario cierra la pestaña a la mitad de una respuesta larga, la conexión se corta. Un servidor que no se entera sigue generando tokens que nadie va a leer, y mientras tanto ese pedido ocupa un lugar en el lote y bloques de KV cache que otro pedido podría usar. Con lo que vimos hoy, es directamente throughput perdido.
@@ -597,25 +655,26 @@ Demo: con el servidor corriendo, lanzar un curl con una respuesta larga, cortarl
 Conectar con el gateway: los tokens se cobran a medida que salen. Los límites y el cobro se cuentan en tokens, no en pedidos, porque un pedido puede costar 10 tokens o 10.000.
 Pasar a la siguiente: dónde se va el tiempo de un pedido.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="tiempos" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="tiempos" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Dónde se va el tiempo</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Casi todo es decode, un token por vez</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Dónde se va el tiempo</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Casi todo es decode, un token por vez</h2>
 </div>
 <div style="display:flex;flex-direction:column;gap:16px">
 <div style="display:flex;height:80px;border-radius:12px;overflow:hidden">
-<div style="width:9%;background:#4A5560;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#F2F3EF">red</p></div>
-<div style="width:6%;background:#F5A524"></div>
-<div style="width:85%;background:#34D399;display:flex;align-items:center;padding:0 32px"><p style="font-size:28px;font-weight:600;color:#0E1114">decode: 300 tokens × 30 ms = 9 s</p></div>
+<div style="width:9%;background:#ADB5BD;display:flex;align-items:center;justify-content:center"><p style="font-size:24px;font-weight:600;color:#0D0D0D">red</p></div>
+<div style="width:6%;background:#B45309"></div>
+<div style="width:85%;background:#046B7D;display:flex;align-items:center;padding:0 32px"><p style="font-size:28px;font-weight:600;color:#FFFFFF">decode: 300 tokens × 30 ms = 9 s</p></div>
 </div>
 <div style="display:flex;gap:48px">
-<div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:28px;background:#4A5560"></div><p style="font-size:24px;color:#A8B3BC">red: decenas de ms</p></div>
-<div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:28px;background:#F5A524"></div><p style="font-size:24px;color:#A8B3BC">cola y prefill: decenas a cientos de ms</p></div>
-<div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:28px;background:#34D399"></div><p style="font-size:24px;color:#A8B3BC">decode: 10 a 50 ms por token</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:28px;background:#ADB5BD"></div><p style="font-size:24px;color:#33393E">red: decenas de ms</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:28px;background:#B45309"></div><p style="font-size:24px;color:#33393E">cola y prefill: decenas a cientos de ms</p></div>
+<div style="display:flex;gap:12px;align-items:center"><div style="width:32px;height:28px;background:#046B7D"></div><p style="font-size:24px;color:#33393E">decode: 10 a 50 ms por token</p></div>
 </div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Por eso importa el streaming: el usuario empieza a leer después del primer token, no del último. La red y el prefill se ven; el decode se lee.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">Valores ilustrativos · Campodónico, "What happens after you hit send"</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">Por eso importa el streaming: el usuario empieza a leer después del primer token, no del último. La red y el prefill se ven; el decode se lee.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">Valores ilustrativos · Campodónico, "What happens after you hit send"</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">29</p>
 <aside>Tiempo: 1:21–1:24 (3 min).
 Idea clave: el tiempo al primer token es red, cola y prefill; todo lo demás es decode, y es casi todo.
 Decir: con valores ilustrativos, que cambian con el modelo, el hardware y la carga. La red, ida y vuelta: decenas de milisegundos. La cola y el prefill: de decenas a cientos de milisegundos, creciendo con el largo del prompt y la carga. Cada token de decode: del orden de 10 a 50 ms.
@@ -623,20 +682,21 @@ Hacer la cuenta: una respuesta de 300 tokens a 30 ms por token son 9 segundos. L
 Cerrar el arco de la clase: el tiempo al primer token depende de la cola y el prefill, y la cola depende de cuántas secuencias entran en el lote: memoria. El tiempo entre tokens depende de cuánto cuesta cada pasada. Y el costo por token depende de cuántas secuencias comparten cada lectura de los pesos: otra vez, memoria. Todo vuelve al KV cache.
 Pasar a la siguiente: el repositorio.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section data-transition="fade" id="demo" style="background:#F3F2EE;color:#0E1114;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" data-transition="fade" id="demo" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#08724F;font-family:'Geist Mono', 'Courier New', monospace">El repositorio</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#0E1114;letter-spacing:-2px">Un servidor de inferencia sin modelo</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El repositorio</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Un servidor de inferencia sin modelo</h2>
 </div>
-<div style="display:flex;flex-direction:column;gap:20px;background:#0E1114;border:1px solid #2A3138;border-radius:16px;padding:48px">
-<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/sim batching</p><p style="font-size:32px;color:#7D8892">estático vs continuo</p></div>
-<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/sim memoria</p><p style="font-size:32px;color:#7D8892">contiguo vs bloques</p></div>
-<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/sim cow</p><p style="font-size:32px;color:#7D8892">copy-on-write</p></div>
-<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/servidor</p><p style="font-size:32px;color:#7D8892">HTTP + SSE de verdad</p></div>
-<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#F2F3EF;font-family:'Geist Mono', 'Courier New', monospace">go run ./cmd/proxy -buffer</p><p style="font-size:32px;color:#7D8892">el bug de streaming</p></div>
+<div style="display:flex;flex-direction:column;gap:20px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:48px">
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim batching</p><p style="font-size:32px;color:#6C757D">estático vs continuo</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim memoria</p><p style="font-size:32px;color:#6C757D">contiguo vs bloques</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/sim cow</p><p style="font-size:32px;color:#6C757D">copy-on-write</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/servidor</p><p style="font-size:32px;color:#6C757D">HTTP + SSE de verdad</p></div>
+<div style="display:flex;gap:48px"><p style="width:760px;font-size:32px;color:#0D0D0D;font-family:'IBM Plex Mono', monospace">go run ./cmd/proxy -buffer</p><p style="font-size:32px;color:#6C757D">el bug de streaming</p></div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#48525C">El mismo motor corre en tiempo virtual (sim) y en tiempo real (servidor). Go 1.24, sin dependencias.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#66707A;font-family:'Geist Mono', 'Courier New', monospace">servir-tokens · go test ./...</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">El mismo motor corre en tiempo virtual (sim) y en tiempo real (servidor). Go 1.24, sin dependencias.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">servir-tokens · go test ./...</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">30</p>
 <aside>Tiempo: 1:24–1:27 (3 min).
 Idea clave: todo lo de la clase se puede reproducir y modificar con el repositorio.
 Decir: el modelo no existe: cada iteración cuesta un tiempo que sale de un modelo de costo, 20 ms de leer los pesos más un poco por secuencia y por token de prefill. Todo lo demás es lo que hace un servidor real: admisión por orden de llegada, batching continuo, tabla de bloques, copy-on-write, desalojo con recomputación y streaming con cancelación.
@@ -645,27 +705,28 @@ El README tiene cinco ejercicios: chunked prefill (Sarathi-Serve), swapping, pre
 Los tests verifican lo que dijimos: menos de un bloque de desperdicio por secuencia, que copy-on-write copia sólo el bloque compartido, que con reserva contigua la utilización queda por debajo del 40%, que el batching continuo le gana al estático, y que al desconectarse el cliente se libera el KV cache.
 Pasar a la siguiente: preguntas.</aside>
 </section>
-</div></div><div class="frame"><div class="stage"><section id="preguntas" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+</div></div><div class="frame"><div class="stage"><section data-estilo="curso" id="preguntas" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Para repasar</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Preguntas y lecturas</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Para repasar</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Preguntas y lecturas</h2>
 </div>
 <div style="display:flex;gap:64px">
-<ol style="flex:1.4;font-size:32px;line-height:1.4;color:#F2F3EF">
+<ol style="flex:1.4;font-size:32px;line-height:1.4;color:#0D0D0D">
 <li>¿Por qué el decode está limitado por la memoria y no por el cómputo?</li>
 <li>¿Por qué con batching estático el primer token llega con la respuesta completa?</li>
 <li>¿Cuáles de los tres desperdicios elimina la paginación, y cuál reduce?</li>
 <li>Cuatro muestras de un prompt de 500 tokens: ¿cuántos bloques se copian? ¿Por qué no cuatro?</li>
 <li>¿Qué queda ocupado si el servidor no se entera de que el cliente se fue?</li>
 </ol>
-<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#161B20;border:1px solid #2A3138;border-radius:16px;padding:40px">
-<h3 style="font-size:32px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Lecturas</h3>
-<p style="font-size:24px;line-height:1.4;color:#F2F3EF"><b>Paper:</b> Kwon et al., Efficient Memory Management for Large Language Model Serving with PagedAttention. SOSP 2023.</p>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Yu et al., Orca. OSDI 2022.</p>
-<p style="font-size:24px;line-height:1.4;color:#A8B3BC">Campodónico, What happens after you hit send. 2026.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#FFFFFF;border:1px solid #DEE2E6;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:32px;font-weight:700;color:#0D0D0D;">Lecturas</h3>
+<p style="font-size:24px;line-height:1.4;color:#0D0D0D"><b>Paper:</b> Kwon et al., Efficient Memory Management for Large Language Model Serving with PagedAttention. SOSP 2023.</p>
+<p style="font-size:24px;line-height:1.4;color:#33393E">Yu et al., Orca. OSDI 2022.</p>
+<p style="font-size:24px;line-height:1.4;color:#33393E">Campodónico, What happens after you hit send. 2026.</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">31</p>
 <aside>Tiempo: 1:27–1:30 (3 min).
 Idea clave: cerrar con las preguntas de repaso. Las respuestas cortas, para tener a mano:
 1. Cada pasada de decode lee todos los pesos y el KV cache para hacer muy poca cuenta: productos de matriz por vector. La GPU espera datos, no cuentas.

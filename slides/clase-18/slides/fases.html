@@ -1,17 +1,18 @@
-<section id="fases" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" id="fases" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">Prefill y decode</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">El mismo modelo, dos trabajos muy distintos</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">Prefill y decode</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">El mismo modelo, dos trabajos muy distintos</h2>
 </div>
-<table style="font-size:32px;color:#F2F3EF;font-family:Geist, Arial, sans-serif">
+<table style="font-size:32px;color:#0D0D0D;font-family:Rubik, Arial, sans-serif">
 <tr><th style="width:30%"></th><th style="width:35%">Prefill</th><th style="width:35%">Decode</th></tr>
 <tr><td>Cuántas veces</td><td>Una por pedido</td><td>Una por token de salida</td></tr>
 <tr><td>Tokens por pasada</td><td>Todo el prompt</td><td>Uno por secuencia</td></tr>
 <tr><td>Cuello de botella</td><td>Cómputo</td><td>Ancho de banda de memoria</td></tr>
 <tr><td>Se nota como</td><td>Tiempo al primer token</td><td>Tiempo entre tokens</td></tr>
-<tr style="background:#232A31"><td><b>Qué gana con batching</b></td><td>Poco: ya es paralelo</td><td><b>Casi todo</b></td></tr>
+<tr style="background:#E9ECEF"><td><b>Qué gana con batching</b></td><td>Poco: ya es paralelo</td><td><b>Casi todo</b></td></tr>
 </table>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §2.2 y §2.3</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §2.2 y §2.3</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">5</p>
 <aside>Tiempo: 0:11–0:16 (5 min).
 Idea clave: el prefill está limitado por el cómputo; el decode, por el ancho de banda de memoria. Eso hace que el batching sea casi gratis en decode.
 Decir: el prefill procesa todo el prompt de una vez: todos los tokens atraviesan todas las capas en paralelo. Son multiplicaciones de matrices grandes y la GPU está ocupada haciendo cuentas. Termina con el primer token.

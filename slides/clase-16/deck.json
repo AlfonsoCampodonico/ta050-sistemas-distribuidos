@@ -12,23 +12,28 @@
     "mapa",
     "paredes",
     "loop",
+    "div-datos",
     "datos",
     "semantica",
     "barrera",
     "central",
     "ring",
     "ringnum",
+    "div-memoria",
     "memoria",
     "zero",
+    "div-tensores",
     "tensores",
     "nodo",
     "pipeline",
     "burbuja",
     "schedules",
     "intercalado",
+    "div-ptdp",
     "ptdp",
     "takeaways",
     "resultado",
+    "div-fallas",
     "fallas",
     "gang",
     "demo",
@@ -41,33 +46,37 @@
     },
     "s2": {
       "description": "Paralelismo de datos y all-reduce: réplicas, barrera y el anillo.",
-      "start": "datos"
+      "start": "div-datos"
     },
     "s3": {
       "description": "Dónde se va la memoria y cómo ZeRO la reparte.",
-      "start": "memoria"
+      "start": "div-memoria"
     },
     "s4": {
       "description": "Partir el modelo: tensores dentro del nodo, pipeline entre nodos.",
-      "start": "tensores"
+      "start": "div-tensores"
     },
     "s5": {
       "description": "PTD-P: cómo se combinan las tres dimensiones y qué logra el paper.",
-      "start": "ptdp"
+      "start": "div-ptdp"
     },
     "s6": {
       "description": "Fallas, checkpoints, planificación y demo.",
-      "start": "fallas"
+      "start": "div-fallas"
     }
   },
   "faces": {
-    "geist": {
-      "family": "Geist",
-      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    "chakra-petch": {
+      "family": "Chakra Petch",
+      "href": "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap"
     },
-    "geist-mono": {
-      "family": "Geist Mono",
-      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    "rubik": {
+      "family": "Rubik",
+      "href": "https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    },
+    "ibm-plex-mono": {
+      "family": "IBM Plex Mono",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     }
   },
   "designSystems": []

@@ -22,7 +22,8 @@
 - `apuntes/`: las notas de cada clase en Markdown, exportadas de los docs.
 - `herramientas/`: los generadores de los decks.
   - `gen17.py`, `gen19.py`, `gen20.py`, `gen21.py` y `gen22.py` regeneran esos decks en `herramientas/out/`.
-  - `visor.py <out>/clase-NN/project slides/clase-NN` arma la carpeta del deck con su `index.html`.
-  - `slidekit.py` y `cover.py` tienen las plantillas del estilo (Geist, oscuro primero).
-  - `restyle.py` es el script que pasó los decks 16 y 18 al estilo nuevo (necesita `beautifulsoup4`).
+  - `visor.py <out>/clase-NN/project slides/clase-NN` arma la carpeta del deck con su `index.html` y le aplica el estilo de la materia. `visor.py slides/clase-NN slides/clase-NN` rearma un deck que ya está en `slides/` (los decks 16 y 18 no tienen generador).
+  - `estilo.py` pasa cada deck al estilo de las slides de la materia (fiubata050.github.io): slides claras, títulos en Chakra Petch, texto en Rubik, separadores oscuros por sección y número de slide. Se puede correr más de una vez.
+  - `slidekit.py` y `cover.py` son las plantillas que usan los generadores; `estilo.py` convierte su salida.
+  - `restyle.py` es el script viejo que pasó los decks 16 y 18 al estilo anterior (necesita `beautifulsoup4`).
   - `render/render.py <deck> <out>` saca PNGs de cada slide con Playwright.

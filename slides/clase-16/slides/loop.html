@@ -1,26 +1,27 @@
-<section id="loop" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:72px">
+<section data-estilo="curso" id="loop" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:72px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">El loop</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">Entrenar es repetir tres pasos millones de veces</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">El loop</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">Entrenar es repetir tres pasos millones de veces</h2>
 </div>
 <div style="display:flex;align-items:center;gap:32px">
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:40px">
-<h3 style="font-size:44px;font-weight:600;color:#34D399;letter-spacing:-0.5px">Forward</h3>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF">El batch atraviesa todas las capas hasta dar una predicción y un error.</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#046B7D;">Forward</h3>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D">El batch atraviesa todas las capas hasta dar una predicción y un error.</p>
 </div>
-<x-shape kind="arrow-right" style="width:64px;height:32px;background:#4A5560"></x-shape>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #F5A524;border-radius:16px;padding:40px">
-<h3 style="font-size:44px;font-weight:600;color:#F5A524;letter-spacing:-0.5px">Backward</h3>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Las capas se recorren al revés para calcular el gradiente de cada parámetro.</p>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#ADB5BD"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:2px solid #B45309;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#B45309;">Backward</h3>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D">Las capas se recorren al revés para calcular el gradiente de cada parámetro.</p>
 </div>
-<x-shape kind="arrow-right" style="width:64px;height:32px;background:#4A5560"></x-shape>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #5A6570;border-radius:16px;padding:40px">
-<h3 style="font-size:44px;font-weight:600;color:#F2F3EF;letter-spacing:-0.5px">Optimizador</h3>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF">Cada parámetro se mueve un poco en contra de su gradiente.</p>
+<x-shape kind="arrow-right" style="width:64px;height:32px;background:#ADB5BD"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:2px solid #868E96;border-radius:16px;padding:40px">
+<h3 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:44px;font-weight:700;color:#0D0D0D;">Optimizador</h3>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D">Cada parámetro se mueve un poco en contra de su gradiente.</p>
 </div>
 </div>
-<p style="font-size:32px;line-height:1.4;color:#A8B3BC">Las activaciones del forward se guardan hasta el backward. Ese detalle va a importar en el pipeline.</p>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 16 · Entrenamiento distribuido</p>
+<p style="font-size:32px;line-height:1.4;color:#33393E">Las activaciones del forward se guardan hasta el backward. Ese detalle va a importar en el pipeline.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 16 · Entrenamiento distribuido</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">4</p>
 <aside>Tiempo: 0:09–0:12 (3 min).
 Idea clave: el loop de entrenamiento tiene tres pasos y una dependencia que importa: las activaciones del forward se usan en el backward.
 Decir: forward, el batch atraviesa las capas y sale una predicción y un error. Backward, se recorren las capas al revés y se obtiene, para cada parámetro, hacia dónde moverlo para reducir el error: el gradiente. Optimizador, cada parámetro se mueve un poco en contra de su gradiente. Y se repite, millones de veces.

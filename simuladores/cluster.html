@@ -3,124 +3,172 @@
 <title>Clúster de inferencia</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap">
 <style>
-/* Clase 19 · un clúster de cuatro réplicas en vivo: router a la izquierda, réplicas al centro, instrumentos a la derecha, comparación abajo. */
+/* Identidad visual de TA050 (fiubata050.github.io): teal #046b7d, Chakra Petch / Rubik / IBM Plex Mono. Claro por defecto. */
 :root {
-  --bg: #0E1114; --panel: #161B20; --panel2: #1A2027; --ink: #F2F3EF; --muted: #A8B3BC; --faint: #7D8892;
-  --line: #2A3138; --cell: #232A31; --accent: #34D399; --accent-ink: #0E1114; --accent-soft: #132A22;
-  --warn: #F5A524; --bad: #FF7A6B;
-  --c0: #34D399; --c1: #F5A524; --c2: #7AA2FF; --c3: #F472B6; --c4: #A78BFA; --c5: #FACC15; --c6: #22D3EE; --c7: #FB923C;
-  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
-  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  color-scheme: dark;
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
-    --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
-    --warn: #A35F00; --bad: #C2362B;
-    --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
-    color-scheme: light;
-  }
-}
-:root[data-theme="light"] {
-  --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
-  --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
-  --warn: #A35F00; --bad: #C2362B;
-  --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
+  --bg: #f3f4f5; --page: #f3f4f5;
+  --panel: #ffffff; --panel2: #f3f4f5; --ink: #0d0d0d; --muted: #495057; --faint: #6c757d;
+  --line: #dee2e6; --cell: #e9ecef; --code-bg: #e9ecef; --code: #393a34;
+  --accent: #046b7d; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: #e3f0f2;
+  --warn: #8a5a00; --warn-soft: #fdf3e0; --bad: #c0261f; --bad-soft: #fbeceb;
+  --h1-color: #0d0d0d; --h1-shadow: .1rem .1rem 0 #046b7d; --h1-case: none; --btn-glow: none;
+  /* Series: una por pedido / réplica. Giran alrededor del teal y se distinguen en los dos temas. */
+  --s0: #046b7d; --s1: #e8590c; --s2: #3b5bdb; --s3: #c2255c; --s4: #7048e8; --s5: #2f8a3e; --s6: #a68a00; --s7: #ae3ec9;
+  --head: "Chakra Petch", "Rubik", system-ui, sans-serif;
+  --sans: "Rubik", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   color-scheme: light;
 }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+    --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+    --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+    --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+    --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+    --h1-color: #ffffff; --h1-case: uppercase;
+    --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+    --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+    --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+  --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+  --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+  --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+  --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+  --h1-color: #ffffff; --h1-case: uppercase;
+  --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+  --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+  --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
+  color-scheme: dark;
+}
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
 body {
-  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  margin: 0; min-height: 100vh; background: var(--page); color: var(--ink);
+  font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.55;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 24px 48px;
+  padding-block: 24px 56px;
+  -webkit-text-size-adjust: 100%;
 }
-.wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-header { display: flex; flex-direction: column; gap: 8px; }
-.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
-h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
-.lead { margin: 0; color: var(--muted); max-width: 72ch; }
-h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+b, strong { font-weight: 500; }
+code, .code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); color: var(--code); padding: .1em .35em; border-radius: 4px; white-space: nowrap; }
+.wrap { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 10px; }
+.back { display: flex; gap: 8px 20px; flex-wrap: wrap; margin-bottom: 14px; font: 400 13px var(--mono); }
+.back a { color: var(--accent); text-decoration: none; }
+.back a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.eyebrow { font: 500 12px/1.3 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 clamp(30px, 5vw, 46px)/1.08 var(--head); letter-spacing: .01em; color: var(--h1-color); text-shadow: var(--h1-shadow); text-transform: var(--h1-case); text-wrap: balance; }
+h2 { margin: 0; font: 600 19px/1.25 var(--head); letter-spacing: .01em; text-wrap: balance; }
+h3 { margin: 0; font: 600 15px/1.3 var(--head); letter-spacing: .02em; }
+.lead { margin: 0; color: var(--muted); max-width: 72ch; font-size: 16px; }
 .small { font-size: 13px; color: var(--muted); }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-
-.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
-.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.field > span { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
-.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 11px; cursor: pointer; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+.controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.field > span, .label { font: 500 11px/1.2 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.field .hint { font: 300 12px/1.35 var(--sans); letter-spacing: 0; text-transform: none; color: var(--faint); max-width: 30ch; }
+.val { font: 600 13px var(--mono); letter-spacing: 0; text-transform: none; color: var(--accent); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 170px; max-width: 100%; accent-color: var(--accent-fill); }
+.seg { align-self: flex-start; display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 400 13px var(--sans); padding: 7px 12px; cursor: pointer; }
 .seg button + button { border-left: 1px solid var(--line); }
-.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg button:hover:not(:disabled) { background: var(--accent-soft); }
+.seg button[aria-pressed="true"] { background: var(--accent-fill); color: var(--accent-ink); font-weight: 500; box-shadow: var(--btn-glow); }
 .seg button:disabled { color: var(--faint); cursor: not-allowed; }
 .seg button[aria-pressed="true"]:disabled { color: var(--accent-ink); opacity: .55; }
-.toggles { display: flex; flex-wrap: wrap; gap: 8px; }
-.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 13px; cursor: pointer; background: transparent; color: var(--ink); font-family: var(--sans); }
-.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
-.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); }
+.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 11px; font: 400 13px var(--sans); cursor: pointer; background: var(--panel); color: var(--ink); }
+.tog:hover { border-color: var(--accent); }
+.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 500; }
+.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); flex: none; }
 .tog[aria-pressed="true"] i { background: var(--accent); border-color: var(--accent); }
-input[type=range] { width: 140px; accent-color: var(--accent); }
-.val { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.btn { font: 400 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent-fill); color: var(--accent-ink); border-color: var(--accent-fill); font-weight: 500; box-shadow: var(--btn-glow); }
+.btn.primary:hover:not(:disabled) { color: var(--accent-ink); filter: brightness(1.12); }
+.btn:disabled { opacity: .55; cursor: progress; }
+select.btn { padding-right: 10px; }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gauges { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; }
+.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
+.gauge span { font-size: 12px; line-height: 1.35; color: var(--muted); }
+.gauge b.good { color: var(--accent); } .gauge b.warn { color: var(--warn); } .gauge b.bad { color: var(--bad); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+.note { font-size: 13.5px; color: var(--ink); background: var(--panel2); border: 1px solid var(--line); border-left: 5px solid var(--accent-fill); border-radius: .5rem; padding: 10px 14px; margin: 0; }
+.tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font: 500 11px/1.3 var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); text-align: left; }
+.foot { font-size: 12.5px; color: var(--faint); margin: 0; }
+svg text { font-family: var(--mono); }
+@media (max-width: 520px) {
+  body { padding-block: 16px 40px; }
+  .panel { padding: 14px; }
+  .controls { gap: 14px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+
+/* Clúster (clase 19): router y opciones arriba, réplicas al centro, instrumentos a la derecha, comparación abajo. */
+:root { --c0: var(--s0); --c1: var(--s1); --c2: var(--s2); --c3: var(--s3); --c4: var(--s4); --c5: var(--s5); --c6: var(--s6); --c7: var(--s7); }
+.controls.bar { padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; }
+.toggles { display: flex; flex-wrap: wrap; gap: 8px; }
 .actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
-.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); cursor: pointer; }
-.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
 .main { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-
+@media (max-width: 960px) { .main { grid-template-columns: minmax(0, 1fr); } }
 .stage { display: flex; flex-direction: column; gap: 14px; }
 .group { display: flex; flex-direction: column; gap: 8px; }
-.group-h { display: flex; justify-content: space-between; gap: 8px; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.group-h { display: flex; justify-content: space-between; gap: 4px 8px; flex-wrap: wrap; font: 500 11px/1.3 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.group-h span:last-child { font: 300 12px/1.3 var(--sans); letter-spacing: 0; text-transform: none; }
 .reps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-@media (max-width: 520px) { .reps { grid-template-columns: minmax(0, 1fr); } }
-.rep { border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--panel2); min-width: 0; }
+@media (max-width: 560px) { .reps { grid-template-columns: minmax(0, 1fr); } }
+.rep { border: 1px solid var(--line); border-radius: .6rem; padding: 12px; display: flex; flex-direction: column; gap: 7px; background: var(--panel2); min-width: 0; }
 .rep-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.rep-h b { font-size: 14px; font-weight: 600; }
-.badge { font: 500 11px/1 var(--mono); padding: 4px 6px; border-radius: 5px; border: 1px solid var(--line); color: var(--muted); }
-.badge.p { color: var(--warn); border-color: var(--warn); }
-.badge.d { color: var(--accent); border-color: var(--accent); }
+.rep-h b { font: 600 14px var(--head); letter-spacing: .02em; }
+.badge { font: 400 11px/1 var(--mono); padding: 4px 7px; border-radius: 5px; border: 1px solid var(--line); color: var(--muted); background: var(--panel); }
+.badge.p { color: var(--warn); border-color: var(--warn); background: var(--warn-soft); }
+.badge.d { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 .meter { height: 8px; border-radius: 4px; background: var(--cell); overflow: hidden; }
-.meter > div { height: 100%; background: var(--accent); width: 0; transition: width .15s linear; }
+.meter > div { height: 100%; background: var(--accent-fill); width: 0; transition: width .15s linear; }
+:root[data-theme="dark"] .meter > div { background: var(--accent); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .meter > div { background: var(--accent); } }
 .meter.q > div { background: var(--warn); }
 .kv { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
-.kv span:last-child { font-family: var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
-.chips { display: flex; flex-wrap: wrap; gap: 4px; min-height: 18px; }
+.kv span:last-child { font-family: var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; min-height: 32px; align-content: flex-start; }
 .chip { width: 14px; height: 14px; border-radius: 50%; }
-.chip.app { border-radius: 3px; width: 18px; font: 600 9px/14px var(--mono); text-align: center; color: var(--bg); }
-.dots { display: flex; gap: 3px; min-height: 10px; }
+.chip.app { border-radius: 3px; width: 18px; font: 600 9px/14px var(--mono); text-align: center; color: var(--panel); }
+.dots { display: flex; gap: 3px; min-height: 10px; flex-wrap: wrap; }
 .dots i { width: 8px; height: 8px; border-radius: 2px; }
-.lbl { font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.lbl { font: 500 10px/1.2 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin-top: 2px; }
 .wire { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
 .wire::before, .wire::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-
-.gauges { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
-.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.gauge span { font-size: 12px; color: var(--muted); }
-.gauge b.warn { color: var(--warn); }
-.gauge b.bad { color: var(--bad); }
-.spark { width: 100%; height: 64px; display: block; }
-.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
-.legend i { display: inline-block; width: 10px; height: 2px; vertical-align: 3px; margin-right: 6px; }
-.note { font-size: 13px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 10px; margin: 0; }
-
-.tablewrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 620px; }
-th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-th:first-child, td:first-child { text-align: left; }
-th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
-td { font-variant-numeric: tabular-nums; font-family: var(--mono); }
-td:first-child { font-family: var(--sans); }
-tr.best td { color: var(--accent); }
-.foot { font-size: 12px; color: var(--faint); }
-.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
-.back a{color:var(--muted);text-decoration:none}
-.back a:hover{color:var(--accent)}
+.wire::before { background: linear-gradient(90deg, transparent, var(--accent)); }
+.wire::after { background: linear-gradient(90deg, var(--accent), transparent); }
+.gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.spark { width: 100%; height: 72px; display: block; background: var(--panel2); border: 1px solid var(--line); border-radius: .5rem; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; vertical-align: 3px; }
+.legend i.dash { height: 0; background: none !important; border-top: 2px dashed var(--faint); vertical-align: 4px; }
+#cmp { min-width: 600px; }
+#cmp th, #cmp td { text-align: right; white-space: nowrap; }
+#cmp th:first-child, #cmp td:first-child { text-align: left; }
+#cmp td { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+#cmp td:first-child { font-family: var(--sans); }
+#cmp td.bad { color: var(--bad); }
+#cmp tr.best td { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+#cmp tr.best td:first-child { color: var(--ink); font-weight: 500; box-shadow: inset 4px 0 0 var(--accent-fill); }
+@media (max-width: 420px) { .actions { margin-left: 0; } }
 </style>
 
 <div class="wrap">
@@ -131,12 +179,13 @@ tr.best td { color: var(--accent); }
     <p class="lead">Cuatro réplicas de un modelo atienden conversaciones de varios turnos. Cada turno manda la conversación entera, así que casi todo el prompt ya se vio antes. Probá cómo elige réplica el router, qué aporta el caché de prefijos y qué pasa al separar el prefill del decode.</p>
   </header>
 
-  <section class="controls" aria-label="Controles">
+  <section class="controls bar" aria-label="Controles">
     <div class="field"><span>Arquitectura</span>
       <div class="seg" id="arch">
         <button data-v="colo" aria-pressed="true">Colocado</button>
         <button data-v="disagg" aria-pressed="false">Prefill / decode separados</button>
       </div>
+      <small class="hint" id="arch-hint">cada réplica hace prefill y decode</small>
     </div>
     <div class="field"><span>Router</span>
       <div class="seg" id="router">
@@ -145,25 +194,29 @@ tr.best td { color: var(--accent); }
         <button data-v="sticky" aria-pressed="false">Por sesión</button>
         <button data-v="prefix" aria-pressed="true">Consciente del prefijo</button>
       </div>
+      <small class="hint" id="router-hint">a qué réplica va cada pedido nuevo</small>
     </div>
     <div class="field"><span>Opciones</span>
       <div class="toggles">
-        <button class="tog" id="t-cache" aria-pressed="true"><i></i>Caché de prefijos</button>
-        <button class="tog" id="t-pool" aria-pressed="false"><i></i>Pool compartido</button>
-        <button class="tog" id="t-chunk" aria-pressed="false"><i></i>Prefill en pedazos</button>
+        <button class="tog" id="t-cache" aria-pressed="true" title="Cada réplica guarda el KV de los prefijos que ya calculó"><i></i>Caché de prefijos</button>
+        <button class="tog" id="t-pool" aria-pressed="false" title="Un caché compartido entre réplicas: traer un prefijo es más barato que recalcularlo"><i></i>Pool compartido</button>
+        <button class="tog" id="t-chunk" aria-pressed="false" title="Parte los prompts largos en pedazos de 512 tokens por iteración"><i></i>Prefill en pedazos</button>
       </div>
     </div>
     <div class="field"><span>Conversaciones nuevas por segundo · <b class="val" id="rate-v">5</b></span>
       <input type="range" id="rate" min="1" max="10" step="1" value="5" aria-label="Conversaciones nuevas por segundo">
+      <small class="hint">cada una sigue con varios turnos</small>
     </div>
     <div class="field" id="pd-field" hidden><span>Réplicas de prefill · <b class="val" id="pd-v">2</b> de 4</span>
       <input type="range" id="pd" min="1" max="3" step="1" value="2" aria-label="Réplicas de prefill">
+      <small class="hint">el resto hace sólo decode</small>
     </div>
     <div class="field"><span>Velocidad · <b class="val" id="speed-v">4×</b></span>
       <input type="range" id="speed" min="0" max="4" step="1" value="2" aria-label="Velocidad de la simulación">
+      <small class="hint">1× = tiempo real</small>
     </div>
     <div class="actions">
-      <button class="btn" id="play">Pausa</button>
+      <button class="btn primary" id="play">Pausa</button>
       <button class="btn" id="reset">Reiniciar</button>
     </div>
   </section>
@@ -172,42 +225,42 @@ tr.best td { color: var(--accent); }
     <section class="panel" aria-labelledby="stage-h">
       <div class="panel-head">
         <h2 id="stage-h">Las réplicas</h2>
-        <span class="small mono" id="clock">t = 0 s</span>
+        <span class="small mono" id="clock">t = 0 s simulados</span>
       </div>
       <div class="stage" id="stage"></div>
-      <p class="small">Cada color es una conversación; los cuadrados con número son los prompts de sistema de las cuatro apps. <b>Llegadas</b>: los últimos pedidos que el router mandó a esa réplica. <b>Caché</b>: las conversaciones que tienen al menos dos bloques guardados ahí, de la usada más recientemente a la menos.</p>
+      <p class="small" style="margin:0">Cada color es una conversación; los cuadrados con número son los prompts de sistema de las cuatro apps. <b>Llegadas</b>: los últimos pedidos que el router mandó a esa réplica. <b>Caché</b>: las conversaciones que tienen al menos dos bloques guardados ahí, de la usada más recientemente a la menos.</p>
     </section>
 
     <section class="panel" aria-labelledby="inst-h">
-      <div class="panel-head"><h2 id="inst-h">Instrumentos</h2><span class="small">últimos 300 pedidos</span></div>
+      <div class="panel-head"><h2 id="inst-h">Instrumentos</h2><span class="small">sobre los últimos 300 pedidos</span></div>
       <div class="gauges">
         <div class="gauge"><b id="g-hit">–</b><span>del prompt salió del caché</span></div>
         <div class="gauge"><b id="g-slo">–</b><span>cumplió el SLO</span></div>
-        <div class="gauge"><b id="g-ttft50">–</b><span>TTFT mediano</span></div>
-        <div class="gauge"><b id="g-ttft99">–</b><span>TTFT p99</span></div>
-        <div class="gauge"><b id="g-tbt">–</b><span>TBT p99, entre tokens</span></div>
+        <div class="gauge"><b id="g-ttft50">–</b><span>TTFT mediano: tiempo al primer token</span></div>
+        <div class="gauge"><b id="g-ttft99">–</b><span>TTFT p99 (SLO: menos de 2 s)</span></div>
+        <div class="gauge"><b id="g-tbt">–</b><span>TBT p99: entre tokens (SLO: 100 ms)</span></div>
         <div class="gauge"><b id="g-tps">–</b><span>tokens generados por segundo</span></div>
       </div>
       <svg class="spark" id="spark" viewBox="0 0 300 64" preserveAspectRatio="none" aria-label="TTFT p99 y TBT p99 en el tiempo"></svg>
-      <div class="legend"><span><i style="background:var(--warn)"></i>TTFT p99</span><span><i style="background:var(--accent)"></i>TBT p99 × 10</span><span>escala hasta 2 s</span></div>
+      <div class="legend"><span><i style="background:var(--warn)"></i>TTFT p99</span><span><i style="background:var(--accent)"></i>TBT p99 × 10</span><span><i class="dash"></i>2 s, el techo del SLO</span><span>últimos 2 min simulados</span></div>
       <p class="note" id="explain"></p>
-      <p class="small">SLO: primer token en menos de 2 s y nunca más de 100 ms entre dos tokens seguidos. Modelo de costo ilustrativo, del orden de un modelo de 70B: leer los pesos 20 ms por iteración, 0,05 ms por token de prefill, 0,005 ms por token traído del pool.</p>
+      <p class="foot">SLO: primer token en menos de 2 s y nunca más de 100 ms entre dos tokens seguidos. Modelo de costo ilustrativo, del orden de un modelo de 70B: leer los pesos 20 ms por iteración, 0,05 ms por token de prefill, 0,005 ms por token traído del pool.</p>
     </section>
   </div>
 
   <section class="panel" aria-labelledby="cmp-h">
     <div class="panel-head">
       <h2 id="cmp-h">Todas las configuraciones, con la misma carga</h2>
-      <button class="btn primary" id="cmp-run">Comparar</button>
+      <button class="btn primary" id="cmp-run">Comparar las 9</button>
     </div>
-    <p class="small" id="cmp-desc">Corre 1.000 conversaciones a la tasa elegida en cada configuración, sin animación. Tarda unos segundos.</p>
+    <p class="note" id="cmp-desc">Corre 1.000 conversaciones a la tasa elegida en cada configuración, sin animación. Tarda unos segundos.</p>
     <div class="tablewrap">
       <table id="cmp" hidden>
-        <thead><tr><th>Configuración</th><th>caché</th><th>TTFT p50</th><th>TTFT p99</th><th>TBT p99</th><th>SLO</th></tr></thead>
+        <thead><tr><th>Configuración</th><th>del prompt en caché</th><th>TTFT p50</th><th>TTFT p99</th><th>TBT p99</th><th>cumple SLO</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
-    <p class="foot">El mismo motor y la misma carga que <span class="mono">go run ./cmd/sim router</span> y <span class="mono">go run ./cmd/sim desagregado</span> del repositorio servir-tokens, con menos conversaciones.</p>
+    <p class="foot">El mismo motor y la misma carga que <code>go run ./cmd/sim router</code> y <code>go run ./cmd/sim desagregado</code> del repositorio servir-tokens, con menos conversaciones.</p>
   </section>
 </div>
 
@@ -406,7 +459,12 @@ function seg(id, key, cb) {
   });
 }
 function tog(id, key) { const b = $(id); b.addEventListener("click", () => { opt[key] = !opt[key]; b.setAttribute("aria-pressed", String(opt[key])); reset(); }); }
-seg("#arch", "arch", () => { $("#pd-field").hidden = opt.arch !== "disagg"; $("#router").querySelectorAll("button").forEach(b => b.disabled = opt.arch === "disagg"); });
+seg("#arch", "arch", () => {
+  const dis = opt.arch === "disagg";
+  $("#pd-field").hidden = !dis; $("#router").querySelectorAll("button").forEach(b => b.disabled = dis);
+  $("#arch-hint").textContent = dis ? "unas réplicas sólo calculan prompts y otras sólo generan" : "cada réplica hace prefill y decode";
+  $("#router-hint").textContent = dis ? "con separados, el prefill siempre elige por prefijo" : "a qué réplica va cada pedido nuevo";
+});
 seg("#router", "router");
 tog("#t-cache", "cache"); tog("#t-pool", "pool"); tog("#t-chunk", "chunk");
 $("#rate").addEventListener("input", e => { opt.rate = +e.target.value; $("#rate-v").textContent = opt.rate; reset(); });
@@ -462,7 +520,7 @@ function reset() {
 const fmtMs = v => isNaN(v) ? "–" : v >= 10000 ? (v / 1000).toFixed(0) + " s" : v >= 1000 ? (v / 1000).toFixed(1).replace(".", ",") + " s" : Math.round(v) + " ms";
 const pctf = v => isNaN(v) ? "–" : Math.round(100 * v) + "%";
 function render() {
-  $("#clock").textContent = `t = ${Math.floor(vt / 1000)} s`;
+  $("#clock").textContent = `t = ${Math.floor(vt / 1000)} s simulados`;
   for (const r of cl.all) {
     const q = r.queued();
     r.el.querySelector('[data-k="batch"]').textContent = `${r.running.length} / ${MAXBATCH}`;
@@ -492,7 +550,7 @@ function render() {
   const W = 300, H = 64, n = Math.max(history.length, 30), sc = v => H - 2 - Math.min(1, (isNaN(v) ? 0 : v) / 2000) * (H - 4);
   const line = (key, mul) => history.map((h, i) => `${(i / (n - 1) * W).toFixed(1)},${sc(h[key] * mul).toFixed(1)}`).join(" ");
   const cs = getComputedStyle(document.documentElement);
-  $("#spark").innerHTML = `<line x1="0" x2="${W}" y1="${sc(SLO.ttft)}" y2="${sc(SLO.ttft)}" stroke="${cs.getPropertyValue("--line")}" stroke-dasharray="3 3"/>` +
+  $("#spark").innerHTML = `<line x1="0" x2="${W}" y1="${sc(SLO.ttft)}" y2="${sc(SLO.ttft)}" stroke="${cs.getPropertyValue("--faint")}" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/>` +
     `<polyline fill="none" stroke="${cs.getPropertyValue("--warn")}" stroke-width="1.6" points="${line("ttft99", 1)}" vector-effect="non-scaling-stroke"/>` +
     `<polyline fill="none" stroke="${cs.getPropertyValue("--accent")}" stroke-width="1.6" points="${line("tbt99", 10)}" vector-effect="non-scaling-stroke"/>`;
 }
@@ -534,8 +592,8 @@ $("#cmp-run").addEventListener("click", () => {
   const one = () => {
     if (k === CONFIGS.length) {
       const best = rows.reduce((a, r) => r.s.slo > a.s.slo ? r : a, rows[0]);
-      tb.innerHTML = rows.map(r => `<tr class="${r === best ? "best" : ""}"><td>${r.name}</td><td>${pctf(r.s.hit)}</td><td>${fmtMs(r.s.ttft50)}</td><td>${fmtMs(r.s.ttft99)}</td><td>${fmtMs(r.s.tbt99)}</td><td>${pctf(r.s.slo)}</td></tr>`).join("");
-      $("#cmp-desc").textContent = `${reqs.length} pedidos de 1.000 conversaciones a ${opt.rate} por segundo, en cuatro réplicas. En verde, la que más pedidos hizo cumplir el SLO.`;
+      tb.innerHTML = rows.map(r => `<tr class="${r === best ? "best" : ""}"><td>${r.name}</td><td>${pctf(r.s.hit)}</td><td>${fmtMs(r.s.ttft50)}</td><td class="${r.s.ttft99 > SLO.ttft ? "bad" : ""}">${fmtMs(r.s.ttft99)}</td><td class="${r.s.tbt99 > SLO.gap ? "bad" : ""}">${fmtMs(r.s.tbt99)}</td><td>${pctf(r.s.slo)}</td></tr>`).join("");
+      $("#cmp-desc").textContent = `${reqs.length.toLocaleString("es-AR")} pedidos de 1.000 conversaciones a ${opt.rate} por segundo, en cuatro réplicas. Resaltada, la que más pedidos hizo cumplir el SLO; en rojo, los p99 que pasan el SLO.`;
       btn.disabled = false; return;
     }
     const [name, o] = CONFIGS[k++];

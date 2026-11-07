@@ -1,22 +1,23 @@
-<section id="analogia" style="background:#0E1114;color:#F2F3EF;font-family:Geist, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<section data-estilo="curso" id="analogia" style="font-weight:300;background:#F3F4F5;color:#0D0D0D;font-family:Rubik, Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
 <div style="display:flex;flex-direction:column;gap:16px">
-<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#34D399;font-family:'Geist Mono', 'Courier New', monospace">PagedAttention · vLLM, SOSP 2023</p>
-<h2 style="font-family:Geist, Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.05;color:#F2F3EF;letter-spacing:-2px">El KV cache como memoria virtual</h2>
+<p style="font-size:24px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:#046B7D;font-family:'IBM Plex Mono', monospace">PagedAttention · vLLM, SOSP 2023</p>
+<h2 style="font-family:'Chakra Petch', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1.05;color:#0D0D0D;;letter-spacing:-0.5px;text-shadow:3px 3px 0 #046B7D">El KV cache como memoria virtual</h2>
 </div>
 <div style="display:flex;gap:64px;align-items:start">
-<table style="width:1000px;font-size:32px;color:#F2F3EF;font-family:Geist, Arial, sans-serif">
+<table style="width:1000px;font-size:32px;color:#0D0D0D;font-family:Rubik, Arial, sans-serif">
 <tr><th style="width:50%">Sistema operativo</th><th style="width:50%">vLLM</th></tr>
 <tr><td>Página</td><td><b>Bloque</b> de KV cache</td></tr>
 <tr><td>Byte</td><td>Token</td></tr>
 <tr><td>Proceso</td><td>Secuencia</td></tr>
 <tr><td>Tabla de páginas</td><td><b>Tabla de bloques</b></td></tr>
 </table>
-<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#161B20;border:2px solid #34D399;border-radius:16px;padding:40px">
-<p style="font-size:96px;font-weight:600;line-height:1;color:#34D399">16</p>
-<p style="font-size:32px;line-height:1.4;color:#F2F3EF">tokens por bloque, por defecto</p>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:2px solid #046B7D;border-radius:16px;padding:40px">
+<p style="font-size:96px;font-weight:600;line-height:1;color:#046B7D">16</p>
+<p style="font-size:32px;line-height:1.4;color:#0D0D0D">tokens por bloque, por defecto</p>
 </div>
 </div>
-<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#7D8892;font-family:'Geist Mono', 'Courier New', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §1, §4.2 y §7.2</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#6C757D;font-family:'IBM Plex Mono', monospace">TA050 · Clase 18 · Cómo se sirve un modelo · Kwon et al., §1, §4.2 y §7.2</p>
+<p data-pnum style="position:absolute;right:64px;bottom:44px;font-family:'IBM Plex Mono', monospace;font-size:24px;color:#046B7D">17</p>
 <aside>Tiempo: 0:43–0:46 (3 min).
 Idea clave: la solución de vLLM es paginar el KV cache, y el paper hace la analogía con el sistema operativo de forma explícita.
 Decir: la memoria del KV cache se parte en bloques de tamaño fijo, 16 tokens por defecto. Cada secuencia ve sus tokens como si estuvieran contiguos, en bloques lógicos 0, 1, 2… Una tabla de bloques por secuencia traduce cada bloque lógico a un bloque físico, que puede estar en cualquier lugar de la GPU. Cada entrada anota además cuántas posiciones del bloque están llenas (§4.2).

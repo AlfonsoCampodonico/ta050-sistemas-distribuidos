@@ -3,115 +3,214 @@
 <title>Bucle de RL</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap">
 <style>
-/* Clase 22 · el bucle de post-entrenamiento con RL: rollouts con cola larga, un trainer, pesos que viajan y staleness. */
+/* Identidad visual de TA050 (fiubata050.github.io): teal #046b7d, Chakra Petch / Rubik / IBM Plex Mono. Claro por defecto. */
 :root {
-  --bg: #0E1114; --panel: #161B20; --panel2: #1A2027; --ink: #F2F3EF; --muted: #A8B3BC; --faint: #7D8892;
-  --line: #2A3138; --cell: #232A31; --accent: #34D399; --accent-ink: #0E1114; --accent-soft: #132A22;
-  --warn: #F5A524; --bad: #FF7A6B; --blue: #7AA2FF; --pink: #F472B6;
-  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
-  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  color-scheme: dark;
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
-    --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
-    --warn: #A35F00; --bad: #C2362B; --blue: #2C56C9; --pink: #C0307F;
-    color-scheme: light;
-  }
-}
-:root[data-theme="light"] {
-  --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
-  --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
-  --warn: #A35F00; --bad: #C2362B; --blue: #2C56C9; --pink: #C0307F;
+  --bg: #f3f4f5; --page: #f3f4f5;
+  --panel: #ffffff; --panel2: #f3f4f5; --ink: #0d0d0d; --muted: #495057; --faint: #6c757d;
+  --line: #dee2e6; --cell: #e9ecef; --code-bg: #e9ecef; --code: #393a34;
+  --accent: #046b7d; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: #e3f0f2;
+  --warn: #8a5a00; --warn-soft: #fdf3e0; --bad: #c0261f; --bad-soft: #fbeceb;
+  --h1-color: #0d0d0d; --h1-shadow: .1rem .1rem 0 #046b7d; --h1-case: none; --btn-glow: none;
+  /* Series: una por pedido / réplica. Giran alrededor del teal y se distinguen en los dos temas. */
+  --s0: #046b7d; --s1: #e8590c; --s2: #3b5bdb; --s3: #c2255c; --s4: #7048e8; --s5: #2f8a3e; --s6: #a68a00; --s7: #ae3ec9;
+  --head: "Chakra Petch", "Rubik", system-ui, sans-serif;
+  --sans: "Rubik", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   color-scheme: light;
 }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+    --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+    --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+    --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+    --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+    --h1-color: #ffffff; --h1-case: uppercase;
+    --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+    --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+    --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+  --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+  --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+  --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+  --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+  --h1-color: #ffffff; --h1-case: uppercase;
+  --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+  --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+  --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
+  color-scheme: dark;
+}
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
 body {
-  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  margin: 0; min-height: 100vh; background: var(--page); color: var(--ink);
+  font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.55;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 24px 48px;
+  padding-block: 24px 56px;
+  -webkit-text-size-adjust: 100%;
 }
-.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
-header { display: flex; flex-direction: column; gap: 8px; }
-.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
-h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
-h2 { margin: 0; font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 600; text-wrap: balance; }
-h3 { margin: 0; font-size: 15px; font-weight: 600; }
-.lead { margin: 0; color: var(--muted); max-width: 72ch; }
+b, strong { font-weight: 500; }
+code, .code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); color: var(--code); padding: .1em .35em; border-radius: 4px; white-space: nowrap; }
+.wrap { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 10px; }
+.back { display: flex; gap: 8px 20px; flex-wrap: wrap; margin-bottom: 14px; font: 400 13px var(--mono); }
+.back a { color: var(--accent); text-decoration: none; }
+.back a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.eyebrow { font: 500 12px/1.3 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 clamp(30px, 5vw, 46px)/1.08 var(--head); letter-spacing: .01em; color: var(--h1-color); text-shadow: var(--h1-shadow); text-transform: var(--h1-case); text-wrap: balance; }
+h2 { margin: 0; font: 600 19px/1.25 var(--head); letter-spacing: .01em; text-wrap: balance; }
+h3 { margin: 0; font: 600 15px/1.3 var(--head); letter-spacing: .02em; }
+.lead { margin: 0; color: var(--muted); max-width: 72ch; font-size: 16px; }
 .small { font-size: 13px; color: var(--muted); }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.controls { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: end; }
-.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.field > span { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
-input[type=range] { width: 170px; max-width: 100%; accent-color: var(--accent); }
-input[type=range]:disabled { opacity: .4; }
-.val { font: 500 13px var(--mono); color: var(--ink); }
-.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 11px; cursor: pointer; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+.controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.field > span, .label { font: 500 11px/1.2 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.field .hint { font: 300 12px/1.35 var(--sans); letter-spacing: 0; text-transform: none; color: var(--faint); max-width: 30ch; }
+.val { font: 600 13px var(--mono); letter-spacing: 0; text-transform: none; color: var(--accent); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 170px; max-width: 100%; accent-color: var(--accent-fill); }
+.seg { align-self: flex-start; display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 400 13px var(--sans); padding: 7px 12px; cursor: pointer; }
 .seg button + button { border-left: 1px solid var(--line); }
-.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font: 13px var(--sans); cursor: pointer; background: transparent; color: var(--ink); }
-.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
-.tog:disabled { opacity: .4; cursor: default; }
-.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); }
+.seg button:hover:not(:disabled) { background: var(--accent-soft); }
+.seg button[aria-pressed="true"] { background: var(--accent-fill); color: var(--accent-ink); font-weight: 500; box-shadow: var(--btn-glow); }
+.seg button:disabled { color: var(--faint); cursor: not-allowed; }
+.seg button[aria-pressed="true"]:disabled { color: var(--accent-ink); opacity: .55; }
+.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 11px; font: 400 13px var(--sans); cursor: pointer; background: var(--panel); color: var(--ink); }
+.tog:hover { border-color: var(--accent); }
+.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 500; }
+.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); flex: none; }
 .tog[aria-pressed="true"] i { background: var(--accent); border-color: var(--accent); }
-button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); cursor: pointer; }
-.btn:disabled { opacity: .5; cursor: default; }
-
-.gauges { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-@media (max-width: 860px) { .gauges { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 480px) { .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.btn { font: 400 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent-fill); color: var(--accent-ink); border-color: var(--accent-fill); font-weight: 500; box-shadow: var(--btn-glow); }
+.btn.primary:hover:not(:disabled) { color: var(--accent-ink); filter: brightness(1.12); }
+.btn:disabled { opacity: .55; cursor: progress; }
+select.btn { padding-right: 10px; }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gauges { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; }
 .gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.gauge span { font-size: 12px; color: var(--muted); }
-.gauge b.bad { color: var(--bad); } .gauge b.warn { color: var(--warn); } .gauge b.good { color: var(--accent); }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
+.gauge span { font-size: 12px; line-height: 1.35; color: var(--muted); }
+.gauge b.good { color: var(--accent); } .gauge b.warn { color: var(--warn); } .gauge b.bad { color: var(--bad); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+.note { font-size: 13.5px; color: var(--ink); background: var(--panel2); border: 1px solid var(--line); border-left: 5px solid var(--accent-fill); border-radius: .5rem; padding: 10px 14px; margin: 0; }
+.tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font: 500 11px/1.3 var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); text-align: left; }
+.foot { font-size: 12.5px; color: var(--faint); margin: 0; }
+svg text { font-family: var(--mono); }
+@media (max-width: 520px) {
+  body { padding-block: 16px 40px; }
+  .panel { padding: 14px; }
+  .controls { gap: 14px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+
+/* Texto sobre un color de serie (chips, trabajos, GPUs ocupadas). */
+:root { --on-series: #ffffff; --on-s0: #fff; --on-s1: #0d0d0d; --on-s2: #fff; --on-s3: #fff; --on-s4: #fff; --on-s5: #fff; --on-s6: #0d0d0d; --on-s7: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --on-series: #031315; --on-s0: #031315; --on-s1: #031315; --on-s2: #031315; --on-s3: #031315; --on-s4: #031315; --on-s5: #031315; --on-s6: #031315; --on-s7: #031315; } }
+:root[data-theme="dark"] { --on-series: #031315; --on-s0: #031315; --on-s1: #031315; --on-s2: #031315; --on-s3: #031315; --on-s4: #031315; --on-s5: #031315; --on-s6: #031315; --on-s7: #031315; }
+/* --- Común a flota, planificador y rl --- */
+.controls-panel { gap: 16px; }
+.controls { align-items: flex-start; }
+.field .hint { margin: 0; }
+.ticks { display: flex; justify-content: space-between; width: 170px; max-width: 100%; margin-top: -3px; font: 400 10.5px/1.2 var(--mono); color: var(--faint); }
+.runbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.runbar .speed { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.runbar .speed .label { white-space: nowrap; }
+.runbar input[type=range] { width: 130px; }
+.runbar .status { margin-left: auto; font: 400 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.btn .ico { display: inline-block; width: 12px; text-align: center; font-size: 11px; line-height: 1; }
+#play { min-width: 112px; justify-content: center; }
+.gauge small { font-size: 11.5px; line-height: 1.35; color: var(--faint); }
+.legend > span { display: inline-flex; align-items: center; }
+.legend i { flex: none; }
+th, td { white-space: nowrap; }
+td { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+th { text-align: right; vertical-align: bottom; }
+th:first-child, td:first-child { text-align: left; font-family: var(--sans); }
+tr.best td { background: var(--accent-soft); }
+tr.best td:first-child { box-shadow: inset 4px 0 0 var(--accent-fill); font-weight: 500; }
+.cmp-head { align-items: center; }
+.empty-state { margin: 0; padding: 18px; border: 1px dashed var(--line); border-radius: .5rem; text-align: center; color: var(--faint); font-size: 13px; }
+@media (max-width: 520px) {
+  .runbar .status { margin-left: 0; width: 100%; }
+  .gauge b { font-size: 19px; }
+}
+.seg { align-self: flex-start; }
+.controls.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px 28px; }
+.controls.grid .wide { grid-column: 1 / -1; }
+.tag { font: 400 12px/1.35 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
+
+/* --- Bucle de RL (clase 22): rollouts con cola larga, un trainer, pesos que viajan y staleness --- */
+:root {
+  --st0: var(--s0); --st1: var(--s2); --st2: var(--s1); --st4: var(--bad);
+  --k-gen: var(--s0); --k-tr: var(--s2); --k-sync: var(--s1);
+}
+.wrap { max-width: 1180px; }
+.gauges { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+@media (max-width: 900px) { .gauges { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .two { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
 @media (max-width: 860px) { .two { grid-template-columns: minmax(0, 1fr); } }
-.box { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--panel2); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
-.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
-.note { font-size: 13px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 10px; margin: 0; min-height: 2.6em; }
+.box { border: 1px solid var(--line); border-radius: .6rem; padding: 14px; background: var(--panel2); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.box-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; }
+.legend i { width: 12px; height: 10px; border-radius: 2px; }
+#note { min-height: 4.4em; }
 
 .gpus { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 @media (max-width: 560px) { .gpus { grid-template-columns: minmax(0, 1fr); } }
-.gpu { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; background: var(--panel); min-width: 0; }
-.gpu.pausa { border-color: var(--warn); }
-.gpu .lbl { font: 500 11px/1.2 var(--mono); letter-spacing: .04em; color: var(--faint); display: flex; justify-content: space-between; gap: 8px; }
-.slot { position: relative; height: 9px; border-radius: 3px; background: var(--cell); overflow: hidden; }
-.slot .goal { position: absolute; top: 0; bottom: 0; left: 0; border-right: 2px solid var(--faint); opacity: .55; }
-.slot .done { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 3px; }
-.trainer { display: flex; flex-direction: column; gap: 8px; }
-.state { font: 600 18px/1.2 var(--mono); }
+.gpu { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; background: var(--panel); min-width: 0; transition: border-color .2s; }
+.gpu.pausa { border-color: var(--k-sync); box-shadow: inset 0 0 0 1px var(--k-sync); }
+.gpu .lbl { font: 400 11px/1.3 var(--mono); color: var(--faint); display: flex; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
+.gpu .lbl b { font: 600 11px var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--ink); }
+.gpu .lbl span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slot { position: relative; height: 8px; border-radius: 2px; background: var(--cell); overflow: hidden; }
+.slot .goal { position: absolute; top: 0; bottom: 0; left: 0; border-right: 2px solid var(--muted); opacity: .6; }
+.slot .done { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 2px; }
+.trainer { gap: 8px; }
+.state { font: 600 17px/1.25 var(--mono); min-height: 1.25em; }
 .bar { height: 10px; border-radius: 5px; background: var(--cell); overflow: hidden; }
-.bar > div { height: 100%; width: 0; background: var(--blue); border-radius: 5px; }
-.pipe { display: flex; align-items: center; gap: 8px; font: 500 12px var(--mono); color: var(--faint); }
+.bar > div { height: 100%; width: 0; background: var(--k-tr); border-radius: 5px; }
+#tr-sub { min-height: 2.8em; margin: 0; }
+.pipe { display: flex; align-items: center; gap: 8px; font: 400 12px var(--mono); color: var(--faint); margin-bottom: 6px; }
 .pipe .arrow { flex: 1; height: 4px; border-radius: 2px; background: var(--cell); position: relative; overflow: hidden; }
-.pipe.on { color: var(--warn); }
-.pipe.on .arrow::after { content: ""; position: absolute; inset: 0; width: 30%; background: var(--warn); animation: flow 0.8s linear infinite; }
+.pipe.on { color: var(--k-sync); }
+.pipe.on .arrow::after { content: ""; position: absolute; inset: 0; width: 30%; background: var(--k-sync); animation: flow 0.8s linear infinite; }
 @keyframes flow { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
 @media (prefers-reduced-motion: reduce) { .pipe.on .arrow::after { animation: none; width: 100%; } }
-svg { display: block; width: 100%; height: auto; }
-canvas { display: block; width: 100%; height: 92px; border-radius: 6px; background: var(--cell); }
-.tl-labels { display: flex; justify-content: space-between; font: 500 11px var(--mono); color: var(--faint); }
-.tablewrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
-th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
-th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
-td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-th.n { text-align: right; }
-tr.best td { color: var(--accent); }
-.foot { font-size: 12px; color: var(--faint); }
-.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
-.back a{color:var(--muted);text-decoration:none}
-.back a:hover{color:var(--accent)}
-</style>
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+#curve .ax { stroke: var(--line); }
+#curve .opt { stroke: var(--faint); stroke-dasharray: 3 3; }
+#curve text { font: 400 10px var(--mono); fill: var(--faint); }
+#curve .ln { fill: none; stroke: var(--k-gen); stroke-width: 2; stroke-linejoin: round; }
+#curve .dot { fill: var(--k-gen); }
 
+.tl { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 8px; row-gap: 4px; }
+.tl-rows { display: flex; flex-direction: column; font: 400 11px/1 var(--mono); color: var(--faint); }
+.tl-rows span { flex: 1; display: flex; align-items: center; white-space: nowrap; }
+canvas { display: block; width: 100%; height: 92px; border-radius: 6px; background: var(--cell); }
+.tl-labels { display: flex; justify-content: space-between; font: 400 11px var(--mono); color: var(--faint); }
+table { min-width: 600px; }
+.greek { font-style: normal; text-transform: none; letter-spacing: 0; }
+.tog:disabled { opacity: .45; cursor: not-allowed; }
+</style>
+</head>
+<body>
 <div class="wrap">
   <header>
     <nav class="back"><a href="../">← Volver al inicio</a><a href="../slides/clase-22/">Slides de la clase 22</a></nav>
@@ -120,38 +219,57 @@ tr.best td { color: var(--accent); }
     <p class="lead">Generar respuestas, puntuarlas y actualizar los pesos, con las mismas GPUs o con pools separados. Mirá cuánto espera cada una a la respuesta más larga, cuánto cuesta llevar los pesos nuevos, y con qué pesos se generó lo que se entrena.</p>
   </header>
 
-  <section class="panel" aria-labelledby="b-h">
-    <h2 id="b-h">El bucle</h2>
-    <div class="controls">
-      <div class="field"><span>Ubicación y sincronía</span>
+  <section class="panel controls-panel" aria-label="Controles">
+    <div class="controls grid">
+      <div class="field wide"><span>Ubicación y sincronía</span>
         <div class="seg" id="modo" role="group" aria-label="Modo">
           <button data-m="col" aria-pressed="true">Colocado</button>
           <button data-m="par" aria-pressed="false">Colocado + parciales</button>
           <button data-m="sep" aria-pressed="false">Separado</button>
         </div>
+        <p class="hint" id="modo-hint" style="max-width:64ch"></p>
       </div>
-      <div class="field"><span>Staleness máxima <i style="text-transform:none;font-style:normal">η</i> · <b class="val" id="eta-v">0</b></span><input type="range" id="eta" min="0" max="9" step="1" value="0" aria-label="Staleness máxima"></div>
-      <div class="field"><span>Opciones</span><div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="tog" id="inter" aria-pressed="true"><i></i>Interrumpible</button>
-        <button class="tog" id="corr" aria-pressed="false"><i></i>Corregir lo viejo</button>
-      </div></div>
-      <div class="field"><span>Velocidad · <b class="val" id="vel-v">40×</b></span><input type="range" id="vel" min="0" max="5" step="1" value="2" aria-label="Velocidad"></div>
-      <div class="field"><span>&nbsp;</span><div style="display:flex;gap:8px"><button class="btn" id="play">Pausa</button><button class="btn" id="reset">Reiniciar</button></div></div>
+      <div class="field"><span>Staleness máxima <i class="greek">η</i> · <b class="val" id="eta-v">0</b></span>
+        <input type="range" id="eta" min="0" max="9" step="1" value="0" aria-label="Staleness máxima">
+        <div class="ticks" aria-hidden="true"><span>0</span><span>3</span><span>6</span><span>∞</span></div>
+        <p class="hint" id="eta-hint">Cuántas versiones atrás pueden estar los pesos con que se generó lo que se entrena.</p>
+      </div>
+      <div class="field"><span>Opciones</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="tog" id="inter" aria-pressed="true"><i></i>Interrumpible</button>
+          <button class="tog" id="corr" aria-pressed="false"><i></i>Corregir lo viejo</button>
+        </div>
+        <p class="hint"><b>Interrumpible</b> (sólo separado): con pesos nuevos, recalcular el KV cache y seguir, en vez de terminar lo empezado. <b>Corregir</b>: pesar cada muestra vieja por cuánto cambió la política.</p>
+      </div>
     </div>
+    <div class="runbar">
+      <div class="actions">
+        <button class="btn primary" id="play"><span class="ico" aria-hidden="true">❚❚</span><span>Pausa</span></button>
+        <button class="btn" id="reset"><span class="ico" aria-hidden="true">↺</span>Reiniciar</button>
+      </div>
+      <div class="speed"><span class="label">Velocidad · <b class="val" id="vel-v">40×</b></span>
+        <input type="range" id="vel" min="0" max="5" step="1" value="2" aria-label="Velocidad">
+      </div>
+      <span class="status" id="clock">tiempo virtual 0 s</span>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="b-h">
+    <div class="panel-head"><h2 id="b-h">El bucle</h2><span class="tag">4 GPUs · 8 problemas × 4 respuestas por paso</span></div>
     <div class="gauges">
       <div class="gauge"><b id="g-paso">0</b><span>pasos de entrenamiento</span></div>
-      <div class="gauge"><b id="g-t">0 s</b><span>tiempo (virtual)</span></div>
-      <div class="gauge"><b id="g-ocio">–</b><span>GPU ociosa</span></div>
-      <div class="gauge"><b id="g-stale">–</b><span>staleness promedio · máx</span></div>
-      <div class="gauge"><b id="g-rew">–</b><span>recompensa esperada (máx 0,80)</span></div>
-      <div class="gauge"><b id="g-len">–</b><span>tokens por respuesta, mediana</span></div>
+      <div class="gauge"><b id="g-ocio">–</b><span>del tiempo de GPU, ociosa</span></div>
+      <div class="gauge"><b id="g-stale">–</b><span>staleness promedio · máx (versiones)</span></div>
+      <div class="gauge"><b id="g-rew">–</b><span>recompensa esperada (óptimo 0,80)</span></div>
+      <div class="gauge"><b id="g-len">–</b><span>tokens por respuesta, mediana (tope 8.192)</span></div>
+      <div class="gauge"><b id="g-tps">–</b><span>tiempo virtual por paso</span></div>
     </div>
     <div class="two">
       <div class="box">
-        <h3 id="gpus-h">GPUs de rollout</h3>
+        <div class="box-head"><h3 id="gpus-h">GPUs de rollout</h3><span class="tag">16 respuestas por GPU</span></div>
         <div class="gpus" id="gpus"></div>
-        <div class="legend"><span>cada barra: una respuesta en el lote; la marca, cuánto va a medir; el ancho total, el tope de 8.192 tokens</span></div>
-        <div class="legend"><span><i style="background:var(--accent)"></i>pesos actuales</span><span><i style="background:var(--blue)"></i>1 versión atrás</span><span><i style="background:var(--warn)"></i>2–3 atrás</span><span><i style="background:var(--bad)"></i>4 o más</span></div>
+        <p class="small">Cada barra es una respuesta en el lote de esa GPU: lo relleno es lo que ya generó, la marca es cuánto va a medir, y el ancho total es el tope de 8.192 tokens. El color dice con qué pesos se empezó:</p>
+        <div class="legend"><span><i style="background:var(--st0)"></i>pesos actuales</span><span><i style="background:var(--st1)"></i>1 versión atrás</span><span><i style="background:var(--st2)"></i>2–3 atrás</span><span><i style="background:var(--st4)"></i>4 o más</span></div>
       </div>
       <div class="box trainer">
         <h3 id="tr-h">Trainer</h3>
@@ -159,31 +277,38 @@ tr.best td { color: var(--accent); }
         <div class="bar"><div id="tr-bar"></div></div>
         <p class="small" id="tr-sub">esperando un lote completo</p>
         <div class="pipe" id="pipe"><span id="pipe-l">pesos</span><div class="arrow"></div><span id="pipe-r">rollout</span></div>
-        <h3>Recompensa por tiempo</h3>
-        <svg id="curve" viewBox="0 0 320 130" aria-label="Recompensa esperada en función del tiempo virtual"></svg>
+        <h3>Recompensa en el tiempo</h3>
+        <svg id="curve" viewBox="0 0 320 130" role="img" aria-label="Recompensa esperada en función del tiempo virtual"></svg>
       </div>
     </div>
     <div class="box">
-      <h3>Qué hace cada GPU</h3>
-      <canvas id="tl" role="img" aria-label="Línea de tiempo de cada GPU"></canvas>
-      <div class="tl-labels"><span id="tl-a">hace –</span><span>ahora</span></div>
-      <div class="legend"><span><i style="background:var(--accent)"></i>generando (más claro: lote más vacío)</span><span><i style="background:var(--blue)"></i>entrenando</span><span><i style="background:var(--warn)"></i>moviendo pesos o recalculando KV</span><span><i style="background:var(--cell);border:1px solid var(--line)"></i>ociosa</span></div>
+      <div class="box-head"><h3>Qué hace cada GPU</h3><span class="tag">el tiempo corre hacia la izquierda</span></div>
+      <div class="tl">
+        <div class="tl-rows" id="tl-rows"></div>
+        <canvas id="tl" role="img" aria-label="Línea de tiempo de cada GPU"></canvas>
+        <span></span>
+        <div class="tl-labels"><span id="tl-a">hace –</span><span>ahora</span></div>
+      </div>
+      <div class="legend"><span><i style="background:var(--k-gen)"></i>generando (más claro: lote más vacío)</span><span><i style="background:var(--k-tr)"></i>entrenando</span><span><i style="background:var(--k-sync)"></i>moviendo pesos o recalculando KV</span><span><i style="background:var(--cell);box-shadow:inset 0 0 0 1px var(--line)"></i>ociosa</span></div>
     </div>
     <p class="note" id="note"></p>
   </section>
 
   <section class="panel" aria-labelledby="c-h">
-    <h2 id="c-h">Comparar</h2>
-    <p class="small">Las mismas 4 GPUs y la misma tarea, 30 pasos, promedio de 4 corridas. Separado: 3 GPUs generan y 1 entrena.</p>
-    <div><button class="btn" id="cmp-run">Comparar</button></div>
-    <p class="small" id="cmp-desc"></p>
-    <div class="tablewrap"><table id="cmp" hidden>
-      <thead><tr><th>Configuración</th><th class="n">Tiempo</th><th class="n">GPU ociosa</th><th class="n">Staleness</th><th class="n">Recompensa</th></tr></thead>
-      <tbody></tbody>
-    </table></div>
+    <div class="panel-head cmp-head">
+      <h2 id="c-h">Todas las configuraciones, con la misma tarea</h2>
+      <button class="btn primary" id="cmp-run">Comparar</button>
+    </div>
+    <p class="small" id="cmp-desc">Las mismas 4 GPUs y la misma tarea, 30 pasos, promedio de 4 corridas. Separado: 3 GPUs generan y 1 entrena.</p>
+    <div class="tablewrap">
+      <p class="empty-state" id="cmp-empty">Apretá <b>Comparar</b> para ver las seis configuraciones lado a lado.</p>
+      <table id="cmp" hidden>
+        <thead><tr><th>Configuración</th><th>tiempo, 30 pasos</th><th>GPU ociosa</th><th>staleness</th><th>recompensa</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="foot">La misma tarea y un modelo de costo parecido al de <code>go run ./cmd/sim asinc</code> y <code>go run ./cmd/sim aprender</code> del repositorio post-entrenamiento, con menos GPUs: 4 GPUs de hasta 16 respuestas cada una, y cada paso son 8 problemas × 4 respuestas. El "modelo" decide cuánto pensar: más largo acierta más, pero pasar los 8.192 tokens vale 0.</p>
   </section>
-
-  <p class="foot">La misma tarea y un modelo de costo parecido al de <span class="mono">go run ./cmd/sim asinc</span> y <span class="mono">go run ./cmd/sim aprender</span> del repositorio post-entrenamiento, con menos GPUs: 4 GPUs de hasta 16 respuestas cada una, y cada paso son 8 problemas × 4 respuestas. El "modelo" decide cuánto pensar: más largo acierta más, pero pasar los 8.192 tokens vale 0.</p>
 </div>
 
 <script>
@@ -366,9 +491,10 @@ function reset() {
   hist = [];
   const tl = $("#tl"); tl.width = tl.clientWidth * (devicePixelRatio || 1); tl.height = 92 * (devicePixelRatio || 1);
   tl.getContext("2d").clearRect(0, 0, tl.width, tl.height);
-  $("#gpus").innerHTML = sim.ws.map(w => `<div class="gpu" data-w="${w.id}"><div class="lbl"><span>GPU ${w.id + 1}</span><span data-k="v"></span></div>` +
+  $("#gpus").innerHTML = sim.ws.map(w => `<div class="gpu" data-w="${w.id}"><div class="lbl"><b>GPU ${w.id + 1}</b><span data-k="v"></span></div>` +
     Array.from({ length: COSTO.slots }, () => `<div class="slot"><div class="goal"></div><div class="done"></div></div>`).join("") + `</div>`).join("");
-  $("#gpus-h").textContent = sim.sep ? "GPUs de rollout (3)" : "Las 4 GPUs, generando";
+  $("#gpus-h").textContent = sim.sep ? "GPUs de rollout (1 a 3)" : "Las 4 GPUs, generando";
+  $("#tl-rows").innerHTML = Array.from({ length: sim.gpus }, (_, i) => `<span>GPU ${i + 1}${sim.sep && i >= sim.nR ? " · trainer" : ""}</span>`).join("");
   $("#tr-h").textContent = sim.sep ? "Trainer (GPU 4)" : "Entrenar (las mismas 4 GPUs)";
   $("#pipe-l").textContent = sim.sep ? "pesos" : "layout";
   $("#pipe-r").textContent = sim.sep ? "rollout" : "generación";
@@ -378,8 +504,16 @@ function syncControls() {
   const sep = st.modo === "sep";
   $("#eta").disabled = !sep; $("#inter").disabled = !sep;
   $("#eta-v").textContent = sep ? etaLabel(st.eta) : st.modo === "par" ? "parcial" : "0";
+  $("#eta-hint").textContent = sep
+    ? "Cuántas versiones atrás pueden estar los pesos con que se generó lo que se entrena. Con 0, separado es sincrónico; ∞ es sin límite."
+    : st.modo === "par" ? "Colocado + parciales no tiene tope fijo: lo que quedó a medias sigue con pesos nuevos." : "Colocado es sincrónico: todo lo que se entrena salió de los pesos actuales. η sólo se elige en separado.";
+  $("#modo-hint").textContent = {
+    col: "Colocado: las mismas 4 GPUs generan un lote entero, después entrenan, y después vuelven a generar (como verl).",
+    par: "Colocado + parciales: como colocado, pero la generación corta cuando hay un lote completo y lo que quedó a medias sigue en la vuelta siguiente (como Kimi k1.5).",
+    sep: "Separado: 3 GPUs sólo generan y 1 sólo entrena; los pesos nuevos viajan por la red de la GPU 4 a las demás (como AReaL).",
+  }[st.modo];
 }
-function staleColor(d) { return d <= 0 ? "var(--accent)" : d === 1 ? "var(--blue)" : d <= 3 ? "var(--warn)" : "var(--bad)"; }
+function staleColor(d) { return d <= 0 ? "var(--st0)" : d === 1 ? "var(--st1)" : d <= 3 ? "var(--st2)" : "var(--st4)"; }
 
 function render() {
   const s = sim;
@@ -410,16 +544,17 @@ function render() {
   if (!s.sep && !s.ocupado && s.ws.some(w => s.now < w.pausa)) { pipeOn = true; sub = "las respuestas a medias recalculan su KV cache"; }
   if (s.sep && s.ws.some(w => s.now < w.pausa)) pipeOn = true;
   $("#tr-state").textContent = estado;
-  $("#tr-state").style.color = estado === "ocioso" ? "var(--faint)" : pipeOn ? "var(--warn)" : "var(--blue)";
+  $("#tr-state").style.color = estado === "ocioso" ? "var(--faint)" : pipeOn ? "var(--k-sync)" : "var(--k-tr)";
   $("#tr-bar").style.width = (frac * 100) + "%";
-  $("#tr-bar").style.background = pipeOn ? "var(--warn)" : "var(--blue)";
+  $("#tr-bar").style.background = pipeOn ? "var(--k-sync)" : "var(--k-tr)";
   $("#tr-sub").textContent = sub;
   $("#pipe").classList.toggle("on", pipeOn);
   // gauges
   const r = s.resumen();
   $("#g-paso").textContent = s.ver;
-  $("#g-t").textContent = s.now < 60000 ? nf(s.now / 1000) + " s" : nf(s.now / 60000, 1) + " min";
-  const go = $("#g-ocio"); go.textContent = s.now > 0 ? Math.round(100 * r.ocio) + "%" : "–"; go.className = r.ocio > 0.6 ? "bad" : r.ocio > 0.3 ? "warn" : "good";
+  $("#clock").textContent = "tiempo virtual " + (s.now < 60000 ? nf(s.now / 1000) + " s" : nf(s.now / 60000, 1) + " min") + (playing ? "" : " · en pausa");
+  $("#g-tps").textContent = s.ver ? nf(s.now / 1000 / s.ver, 1) + " s" : "–";
+  const go = $("#g-ocio"); go.textContent = s.now > 0 ? Math.round(100 * r.ocio) + "%" : "–"; go.className = s.now <= 0 ? "" : r.ocio > 0.6 ? "bad" : r.ocio > 0.3 ? "warn" : "good";
   $("#g-stale").textContent = isNaN(r.stale) ? "–" : `${nf(r.stale, 1)} · ${r.staleMax}`;
   const gr = $("#g-rew"); gr.textContent = nf(r.rew, 2); gr.className = r.rew > 0.75 ? "good" : r.rew < 0.3 && s.ver > 5 ? "bad" : "";
   $("#g-len").textContent = nf(r.med);
@@ -427,13 +562,16 @@ function render() {
   const W = 320, H = 130, pad = 18, T = Math.max(s.now, 60000);
   const X = t => pad + (t / T) * (W - pad - 4), Y = v => H - pad - v * (H - pad - 6);
   const pts = s.curva.map(c => `${X(c.t).toFixed(1)},${Y(c.r).toFixed(1)}`).concat([`${X(s.now).toFixed(1)},${Y(r.rew).toFixed(1)}`]).join(" ");
-  $("#curve").innerHTML = `<line x1="${pad}" x2="${W - 4}" y1="${Y(0.8)}" y2="${Y(0.8)}" stroke="var(--line)" stroke-dasharray="3 3"/>` +
-    `<text x="${W - 4}" y="${Y(0.8) - 4}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="var(--mono)">óptimo 0,80</text>` +
-    `<line x1="${pad}" x2="${pad}" y1="6" y2="${H - pad}" stroke="var(--line)"/><line x1="${pad}" x2="${W - 4}" y1="${H - pad}" y2="${H - pad}" stroke="var(--line)"/>` +
-    `<text x="${pad - 4}" y="${Y(0) + 3}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="var(--mono)">0</text>` +
-    `<text x="${pad - 4}" y="${Y(1) + 8}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="var(--mono)">1</text>` +
-    `<text x="${W - 4}" y="${H - 4}" text-anchor="end" font-size="10" fill="var(--faint)" font-family="var(--mono)">${nf(T / 60000, 1)} min</text>` +
-    `<polyline fill="none" stroke="var(--accent)" stroke-width="2" points="${pts}" vector-effect="non-scaling-stroke"/>`;
+  $("#curve").innerHTML = `<line class="opt" x1="${pad}" x2="${W - 4}" y1="${Y(0.8)}" y2="${Y(0.8)}"/>` +
+    `<text x="${W - 4}" y="${Y(0.8) - 4}" text-anchor="end">óptimo 0,80</text>` +
+    `<line class="ax" x1="${pad}" x2="${pad}" y1="6" y2="${H - pad}"/><line class="ax" x1="${pad}" x2="${W - 4}" y1="${H - pad}" y2="${H - pad}"/>` +
+    `<text x="${pad - 4}" y="${Y(0) + 3}" text-anchor="end">0</text>` +
+    `<text x="${pad - 4}" y="${Y(1) + 8}" text-anchor="end">1</text>` +
+    `<text x="${pad}" y="${H - 4}">0</text>` +
+    `<text x="${(pad + W) / 2}" y="${H - 4}" text-anchor="middle">tiempo virtual</text>` +
+    `<text x="${W - 4}" y="${H - 4}" text-anchor="end">${nf(T / 60000, 1)} min</text>` +
+    `<polyline class="ln" points="${pts}" vector-effect="non-scaling-stroke"/>` +
+    `<circle class="dot" cx="${X(s.now).toFixed(1)}" cy="${Y(r.rew).toFixed(1)}" r="3"/>`;
   // nota
   $("#note").textContent = nota(s, r);
 }
@@ -453,7 +591,7 @@ function tlColumn() {
   const step = Math.max(1, Math.round(1.5 * d));
   ctx.drawImage(c, -step, 0);
   const rows = s.gpus, rh = H / rows;
-  const C = { gen: css("--accent"), tr: css("--blue"), sync: css("--warn"), idle: css("--cell"), line: css("--line") };
+  const C = { gen: css("--k-gen"), tr: css("--k-tr"), sync: css("--k-sync"), idle: css("--cell"), line: css("--line") };
   for (let i = 0; i < rows; i++) {
     let col = C.idle, alpha = 1;
     if (i < s.nR) {
@@ -489,7 +627,8 @@ $("#eta").addEventListener("input", e => { st.eta = +e.target.value; reset(); })
 $("#inter").addEventListener("click", e => { st.inter = !st.inter; e.currentTarget.setAttribute("aria-pressed", st.inter); reset(); });
 $("#corr").addEventListener("click", e => { st.corr = !st.corr; e.currentTarget.setAttribute("aria-pressed", st.corr); reset(); });
 $("#vel").addEventListener("input", e => { $("#vel-v").textContent = VELS[+e.target.value] + "×"; });
-$("#play").addEventListener("click", () => { playing = !playing; $("#play").textContent = playing ? "Pausa" : "Seguir"; });
+function setPlaying(v) { playing = v; $("#play").innerHTML = playing ? `<span class="ico" aria-hidden="true">❚❚</span><span>Pausa</span>` : `<span class="ico" aria-hidden="true">▶</span><span>Seguir</span>`; render(); }
+$("#play").addEventListener("click", () => setPlaying(!playing));
 $("#reset").addEventListener("click", reset);
 addEventListener("resize", () => { const tl = $("#tl"); const w = tl.clientWidth * (devicePixelRatio || 1); if (Math.abs(w - tl.width) > 2) { tl.width = w; tl.height = 92 * (devicePixelRatio || 1); } });
 
@@ -504,13 +643,13 @@ const CONFIGS = [
 ];
 $("#cmp-run").addEventListener("click", () => {
   const btn = $("#cmp-run"); btn.disabled = true;
-  const tb = $("#cmp tbody"); tb.innerHTML = ""; $("#cmp").hidden = false;
+  const tb = $("#cmp tbody"); tb.innerHTML = ""; $("#cmp").hidden = false; $("#cmp-empty").hidden = true;
   const rows = []; let k = 0;
   const one = () => {
     if (k === CONFIGS.length) {
       const ok = rows.filter(r => r.rew > 0.75), best = ok.length ? ok.reduce((a, r) => r.t < a.t ? r : a) : null;
       tb.innerHTML = rows.map(r => `<tr class="${r === best ? "best" : ""}"><td>${r.name}</td><td class="n">${nf(r.t / 60, 0)} min</td><td class="n">${Math.round(100 * r.ocio)}%</td><td class="n">${nf(r.stale, 1)}</td><td class="n">${nf(r.rew, 2)}</td></tr>`).join("");
-      $("#cmp-desc").textContent = "En verde, la que llega antes con recompensa de más de 0,75.";
+      $("#cmp-desc").textContent = "Promedio de 4 corridas de 30 pasos cada una; separado es 3 GPUs que generan y 1 que entrena. Resaltada, la que termina antes entre las que llegan a una recompensa de más de 0,75.";
       btn.disabled = false; return;
     }
     const [name, o] = CONFIGS[k++];
@@ -531,5 +670,5 @@ $("#cmp-run").addEventListener("click", () => {
 reset();
 requestAnimationFrame(frame);
 </script>
-
+</body>
 </html>

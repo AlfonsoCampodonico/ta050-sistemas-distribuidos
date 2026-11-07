@@ -13,13 +13,13 @@
 body.present{overflow:hidden;background:#000}
 body.present header,body.present .frame:not(.cur),body.present .note{display:none}
 body.present .frame.cur{position:fixed;left:0;right:0;margin:0 auto;border:0;border-radius:0;aspect-ratio:auto}
-body.present.notes .note.cur{display:block;position:fixed;left:0;right:0;bottom:0;width:auto;margin:0;padding:20px max(16px,calc((100vw - 1100px)/2)) ${BAR + 16}px;overflow:auto;background:#0E1114;border-top:1px solid #2A3138;color:#C9D1D8;font-size:17px}
-.pbar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:6px;background:rgba(14,17,20,.92);border:1px solid #2A3138;border-radius:10px;font:500 14px 'Geist Mono',monospace;color:#A8B3BC;z-index:10;transition:opacity .3s;user-select:none}
+body.present.notes .note.cur{display:block;position:fixed;left:0;right:0;bottom:0;width:auto;margin:0;padding:20px max(16px,calc((100vw - 1100px)/2)) ${BAR + 16}px;overflow:auto;background:#03181A;border-top:1px solid #0B2E33;color:#DEE2E6;font-size:17px;font-family:Rubik,sans-serif;font-weight:300}
+.pbar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:6px;background:rgba(1,1,1,.9);border:1px solid #0B2E33;border-radius:10px;font:500 14px 'IBM Plex Mono',monospace;color:#ADB5BD;z-index:10;transition:opacity .3s;user-select:none}
 body:not(.present) .pbar{position:fixed}
 body.present.idle .pbar{opacity:0}
 .pbar button{background:none;border:0;color:inherit;font:inherit;padding:8px 12px;border-radius:6px;cursor:pointer;min-width:40px}
-.pbar button:hover{background:#1C2228;color:#F2F3EF}
-.pbar button.on{color:#34D399}
+.pbar button:hover{background:#046B7D;color:#FFFFFF}
+.pbar button.on{color:#25F6FE}
 .pbar .count{padding:0 8px;min-width:64px;text-align:center}
 .pbar a{color:inherit;text-decoration:none;padding:8px 12px}
 body:not(.present) .frame{cursor:pointer}

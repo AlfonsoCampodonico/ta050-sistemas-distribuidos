@@ -11,6 +11,7 @@
     "mapa",
     "escala",
     "cuenta",
+    "div-cuatrod",
     "cuatrod",
     "configs",
     "red",
@@ -18,17 +19,20 @@
     "fsdp",
     "contexto",
     "pipe",
+    "div-moe",
     "moe",
     "ep",
     "demomoe",
     "dualpipe",
     "fp8",
     "costo",
+    "div-fallas",
     "fallas",
     "mtbf",
     "youngdaly",
     "demofallas",
     "operar",
+    "div-multidc",
     "multidc",
     "diloco",
     "demodiloco",
@@ -44,30 +48,34 @@
     },
     "s2": {
       "description": "Paralelismo 4D en Llama 3: el orden, la red, FSDP, contexto y pipeline.",
-      "start": "cuatrod"
+      "start": "div-cuatrod"
     },
     "s3": {
       "description": "DeepSeek-V3: expertos, DualPipe, FP8 y lo que costó.",
-      "start": "moe"
+      "start": "div-moe"
     },
     "s4": {
       "description": "Fallas a escala: la cuenta, los checkpoints y la operación.",
-      "start": "fallas"
+      "start": "div-fallas"
     },
     "s5": {
       "description": "Más allá de un datacenter, los laboratorios y el cierre.",
-      "start": "multidc"
+      "start": "div-multidc"
     }
   },
   "cover": "cover",
   "faces": {
-    "geist": {
-      "family": "Geist",
-      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    "chakra-petch": {
+      "family": "Chakra Petch",
+      "href": "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap"
     },
-    "geist-mono": {
-      "family": "Geist Mono",
-      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    "rubik": {
+      "family": "Rubik",
+      "href": "https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    },
+    "ibm-plex-mono": {
+      "family": "IBM Plex Mono",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     }
   },
   "designSystems": []

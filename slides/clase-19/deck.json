@@ -11,22 +11,27 @@
     "mapa",
     "carga",
     "reuso",
+    "div-hash",
     "hash",
     "niveles",
+    "div-router",
     "router",
     "demorouter",
     "sticky",
     "k8s",
+    "div-interferencia",
     "interferencia",
     "sarathi",
     "distserve",
     "transfer",
     "demodesag",
     "ratio",
+    "div-mooncake",
     "mooncake",
     "cpp",
     "sobrecarga",
     "resultados",
+    "div-moeserve",
     "moeserve",
     "deepseekday",
     "especulativo",
@@ -43,34 +48,38 @@
     },
     "s2": {
       "description": "El caché de prefijos y dónde vive.",
-      "start": "hash"
+      "start": "div-hash"
     },
     "s3": {
       "description": "El router: cómo elegir réplica con caché de prefijos.",
-      "start": "router"
+      "start": "div-router"
     },
     "s4": {
       "description": "Prefill y decode: interferencia, prefill en pedazos y desagregación.",
-      "start": "interferencia"
+      "start": "div-interferencia"
     },
     "s5": {
       "description": "Mooncake: el KV cache en el centro, contexto largo, sobrecarga y resultados.",
-      "start": "mooncake"
+      "start": "div-mooncake"
     },
     "s6": {
       "description": "La frontera: expertos, decodificación especulativa, KV más chico y los laboratorios.",
-      "start": "moeserve"
+      "start": "div-moeserve"
     }
   },
   "cover": "cover",
   "faces": {
-    "geist": {
-      "family": "Geist",
-      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    "chakra-petch": {
+      "family": "Chakra Petch",
+      "href": "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap"
     },
-    "geist-mono": {
-      "family": "Geist Mono",
-      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    "rubik": {
+      "family": "Rubik",
+      "href": "https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    },
+    "ibm-plex-mono": {
+      "family": "IBM Plex Mono",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     }
   },
   "designSystems": []

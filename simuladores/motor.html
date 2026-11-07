@@ -3,107 +3,159 @@
 <title>Motor de inferencia</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap">
 <style>
-/* Layout: banco de pruebas — barra de controles arriba, mapa de memoria de la GPU como pieza central, instrumentos a la derecha, comparación abajo. */
+/* Identidad visual de TA050 (fiubata050.github.io): teal #046b7d, Chakra Petch / Rubik / IBM Plex Mono. Claro por defecto. */
 :root {
-  --bg: #F3F2EE;
-  --panel: #FBFBF8;
-  --ink: #0E1114;
-  --muted: #48525C;
-  --line: #D9DAD4;
-  --cell: #E6E6E0;
-  --accent: #08724F;
-  --accent-ink: #FFFFFF;
-  --warn: #A35F00;
-  --good: #08724F;
-  --q1: #0E8A60; --q2: #B86E00; --q3: #2C56C9; --q4: #C0307F;
-  --q5: #6D4FC4; --q6: #8A7300; --q7: #0E7C99; --q8: #C2410C;
-  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
-  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --bg: #f3f4f5; --page: #f3f4f5;
+  --panel: #ffffff; --panel2: #f3f4f5; --ink: #0d0d0d; --muted: #495057; --faint: #6c757d;
+  --line: #dee2e6; --cell: #e9ecef; --code-bg: #e9ecef; --code: #393a34;
+  --accent: #046b7d; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: #e3f0f2;
+  --warn: #8a5a00; --warn-soft: #fdf3e0; --bad: #c0261f; --bad-soft: #fbeceb;
+  --h1-color: #0d0d0d; --h1-shadow: .1rem .1rem 0 #046b7d; --h1-case: none; --btn-glow: none;
+  /* Series: una por pedido / réplica. Giran alrededor del teal y se distinguen en los dos temas. */
+  --s0: #046b7d; --s1: #e8590c; --s2: #3b5bdb; --s3: #c2255c; --s4: #7048e8; --s5: #2f8a3e; --s6: #a68a00; --s7: #ae3ec9;
+  --head: "Chakra Petch", "Rubik", system-ui, sans-serif;
+  --sans: "Rubik", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0E1114; --panel: #161B20; --ink: #F2F3EF; --muted: #A8B3BC; --line: #2A3138; --cell: #232A31;
-    --accent: #34D399; --accent-ink: #0E1114; --warn: #F5A524; --good: #34D399;
-    --q1: #34D399; --q2: #F5A524; --q3: #7AA2FF; --q4: #F472B6; --q5: #A78BFA; --q6: #FACC15; --q7: #22D3EE; --q8: #FB923C;
+    --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+    --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+    --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+    --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+    --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+    --h1-color: #ffffff; --h1-case: uppercase;
+    --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+    --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+    --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0E1114; --panel: #161B20; --ink: #F2F3EF; --muted: #A8B3BC; --line: #2A3138; --cell: #232A31;
-    --accent: #34D399; --accent-ink: #0E1114; --warn: #F5A524; --good: #34D399;
-    --q1: #34D399; --q2: #F5A524; --q3: #7AA2FF; --q4: #F472B6; --q5: #A78BFA; --q6: #FACC15; --q7: #22D3EE; --q8: #FB923C;
+  --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+  --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+  --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+  --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+  --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+  --h1-color: #ffffff; --h1-case: uppercase;
+  --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+  --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+  --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
 body {
-  background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  margin: 0; min-height: 100vh; background: var(--page); color: var(--ink);
+  font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.55;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 24px 48px;
+  padding-block: 24px 56px;
+  -webkit-text-size-adjust: 100%;
 }
+b, strong { font-weight: 500; }
+code, .code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); color: var(--code); padding: .1em .35em; border-radius: 4px; white-space: nowrap; }
 .wrap { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-header { display: flex; flex-direction: column; gap: 6px; }
-.eyebrow { font: 600 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
-h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
-.lead { margin: 0; color: var(--muted); max-width: 70ch; }
-h2 { margin: 0; font-size: 15px; font-weight: 600; }
+header { display: flex; flex-direction: column; gap: 10px; }
+.back { display: flex; gap: 8px 20px; flex-wrap: wrap; margin-bottom: 14px; font: 400 13px var(--mono); }
+.back a { color: var(--accent); text-decoration: none; }
+.back a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.eyebrow { font: 500 12px/1.3 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 clamp(30px, 5vw, 46px)/1.08 var(--head); letter-spacing: .01em; color: var(--h1-color); text-shadow: var(--h1-shadow); text-transform: var(--h1-case); text-wrap: balance; }
+h2 { margin: 0; font: 600 19px/1.25 var(--head); letter-spacing: .01em; text-wrap: balance; }
+h3 { margin: 0; font: 600 15px/1.3 var(--head); letter-spacing: .02em; }
+.lead { margin: 0; color: var(--muted); max-width: 72ch; font-size: 16px; }
 .small { font-size: 13px; color: var(--muted); }
-
-.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
-.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.field > span { font: 500 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
-.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 12px; cursor: pointer; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+.controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.field > span, .label { font: 500 11px/1.2 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.field .hint { font: 300 12px/1.35 var(--sans); letter-spacing: 0; text-transform: none; color: var(--faint); max-width: 30ch; }
+.val { font: 600 13px var(--mono); letter-spacing: 0; text-transform: none; color: var(--accent); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 170px; max-width: 100%; accent-color: var(--accent-fill); }
+.seg { align-self: flex-start; display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 400 13px var(--sans); padding: 7px 12px; cursor: pointer; }
 .seg button + button { border-left: 1px solid var(--line); }
-.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-input[type=range] { width: 150px; accent-color: var(--accent); }
-.val { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.seg button:hover:not(:disabled) { background: var(--accent-soft); }
+.seg button[aria-pressed="true"] { background: var(--accent-fill); color: var(--accent-ink); font-weight: 500; box-shadow: var(--btn-glow); }
+.seg button:disabled { color: var(--faint); cursor: not-allowed; }
+.seg button[aria-pressed="true"]:disabled { color: var(--accent-ink); opacity: .55; }
+.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 11px; font: 400 13px var(--sans); cursor: pointer; background: var(--panel); color: var(--ink); }
+.tog:hover { border-color: var(--accent); }
+.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 500; }
+.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); flex: none; }
+.tog[aria-pressed="true"] i { background: var(--accent); border-color: var(--accent); }
+.btn { font: 400 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent-fill); color: var(--accent-ink); border-color: var(--accent-fill); font-weight: 500; box-shadow: var(--btn-glow); }
+.btn.primary:hover:not(:disabled) { color: var(--accent-ink); filter: brightness(1.12); }
+.btn:disabled { opacity: .55; cursor: progress; }
+select.btn { padding-right: 10px; }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gauges { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; }
+.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
+.gauge span { font-size: 12px; line-height: 1.35; color: var(--muted); }
+.gauge b.good { color: var(--accent); } .gauge b.warn { color: var(--warn); } .gauge b.bad { color: var(--bad); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+.note { font-size: 13.5px; color: var(--ink); background: var(--panel2); border: 1px solid var(--line); border-left: 5px solid var(--accent-fill); border-radius: .5rem; padding: 10px 14px; margin: 0; }
+.tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font: 500 11px/1.3 var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); text-align: left; }
+.foot { font-size: 12.5px; color: var(--faint); margin: 0; }
+svg text { font-family: var(--mono); }
+@media (max-width: 520px) {
+  body { padding-block: 16px 40px; }
+  .panel { padding: 14px; }
+  .controls { gap: 14px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+
+/* Motor (clase 18): barra de controles arriba, mapa de memoria de la GPU al centro, instrumentos a la derecha, comparación abajo. */
+:root { --q1: var(--s0); --q2: var(--s1); --q3: var(--s2); --q4: var(--s3); --q5: var(--s4); --q6: var(--s5); --q7: var(--s6); --q8: var(--s7); }
+.controls.bar { padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; }
 .actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
-.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
-.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
+.field.off { opacity: .5; }
 .main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-@media (max-width: 860px) { .main { grid-template-columns: minmax(0, 1fr); } }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.side { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 canvas { display: block; width: 100%; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--muted); }
-.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
-
-.gauges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
-.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; }
-.gauge span { font-size: 12px; color: var(--muted); }
-.gauge b.warn { color: var(--warn); }
-
+.mem-sub { min-height: 1.6em; font-variant-numeric: tabular-nums; }
+.gauges { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.chart-y { display: flex; justify-content: space-between; font: 400 11px var(--mono); color: var(--faint); }
 .batch { display: flex; flex-direction: column; gap: 4px; height: 362px; overflow-y: auto; scrollbar-gutter: stable; }
-.seq { display: grid; grid-template-columns: 22px 12px 44px 70px minmax(0, 1fr) 76px; gap: 8px; align-items: center; height: 18px; flex: none; font: 13px var(--mono); font-variant-numeric: tabular-nums; }
-.seq .slot { color: var(--muted); opacity: .6; text-align: right; }
-.seq.head { position: sticky; top: 0; background: var(--panel); font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.seq.free .st, .seq.free .kv { opacity: .45; }
+.seq { display: grid; grid-template-columns: 22px 12px 44px 64px minmax(40px, 1fr) 72px; gap: 8px; align-items: center; height: 18px; flex: none; font: 400 12.5px var(--mono); font-variant-numeric: tabular-nums; }
+.seq .slot { color: var(--faint); text-align: right; }
+.seq.head { position: sticky; top: 0; z-index: 1; height: 24px; background: var(--panel); font: 500 10.5px var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); border-bottom: 1px solid var(--line); }
+.seq.free .st, .seq.free .kv { opacity: .5; }
 .seq .dot { width: 10px; height: 10px; border-radius: 2px; }
 .seq .bar { height: 8px; background: var(--cell); border-radius: 4px; overflow: hidden; }
 .seq .bar > div { height: 100%; }
 .seq .st { color: var(--muted); }
+.seq .st.prefill { color: var(--warn); }
 .seq .kv { color: var(--muted); text-align: right; }
-
-.tablewrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
-th:first-child, td:first-child { text-align: left; }
-th { font: 500 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
-td { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-td:first-child { font-family: var(--sans); }
-tr.best td { color: var(--good); font-weight: 600; }
-tr.best td:first-child { color: var(--ink); }
-.note { font-size: 13px; color: var(--muted); max-width: 80ch; margin: 0; }
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
-.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
-.back a{color:var(--muted);text-decoration:none}
-.back a:hover{color:var(--accent)}
+@media (max-width: 420px) {
+  .seq { grid-template-columns: 10px 38px 52px minmax(30px, 1fr) 62px; gap: 6px; font-size: 11.5px; }
+  .seq .slot { display: none; }
+  .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .actions { margin-left: 0; }
+}
+#cmp th, #cmp td { text-align: right; white-space: nowrap; }
+#cmp th:first-child, #cmp td:first-child { text-align: left; }
+#cmp td { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+#cmp td:first-child { font-family: var(--sans); }
+#cmp tr.best td { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+#cmp tr.best td:first-child { color: var(--ink); font-weight: 500; box-shadow: inset 4px 0 0 var(--accent-fill); }
+#cmp th small { display: block; font: 400 10px var(--mono); letter-spacing: 0; text-transform: none; }
 </style>
 
 <div class="wrap">
@@ -114,32 +166,37 @@ tr.best td:first-child { color: var(--ink); }
     <p class="lead">Una GPU con lugar para 2.048 tokens de KV cache atiende pedidos que llegan solos. Cambiá cómo arma los lotes y cómo reparte la memoria, y mirá qué pasa con el mapa de memoria, el lote y los tiempos.</p>
   </header>
 
-  <section class="controls" aria-label="Controles">
+  <section class="controls bar" aria-label="Controles">
     <div class="field"><span>Batching</span>
       <div class="seg" role="group" aria-label="Batching">
         <button id="b-static" aria-pressed="false">Estático</button>
         <button id="b-cont" aria-pressed="true">Continuo</button>
       </div>
+      <small class="hint" id="b-hint"></small>
     </div>
     <div class="field"><span>Memoria</span>
       <div class="seg" role="group" aria-label="Memoria">
         <button id="m-contig" aria-pressed="false">Contigua (reserva 512)</button>
         <button id="m-paged" aria-pressed="true">Paginada</button>
       </div>
+      <small class="hint" id="m-hint"></small>
     </div>
     <label class="field" for="rate"><span>Pedidos por segundo · <b class="val" id="rate-v">6</b></span>
       <input type="range" id="rate" min="1" max="20" step="1" value="6">
+      <small class="hint">llegadas al azar (Poisson)</small>
     </label>
-    <label class="field" for="block"><span>Bloque (tokens)</span>
+    <label class="field" for="block" id="block-field"><span>Bloque de memoria</span>
       <select id="block" class="btn"><option>4</option><option>8</option><option selected>16</option><option>32</option><option>64</option></select>
+      <small class="hint" id="block-hint">tokens por bloque</small>
     </label>
     <label class="field" for="speed"><span>Velocidad</span>
       <select id="speed" class="btn"><option value="0.02">0,02×</option><option value="0.05">0,05×</option><option value="0.1" selected>0,1×</option><option value="0.25">0,25×</option><option value="0.5">0,5×</option><option value="1">1× (tiempo real)</option></select>
+      <small class="hint">0,1× = 10 veces más lento que la GPU</small>
     </label>
     <div class="actions">
       <button class="btn primary" id="play">Pausa</button>
       <button class="btn" id="step">Una iteración</button>
-      <button class="btn" id="reset">Reiniciar</button>
+      <button class="btn" id="reset" title="Vuelve a t = 0 con la memoria vacía">Reiniciar</button>
     </div>
   </section>
 
@@ -147,33 +204,34 @@ tr.best td:first-child { color: var(--ink); }
     <section class="panel" aria-labelledby="mem-h">
       <div class="panel-head">
         <h2 id="mem-h">KV cache en la GPU</h2>
-        <span class="small" id="mem-sub">2.048 slots · 1 cuadrado = 1 token</span>
+        <span class="small">2.048 lugares · 1 cuadrado = 1 token</span>
       </div>
+      <p class="small mem-sub" id="mem-sub" aria-live="off" style="margin:0"></p>
       <canvas id="mem" height="300" role="img" aria-label="Mapa de la memoria del KV cache"></canvas>
       <div class="legend">
-        <span><i style="background:var(--q1)"></i>token guardado (un color por pedido)</span>
-        <span><i style="background:var(--q1);opacity:.22"></i>reservado sin usar</span>
-        <span><i style="background:var(--cell)"></i>libre</span>
+        <span><i style="background:linear-gradient(90deg,var(--q1) 0 25%,var(--q2) 25% 50%,var(--q3) 50% 75%,var(--q4) 75%)"></i>token guardado (un color por pedido)</span>
+        <span><i style="background:var(--q1);opacity:.22"></i>reservado sin usar (fragmentación interna)</span>
+        <span><i style="background:var(--cell);outline:1px solid var(--line)"></i>libre</span>
       </div>
     </section>
 
-    <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+    <div class="side">
       <section class="panel" aria-labelledby="ins-h">
-        <div class="panel-head"><h2 id="ins-h">Instrumentos</h2><span class="small val" id="clock">t = 0,0 s</span></div>
+        <div class="panel-head"><h2 id="ins-h">Instrumentos</h2><span class="small mono" id="clock">t = 0,0 s</span></div>
         <div class="gauges">
-          <div class="gauge"><b id="g-tps">0</b><span>tokens/s</span></div>
-          <div class="gauge"><b id="g-ttft">–</b><span>primer token, ms</span></div>
-          <div class="gauge"><b id="g-util">–</b><span>de lo asignado guarda tokens</span></div>
-          <div class="gauge"><b id="g-batch">0</b><span>en el lote</span></div>
-          <div class="gauge"><b id="g-queue">0</b><span>en la cola</span></div>
-          <div class="gauge"><b id="g-pre">0</b><span>desalojos</span></div>
+          <div class="gauge"><b id="g-tps">0</b><span>tokens por segundo (últimos 3 s)</span></div>
+          <div class="gauge"><b id="g-ttft">–</b><span>ms al primer token (últimos 40 pedidos)</span></div>
+          <div class="gauge"><b id="g-util">–</b><span>de la memoria asignada guarda tokens</span></div>
+          <div class="gauge"><b id="g-batch">0</b><span>secuencias en el lote (máx. 32)</span></div>
+          <div class="gauge"><b id="g-queue">0</b><span>pedidos esperando en la cola</span></div>
+          <div class="gauge"><b id="g-pre">0</b><span>desalojos: sin memoria, un pedido vuelve a la cola</span></div>
         </div>
         <canvas id="hist" height="110" role="img" aria-label="Lote y uso del KV en el tiempo"></canvas>
-        <div class="legend"><span><i style="background:var(--accent)"></i>secuencias en el lote</span><span><i style="background:var(--q2)"></i>% de la memoria asignada con tokens</span></div>
+        <div class="legend"><span><i style="background:var(--accent);height:3px;vertical-align:3px"></i>secuencias en el lote (0 a 32)</span><span><i style="background:var(--q2);height:3px;vertical-align:3px"></i>% de la memoria asignada con tokens</span><span>últimos 24 s simulados</span></div>
       </section>
 
       <section class="panel" aria-labelledby="batch-h">
-        <div class="panel-head"><h2 id="batch-h">El lote</h2><span class="small">progreso de la respuesta · KV usado / asignado</span></div>
+        <div class="panel-head"><h2 id="batch-h">El lote</h2><span class="small">32 lugares · progreso de la respuesta · KV usado / asignado</span></div>
         <div class="batch" id="batch"></div>
       </section>
     </div>
@@ -186,9 +244,9 @@ tr.best td:first-child { color: var(--ink); }
     </div>
     <p class="note" id="cmp-desc"></p>
     <div class="tablewrap">
-      <table id="cmp"><thead><tr><th>Batching · memoria</th><th>tokens/s</th><th>primer token</th><th>respuesta completa</th><th>lote prom.</th><th>uso KV</th><th>desalojos</th></tr></thead><tbody></tbody></table>
+      <table id="cmp"><thead><tr><th>Batching · memoria</th><th>tokens/s</th><th>primer token<small>ms</small></th><th>respuesta completa<small>ms</small></th><th>lote prom.<small>secuencias</small></th><th>uso KV<small>de lo asignado</small></th><th>desalojos</th></tr></thead><tbody></tbody></table>
     </div>
-    <p class="note">Tiempos en ms, promedios sobre 300 pedidos. Costo de una iteración: 20 ms de leer los pesos, más 0,25 ms por secuencia y 0,05 ms por token de prefill. Es el mismo modelo del repositorio <code>servir-tokens</code>; los números son ilustrativos.</p>
+    <p class="foot">Tiempos en ms, promedios sobre 300 pedidos. Costo de una iteración: 20 ms de leer los pesos, más 0,25 ms por secuencia y 0,05 ms por token de prefill. Es el mismo modelo del repositorio <code>servir-tokens</code>; los números son ilustrativos.</p>
   </section>
 </div>
 
@@ -197,6 +255,8 @@ tr.best td:first-child { color: var(--ink); }
 const CAP = 2048, MAX_LEN = 512, MAX_BATCH = 32;
 const COST = { base: 20, perSeq: 0.25, perPrefill: 0.05 };
 const PALETTE = ["--q1","--q2","--q3","--q4","--q5","--q6","--q7","--q8"];
+// Color de un pedido: no sólo id % 8, así pedidos que conviven con ids parecidos (4, 12, 20…) no comparten color.
+const hue = id => (id + (id >> 3)) % PALETTE.length;
 
 function rng(seed) { // mulberry32
   return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
@@ -341,16 +401,18 @@ function renderComparison() {
     <td>${label[r.mode]} · ${label[r.mem]}</td><td>${nf.format(r.tps)}</td><td>${nf.format(r.ttft)}</td><td>${nf.format(r.lat)}</td>
     <td>${nf1.format(r.batch)}</td><td>${nf.format(100 * r.util)}%</td><td>${nf.format(r.pre)}</td></tr>`).join("");
   document.getElementById("cmp-desc").textContent =
-    `${state.rate} pedidos por segundo, KV cache de 2.048 tokens, longitud máxima 512. En verde, la de más throughput. ` +
+    `${state.rate} pedidos por segundo, KV cache de 2.048 tokens, longitud máxima 512. Resaltada, la de más throughput. ` +
     `Con batching estático nadie ve tokens hasta que termina el lote, así que el primer token llega con la respuesta completa.`;
 }
 
 // --- Estado de la animación ---
 const state = { mode: "continuous", mem: "paged", rate: 6, block: 16, speed: 0.1, playing: true };
 let eng, nextReq, pending, hist, lastSample;
-function reset() {
+// warm: arranca con 4 s simulados, el sistema ya en régimen. "Reiniciar" arranca vacío.
+function reset(warm = true) {
   eng = new Engine(state.mode, makeKV(state.mem, state.block)); slots = [];
   nextReq = arrivals(state.rate, 3); pending = nextReq(); hist = []; lastSample = 0;
+  if (warm) advance(4000);
   draw();
 }
 function advance(target) {
@@ -398,7 +460,7 @@ function drawMemory() {
     const x = k * cell + Math.floor(k / gapPer) * (per < cols ? blockGap : 0), y = r * cell;
     const v = cells[i];
     ctx.globalAlpha = 1; ctx.fillStyle = free;
-    if (v) { ctx.fillStyle = colors[v.id % colors.length]; ctx.globalAlpha = v.used ? 1 : 0.22; }
+    if (v) { ctx.fillStyle = colors[hue(v.id)]; ctx.globalAlpha = v.used ? 1 : 0.22; }
     ctx.fillRect(x, y, cell - 1, cell - 1);
   }
   ctx.globalAlpha = 1;
@@ -434,14 +496,14 @@ function drawBatch() {
   const rows = Array.from({ length: MAX_BATCH }, (_, i) => {
     const s = slots[i];
     if (!s) return `<div class="seq free"><span class="slot">${i + 1}</span><span></span><span></span><span class="st">libre</span><span class="bar"></span><span class="kv">–</span></div>`;
-    const col = `var(${PALETTE[s.req.id % PALETTE.length]})`;
+    const col = `var(${PALETTE[hue(s.req.id)]})`;
     const phase = s.finished ? "espera" : s.prefilled ? "decode" : "prefill";
     const [u, a] = eng.kv.usage(s.req.id);
-    return `<div class="seq"><span class="slot">${i + 1}</span><span class="dot" style="background:${col}"></span><span>#${s.req.id}</span><span class="st">${phase}</span>
+    return `<div class="seq"><span class="slot">${i + 1}</span><span class="dot" style="background:${col}"></span><span>#${s.req.id}</span><span class="st ${phase}">${phase}</span>
       <span class="bar" title="${s.gen} de ${s.req.output} tokens"><div style="width:${100 * s.gen / s.req.output}%;background:${col}"></div></span>
       <span class="kv">${u}/${a}</span></div>`;
   });
-  el.innerHTML = `<div class="seq head"><span></span><span></span><span>Pedido</span><span>Fase</span><span>Respuesta</span><span class="kv">KV</span></div>` + rows.join("");
+  el.innerHTML = `<div class="seq head"><span class="slot"></span><span></span><span>Pedido</span><span>Fase</span><span>Respuesta</span><span class="kv">KV</span></div>` + rows.join("");
 }
 function drawGauges() {
   const made = eng.tokens.reduce((a, t) => a + t[1], 0), win = Math.min(3, eng.now / 1000) || 1;
@@ -468,8 +530,19 @@ function frame(t) {
 // --- Controles ---
 function seg(a, b, key, va, vb, resetAfter = true) {
   const A = document.getElementById(a), B = document.getElementById(b);
-  const set = v => { state[key] = v; A.setAttribute("aria-pressed", v === va); B.setAttribute("aria-pressed", v === vb); if (resetAfter) reset(); };
+  const set = v => { state[key] = v; A.setAttribute("aria-pressed", v === va); B.setAttribute("aria-pressed", v === vb); syncHints(); if (resetAfter) reset(); };
   A.onclick = () => set(va); B.onclick = () => set(vb);
+}
+function syncHints() {
+  document.getElementById("b-hint").textContent = state.mode === "static"
+    ? "arma un lote y no admite a nadie hasta que terminen todos"
+    : "en cada iteración saca a los que terminaron y suma de la cola";
+  document.getElementById("m-hint").textContent = state.mem === "paged"
+    ? "pide bloques a medida que la respuesta crece"
+    : "reserva el largo máximo (512) apenas admite un pedido";
+  const paged = state.mem === "paged", bf = document.getElementById("block-field");
+  bf.classList.toggle("off", !paged); document.getElementById("block").disabled = !paged;
+  document.getElementById("block-hint").textContent = paged ? "tokens por bloque" : "sólo con memoria paginada";
 }
 seg("b-static", "b-cont", "mode", "static", "continuous");
 seg("m-contig", "m-paged", "mem", "contig", "paged");
@@ -478,10 +551,11 @@ rate.oninput = () => { state.rate = +rate.value; document.getElementById("rate-v
 rate.onchange = () => { reset(); renderComparison(); };
 document.getElementById("block").onchange = e => { state.block = +e.target.value; reset(); renderComparison(); };
 document.getElementById("speed").onchange = e => { state.speed = +e.target.value; };
+syncHints();
 const play = document.getElementById("play");
 play.onclick = () => { state.playing = !state.playing; play.textContent = state.playing ? "Pausa" : "Seguir"; };
 document.getElementById("step").onclick = () => { state.playing = false; play.textContent = "Seguir"; oneStep(); };
-document.getElementById("reset").onclick = reset;
+document.getElementById("reset").onclick = () => reset(false);
 document.getElementById("cmp-run").onclick = renderComparison;
 if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) state.speed = 0.02, document.getElementById("speed").value = "0.02";
 new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -489,8 +563,6 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
 addEventListener("resize", () => { document.getElementById("mem").width = 0; document.getElementById("hist").width = 0; draw(); });
 
 reset();
-advance(4000); // arranca con el sistema ya en régimen
-draw();
 renderComparison();
 requestAnimationFrame(frame);
 </script>

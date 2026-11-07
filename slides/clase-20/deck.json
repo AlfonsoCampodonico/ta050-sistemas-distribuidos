@@ -12,12 +12,14 @@
     "carga",
     "serverless",
     "multiplex",
+    "div-tamanos",
     "tamanos",
     "niveles",
     "cargar",
     "formato",
     "pipeline",
     "democarga",
+    "div-estimar",
     "estimar",
     "politicas",
     "migracion",
@@ -26,11 +28,13 @@
     "demoubica",
     "resultados",
     "keepalive",
+    "div-lora",
     "lora",
     "mixto",
     "paginas",
     "slorares",
     "demolora",
+    "div-lente",
     "lente",
     "takeaways",
     "demo",
@@ -43,30 +47,34 @@
     },
     "s2": {
       "description": "Anatomía de un arranque en frío: niveles, formato y carga en pipeline.",
-      "start": "tamanos"
+      "start": "div-tamanos"
     },
     "s3": {
       "description": "Dónde arrancar: localidad, migración en vivo y el estado del scheduler.",
-      "start": "estimar"
+      "start": "div-estimar"
     },
     "s4": {
       "description": "Muchos fine-tunes: LoRA, lote mixto y paginación unificada.",
-      "start": "lora"
+      "start": "div-lora"
     },
     "s5": {
       "description": "Cierre: la lente de la materia, el repositorio y preguntas.",
-      "start": "lente"
+      "start": "div-lente"
     }
   },
   "cover": "cover",
   "faces": {
-    "geist": {
-      "family": "Geist",
-      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    "chakra-petch": {
+      "family": "Chakra Petch",
+      "href": "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap"
     },
-    "geist-mono": {
-      "family": "Geist Mono",
-      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    "rubik": {
+      "family": "Rubik",
+      "href": "https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    },
+    "ibm-plex-mono": {
+      "family": "IBM Plex Mono",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     }
   },
   "designSystems": []

@@ -12,20 +12,24 @@
     "philly",
     "carga",
     "fallas",
+    "div-gang",
     "gang",
     "demogang",
     "cabeza",
     "hambre",
+    "div-localidad",
     "localidad",
     "esperar",
     "fragmentacion",
     "consolidar",
     "demolocalidad",
+    "div-las",
     "las",
     "colas",
     "preempcion",
     "tiresias",
     "demoduraciones",
+    "div-gandiva",
     "gandiva",
     "mlaas",
     "cuotas",
@@ -41,30 +45,34 @@
     },
     "s2": {
       "description": "Todo o nada: gang scheduling, bloqueo de cabeza de cola y backfill.",
-      "start": "gang"
+      "start": "div-gang"
     },
     "s3": {
       "description": "Localidad: esperar el lugar bueno o arrancar en uno peor, y la fragmentación.",
-      "start": "localidad"
+      "start": "div-localidad"
     },
     "s4": {
       "description": "Sin conocer las duraciones: 2D-LAS, preempción y Tiresias.",
-      "start": "las"
+      "start": "div-las"
     },
     "s5": {
       "description": "Compartir: el tiempo, una GPU, el clúster entre equipos, y hoy.",
-      "start": "gandiva"
+      "start": "div-gandiva"
     }
   },
   "cover": "cover",
   "faces": {
-    "geist": {
-      "family": "Geist",
-      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    "chakra-petch": {
+      "family": "Chakra Petch",
+      "href": "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap"
     },
-    "geist-mono": {
-      "family": "Geist Mono",
-      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    "rubik": {
+      "family": "Rubik",
+      "href": "https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    },
+    "ibm-plex-mono": {
+      "family": "IBM Plex Mono",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     }
   },
   "designSystems": []

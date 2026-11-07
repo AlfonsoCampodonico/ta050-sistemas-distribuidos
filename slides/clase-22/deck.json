@@ -14,14 +14,17 @@
     "grpo",
     "modelos",
     "alargan",
+    "div-cola",
     "cola",
     "barrera",
     "pesa",
+    "div-ubicaciones",
     "ubicaciones",
     "reshard",
     "hybridengine",
     "broadcast",
     "demoubic",
+    "div-asinc",
     "asinc",
     "ssp",
     "areal",
@@ -29,6 +32,7 @@
     "demoasinc",
     "demoaprender",
     "parciales",
+    "div-fallas",
     "fallas",
     "serie",
     "takeaways",
@@ -42,30 +46,34 @@
     },
     "s2": {
       "description": "El rollout domina: la cola larga y la barrera.",
-      "start": "cola"
+      "start": "div-cola"
     },
     "s3": {
       "description": "Dónde va cada trabajo, y cuánto cuesta mover los pesos.",
-      "start": "ubicaciones"
+      "start": "div-ubicaciones"
     },
     "s4": {
       "description": "Asincrónico: staleness acotada, rollouts interrumpibles y parciales.",
-      "start": "asinc"
+      "start": "div-asinc"
     },
     "s5": {
       "description": "Cerrar la serie.",
-      "start": "fallas"
+      "start": "div-fallas"
     }
   },
   "cover": "cover",
   "faces": {
-    "geist": {
-      "family": "Geist",
-      "href": "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap"
+    "chakra-petch": {
+      "family": "Chakra Petch",
+      "href": "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap"
     },
-    "geist-mono": {
-      "family": "Geist Mono",
-      "href": "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap"
+    "rubik": {
+      "family": "Rubik",
+      "href": "https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    },
+    "ibm-plex-mono": {
+      "family": "IBM Plex Mono",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     }
   },
   "designSystems": []

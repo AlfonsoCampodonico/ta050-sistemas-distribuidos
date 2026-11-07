@@ -3,114 +3,197 @@
 <title>Planificador de GPUs</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap">
 <style>
-/* Clase 21 · un clúster de 256 GPUs compartido: la grilla de GPUs a la izquierda, la cola y los instrumentos a la derecha, comparación abajo. */
+/* Identidad visual de TA050 (fiubata050.github.io): teal #046b7d, Chakra Petch / Rubik / IBM Plex Mono. Claro por defecto. */
 :root {
-  --bg: #0E1114; --panel: #161B20; --panel2: #1A2027; --ink: #F2F3EF; --muted: #A8B3BC; --faint: #7D8892;
-  --line: #2A3138; --cell: #232A31; --accent: #34D399; --accent-ink: #0E1114; --accent-soft: #132A22;
-  --warn: #F5A524; --bad: #FF7A6B;
-  --c0: #34D399; --c1: #F5A524; --c2: #7AA2FF; --c3: #F472B6; --c4: #A78BFA; --c5: #FACC15; --c6: #22D3EE; --c7: #FB923C;
-  --sans: Geist, "Helvetica Neue", Arial, sans-serif;
-  --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  color-scheme: dark;
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
-    --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
-    --warn: #A35F00; --bad: #C2362B;
-    --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
-    color-scheme: light;
-  }
-}
-:root[data-theme="light"] {
-  --bg: #F3F2EE; --panel: #FBFBF8; --panel2: #F0EFEA; --ink: #0E1114; --muted: #48525C; --faint: #66707A;
-  --line: #D9DAD4; --cell: #E6E6E0; --accent: #08724F; --accent-ink: #FFFFFF; --accent-soft: #DDF3EA;
-  --warn: #A35F00; --bad: #C2362B;
-  --c0: #0E8A60; --c1: #B86E00; --c2: #2C56C9; --c3: #C0307F; --c4: #6D4FC4; --c5: #8A7300; --c6: #0E7C99; --c7: #C2410C;
+  --bg: #f3f4f5; --page: #f3f4f5;
+  --panel: #ffffff; --panel2: #f3f4f5; --ink: #0d0d0d; --muted: #495057; --faint: #6c757d;
+  --line: #dee2e6; --cell: #e9ecef; --code-bg: #e9ecef; --code: #393a34;
+  --accent: #046b7d; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: #e3f0f2;
+  --warn: #8a5a00; --warn-soft: #fdf3e0; --bad: #c0261f; --bad-soft: #fbeceb;
+  --h1-color: #0d0d0d; --h1-shadow: .1rem .1rem 0 #046b7d; --h1-case: none; --btn-glow: none;
+  /* Series: una por pedido / réplica. Giran alrededor del teal y se distinguen en los dos temas. */
+  --s0: #046b7d; --s1: #e8590c; --s2: #3b5bdb; --s3: #c2255c; --s4: #7048e8; --s5: #2f8a3e; --s6: #a68a00; --s7: #ae3ec9;
+  --head: "Chakra Petch", "Rubik", system-ui, sans-serif;
+  --sans: "Rubik", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   color-scheme: light;
 }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+    --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+    --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+    --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+    --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+    --h1-color: #ffffff; --h1-case: uppercase;
+    --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+    --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+    --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #03181a; --page: linear-gradient(180deg, #010101 0%, #03181a 100%) fixed;
+  --panel: #061a1d; --panel2: #0a2327; --ink: #e8f1f2; --muted: #a6babd; --faint: #7f9a9e;
+  --line: #17383d; --cell: #10292d; --code-bg: #10292d; --code: #d3e6e8;
+  --accent: #3fe0e8; --accent-fill: #046b7d; --accent-ink: #ffffff; --accent-soft: rgba(37, 246, 254, .08);
+  --warn: #f2b44c; --warn-soft: rgba(242, 180, 76, .12); --bad: #ff7a6e; --bad-soft: rgba(255, 122, 110, .12);
+  --h1-color: #ffffff; --h1-case: uppercase;
+  --h1-shadow: 0 0 .6em rgba(37, 246, 254, .5), 0 0 .22em rgba(37, 246, 254, .7), .04em .04em 0 rgba(0, 0, 0, .7);
+  --btn-glow: 0 0 .8em rgba(37, 246, 254, .28);
+  --s0: #2fd3de; --s1: #ff922b; --s2: #7ea6ff; --s3: #ff6b9a; --s4: #b197fc; --s5: #69db7c; --s6: #f5cf3a; --s7: #e599f7;
+  color-scheme: dark;
+}
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
 body {
-  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  margin: 0; min-height: 100vh; background: var(--page); color: var(--ink);
+  font-family: var(--sans); font-weight: 300; font-size: 15px; line-height: 1.55;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 24px 48px;
+  padding-block: 24px 56px;
+  -webkit-text-size-adjust: 100%;
 }
-.wrap { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-header { display: flex; flex-direction: column; gap: 8px; }
-.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
-h1 { margin: 0; font-size: clamp(28px, 4.2vw, 40px); line-height: 1.05; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
-.lead { margin: 0; color: var(--muted); max-width: 72ch; }
-h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+b, strong { font-weight: 500; }
+code, .code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); color: var(--code); padding: .1em .35em; border-radius: 4px; white-space: nowrap; }
+.wrap { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 10px; }
+.back { display: flex; gap: 8px 20px; flex-wrap: wrap; margin-bottom: 14px; font: 400 13px var(--mono); }
+.back a { color: var(--accent); text-decoration: none; }
+.back a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.eyebrow { font: 500 12px/1.3 var(--head); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 clamp(30px, 5vw, 46px)/1.08 var(--head); letter-spacing: .01em; color: var(--h1-color); text-shadow: var(--h1-shadow); text-transform: var(--h1-case); text-wrap: balance; }
+h2 { margin: 0; font: 600 19px/1.25 var(--head); letter-spacing: .01em; text-wrap: balance; }
+h3 { margin: 0; font: 600 15px/1.3 var(--head); letter-spacing: .02em; }
+.lead { margin: 0; color: var(--muted); max-width: 72ch; font-size: 16px; }
 .small { font-size: 13px; color: var(--muted); }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-
-.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
-.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.field > span { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
-.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.seg button { border: 0; background: transparent; color: var(--ink); font: 500 13px var(--sans); padding: 7px 11px; cursor: pointer; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+.controls { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end; }
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.field > span, .label { font: 500 11px/1.2 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.field .hint { font: 300 12px/1.35 var(--sans); letter-spacing: 0; text-transform: none; color: var(--faint); max-width: 30ch; }
+.val { font: 600 13px var(--mono); letter-spacing: 0; text-transform: none; color: var(--accent); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 170px; max-width: 100%; accent-color: var(--accent-fill); }
+.seg { align-self: flex-start; display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: transparent; color: var(--ink); font: 400 13px var(--sans); padding: 7px 12px; cursor: pointer; }
 .seg button + button { border-left: 1px solid var(--line); }
-.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg button:hover:not(:disabled) { background: var(--accent-soft); }
+.seg button[aria-pressed="true"] { background: var(--accent-fill); color: var(--accent-ink); font-weight: 500; box-shadow: var(--btn-glow); }
 .seg button:disabled { color: var(--faint); cursor: not-allowed; }
 .seg button[aria-pressed="true"]:disabled { color: var(--accent-ink); opacity: .55; }
-input[type=range] { width: 140px; accent-color: var(--accent); }
-.val { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
-.actions { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
-.btn { font: 500 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel2); color: var(--ink); cursor: pointer; }
-.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.btn:disabled { opacity: .6; cursor: progress; }
-button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tog { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 11px; font: 400 13px var(--sans); cursor: pointer; background: var(--panel); color: var(--ink); }
+.tog:hover { border-color: var(--accent); }
+.tog[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 500; }
+.tog i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--faint); flex: none; }
+.tog[aria-pressed="true"] i { background: var(--accent); border-color: var(--accent); }
+.btn { font: 400 13px var(--sans); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent-fill); color: var(--accent-ink); border-color: var(--accent-fill); font-weight: 500; box-shadow: var(--btn-glow); }
+.btn.primary:hover:not(:disabled) { color: var(--accent-ink); filter: brightness(1.12); }
+.btn:disabled { opacity: .55; cursor: progress; }
+select.btn { padding-right: 10px; }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.gauges { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; }
+.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; }
+.gauge span { font-size: 12px; line-height: 1.35; color: var(--muted); }
+.gauge b.good { color: var(--accent); } .gauge b.warn { color: var(--warn); } .gauge b.bad { color: var(--bad); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 6px; }
+.note { font-size: 13.5px; color: var(--ink); background: var(--panel2); border: 1px solid var(--line); border-left: 5px solid var(--accent-fill); border-radius: .5rem; padding: 10px 14px; margin: 0; }
+.tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font: 500 11px/1.3 var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); text-align: left; }
+.foot { font-size: 12.5px; color: var(--faint); margin: 0; }
+svg text { font-family: var(--mono); }
+@media (max-width: 520px) {
+  body { padding-block: 16px 40px; }
+  .panel { padding: 14px; }
+  .controls { gap: 14px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
 
+/* Texto sobre un color de serie (chips, trabajos, GPUs ocupadas). */
+:root { --on-series: #ffffff; --on-s0: #fff; --on-s1: #0d0d0d; --on-s2: #fff; --on-s3: #fff; --on-s4: #fff; --on-s5: #fff; --on-s6: #0d0d0d; --on-s7: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --on-series: #031315; --on-s0: #031315; --on-s1: #031315; --on-s2: #031315; --on-s3: #031315; --on-s4: #031315; --on-s5: #031315; --on-s6: #031315; --on-s7: #031315; } }
+:root[data-theme="dark"] { --on-series: #031315; --on-s0: #031315; --on-s1: #031315; --on-s2: #031315; --on-s3: #031315; --on-s4: #031315; --on-s5: #031315; --on-s6: #031315; --on-s7: #031315; }
+/* --- Común a flota, planificador y rl --- */
+.controls-panel { gap: 16px; }
+.controls { align-items: flex-start; }
+.field .hint { margin: 0; }
+.ticks { display: flex; justify-content: space-between; width: 170px; max-width: 100%; margin-top: -3px; font: 400 10.5px/1.2 var(--mono); color: var(--faint); }
+.runbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.runbar .speed { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.runbar .speed .label { white-space: nowrap; }
+.runbar input[type=range] { width: 130px; }
+.runbar .status { margin-left: auto; font: 400 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.btn .ico { display: inline-block; width: 12px; text-align: center; font-size: 11px; line-height: 1; }
+#play { min-width: 112px; justify-content: center; }
+.gauge small { font-size: 11.5px; line-height: 1.35; color: var(--faint); }
+.legend > span { display: inline-flex; align-items: center; }
+.legend i { flex: none; }
+th, td { white-space: nowrap; }
+td { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+th { text-align: right; vertical-align: bottom; }
+th:first-child, td:first-child { text-align: left; font-family: var(--sans); }
+tr.best td { background: var(--accent-soft); }
+tr.best td:first-child { box-shadow: inset 4px 0 0 var(--accent-fill); font-weight: 500; }
+.cmp-head { align-items: center; }
+.empty-state { margin: 0; padding: 18px; border: 1px dashed var(--line); border-radius: .5rem; text-align: center; color: var(--faint); font-size: 13px; }
+@media (max-width: 520px) {
+  .runbar .status { margin-left: 0; width: 100%; }
+  .gauge b { font-size: 19px; }
+}
+.seg { align-self: flex-start; }
+.controls.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px 28px; }
+.controls.grid .wide { grid-column: 1 / -1; }
+.tag { font: 400 12px/1.35 var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
+
+/* --- Planificador (clase 21): la grilla de GPUs a la izquierda, la cola y los instrumentos a la derecha --- */
 .main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+@media (max-width: 960px) { .main { grid-template-columns: minmax(0, 1fr); } }
 .side { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 
 .racks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-@media (max-width: 1100px) and (min-width: 901px), (max-width: 640px) { .racks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.rack { border: 1px solid var(--line); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px; background: var(--panel2); min-width: 0; }
-.rack-h { display: flex; justify-content: space-between; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding-bottom: 2px; }
-.srv { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; padding: 2px; border-radius: 6px; border: 1px dashed transparent; }
-.srv.empty { border-color: var(--line); }
-.gpu { aspect-ratio: 1; border-radius: 3px; background: var(--cell); min-width: 0; }
-.gpu.held { background: repeating-linear-gradient(135deg, var(--hc) 0 3px, transparent 3px 6px); outline: 1px solid var(--hc); outline-offset: -1px; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); align-items: center; }
-.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+@media (max-width: 1160px) and (min-width: 961px), (max-width: 680px) { .racks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.rack { border: 1px solid var(--line); border-radius: .6rem; padding: 8px; display: flex; flex-direction: column; gap: 5px; background: var(--panel2); min-width: 0; }
+.rack-h { display: flex; justify-content: space-between; gap: 6px; font: 500 11px/1.2 var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); padding: 0 2px 3px; }
+.rack-h span:last-child { font: 400 11px var(--mono); letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
+.srv { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; padding: 2px; border-radius: 5px; border: 1px dashed transparent; }
+.srv.empty { border-color: var(--faint); }
+.gpu { aspect-ratio: 1; border-radius: 2px; background: var(--cell); min-width: 0; }
+.gpu.held { background: repeating-linear-gradient(135deg, var(--hc) 0 2px, transparent 2px 5px); box-shadow: inset 0 0 0 1px var(--hc); }
+.legend i { width: 12px; height: 12px; border-radius: 3px; }
+.legend .sw-free { background: var(--cell); }
+.legend .sw-run { background: linear-gradient(90deg, var(--s0) 0 33%, var(--s1) 33% 66%, var(--s2) 66%); }
+.legend .sw-held { background: repeating-linear-gradient(135deg, var(--s3) 0 2px, transparent 2px 5px); box-shadow: inset 0 0 0 1px var(--s3); }
+.legend .sw-empty { border: 1px dashed var(--faint); background: transparent; }
 
-.queue { display: flex; flex-wrap: wrap; gap: 6px; min-height: 34px; align-content: flex-start; }
-.job { display: inline-flex; align-items: center; gap: 6px; border-radius: 6px; padding: 3px 7px; font: 600 12px/1.3 var(--mono); color: var(--bg); font-variant-numeric: tabular-nums; }
-.job.head { outline: 2px solid var(--ink); outline-offset: 1px; }
-.job small { font-weight: 500; opacity: .85; }
-.headinfo { font-size: 13px; color: var(--muted); border-left: 2px solid var(--warn); padding-left: 10px; margin: 0; min-height: 40px; }
+.queue { display: flex; flex-wrap: wrap; gap: 5px; height: calc(4 * 22px + 3 * 5px + 8px); padding: 4px; margin: -4px; overflow: hidden; align-content: flex-start; }
+.job { display: inline-flex; align-items: baseline; gap: 5px; border-radius: 5px; height: 22px; padding: 0 7px; line-height: 22px; font-weight: 600; font-size: 12px; font-family: var(--mono); color: var(--on-series); font-variant-numeric: tabular-nums; }
+.job.head { box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--ink); }
+.job small { font-weight: 400; font-size: 11px; opacity: .9; }
+.queue .empty { font-size: 13px; color: var(--faint); }
+.headinfo { font-size: 13.5px; color: var(--ink); background: var(--warn-soft); border: 1px solid var(--line); border-left: 5px solid var(--warn); border-radius: .5rem; padding: 9px 12px; margin: 0; min-height: 5.6em; }
+.headinfo.calm { background: var(--panel2); border-left-color: var(--line); color: var(--muted); }
 .headinfo b { color: var(--ink); }
 
-.gauges { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.gauge { background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.gauge b { font: 600 22px/1.15 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.gauge span { font-size: 12px; color: var(--muted); }
-.gauge b.warn { color: var(--warn); }
-.gauge b.bad { color: var(--bad); }
-.note { font-size: 13px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 10px; margin: 0; }
-.banner { font-size: 13px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--bad); color: var(--bad); margin: 0; }
-
-.tablewrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 680px; }
-th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-th:first-child, td:first-child { text-align: left; }
-th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
-td { font-variant-numeric: tabular-nums; font-family: var(--mono); }
-td:first-child { font-family: var(--sans); }
-tr.best td { color: var(--accent); }
-.foot { font-size: 12px; color: var(--faint); }
-.back{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:13px}
-.back a{color:var(--muted);text-decoration:none}
-.back a:hover{color:var(--accent)}
+.gauges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.banner { font-size: 13.5px; padding: 10px 12px; border-radius: .5rem; border: 1px solid var(--bad); border-left-width: 5px; background: var(--bad-soft); color: var(--ink); margin: 0; }
+.banner b { color: var(--bad); }
+#explain { min-height: 7.4em; }
+table { min-width: 720px; }
+td.dead { text-align: left; color: var(--bad); font-family: var(--sans); }
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <header>
     <nav class="back"><a href="../">← Volver al inicio</a><a href="../slides/clase-21/">Slides de la clase 21</a></nav>
@@ -119,70 +202,82 @@ tr.best td { color: var(--accent); }
     <p class="lead">Un clúster compartido de 256 GPUs: 4 racks de 8 servidores de 8. Llegan muchos trabajos de 1 GPU y unos pocos de 16 o 32, con duraciones que nadie conoce de antemano. Un trabajo distribuido necesita todas sus GPUs a la vez, y si se reparte en más servidores de los necesarios, corre más lento. Probá cómo decide cada planificador quién usa las GPUs.</p>
   </header>
 
-  <section class="controls" aria-label="Controles">
-    <div class="field"><span>Orden de la cola</span>
-      <div class="seg" id="order">
-        <button data-v="pod" aria-pressed="false">De a un pod</button>
-        <button data-v="fifo" aria-pressed="false">FIFO</button>
-        <button data-v="bf" aria-pressed="true">FIFO + backfill</button>
-        <button data-v="las" aria-pressed="false">2D-LAS</button>
-        <button data-v="srtf" aria-pressed="false">SRTF</button>
+  <section class="panel controls-panel" aria-label="Controles">
+    <div class="controls grid">
+      <div class="field wide"><span>Orden de la cola</span>
+        <div class="seg" id="order" role="group" aria-label="Orden de la cola">
+          <button data-v="pod" aria-pressed="false">De a un pod</button>
+          <button data-v="fifo" aria-pressed="false">FIFO</button>
+          <button data-v="bf" aria-pressed="true">FIFO + backfill</button>
+          <button data-v="las" aria-pressed="false">2D-LAS</button>
+          <button data-v="srtf" aria-pressed="false">SRTF</button>
+        </div>
+        <p class="hint" style="max-width:60ch">A quién atiende primero cuando se liberan GPUs. 2D-LAS y SRTF además pueden desalojar a un trabajo que ya corre.</p>
+      </div>
+      <div class="field wide"><span>Ubicación</span>
+        <div class="seg" id="place" role="group" aria-label="Ubicación">
+          <button data-v="strict" aria-pressed="false">Consolidada siempre</button>
+          <button data-v="any" aria-pressed="false">Donde haya lugar</button>
+          <button data-v="cons" aria-pressed="true">Consolidar si importa</button>
+        </div>
+        <p class="hint" id="place-hint" style="max-width:60ch">Si un trabajo de varias GPUs espera a tenerlas juntas (mismo servidor, o servidores vacíos de un rack) o arranca repartido.</p>
+      </div>
+      <div class="field"><span>Carga · <b class="val" id="load-v">90%</b></span>
+        <input type="range" id="load" min="60" max="120" step="10" value="90" aria-label="Carga del clúster">
+        <div class="ticks" aria-hidden="true"><span>60%</span><span>90%</span><span>120%</span></div>
+        <p class="hint">GPU·horas que llegan por hora, sobre las 256 GPUs. Arriba de 100% la cola crece sin parar.</p>
+      </div>
+      <div class="field" id="pre-field"><span>Costo de desalojo · <b class="val" id="pre-v">1 min</b></span>
+        <input type="range" id="pre" min="0" max="4" step="1" value="1" aria-label="Costo de cada preempción">
+        <div class="ticks" aria-hidden="true"><span>0</span><span>1 m</span><span>5 m</span><span>10 m</span><span>30 m</span></div>
+        <p class="hint" id="pre-hint">Tiempo que pierde el desalojado guardando y recargando su checkpoint.</p>
       </div>
     </div>
-    <div class="field"><span>Ubicación</span>
-      <div class="seg" id="place">
-        <button data-v="strict" aria-pressed="false">Consolidada siempre</button>
-        <button data-v="any" aria-pressed="false">Donde haya lugar</button>
-        <button data-v="cons" aria-pressed="true">Consolidar si importa</button>
+    <div class="runbar">
+      <div class="actions">
+        <button class="btn primary" id="play"><span class="ico" aria-hidden="true">❚❚</span><span>Pausa</span></button>
+        <button class="btn" id="reset" title="Vuelve a empezar con otra carga al azar"><span class="ico" aria-hidden="true">↺</span>Reiniciar</button>
       </div>
-    </div>
-    <div class="field"><span>Carga · <b class="val" id="load-v">90%</b></span>
-      <input type="range" id="load" min="60" max="120" step="10" value="90" aria-label="Carga del clúster">
-    </div>
-    <div class="field" id="pre-field"><span>Costo de preempción · <b class="val" id="pre-v">1 min</b></span>
-      <input type="range" id="pre" min="0" max="4" step="1" value="1" aria-label="Costo de cada preempción">
-    </div>
-    <div class="field"><span>Velocidad · <b class="val" id="speed-v">30 min/s</b></span>
-      <input type="range" id="speed" min="0" max="4" step="1" value="2" aria-label="Velocidad de la simulación">
-    </div>
-    <div class="actions">
-      <button class="btn" id="play">Pausa</button>
-      <button class="btn" id="reset">Reiniciar</button>
+      <div class="speed"><span class="label">Velocidad · <b class="val" id="speed-v">30 min/s</b></span>
+        <input type="range" id="speed" min="0" max="4" step="1" value="2" aria-label="Velocidad de la simulación">
+      </div>
+      <span class="status" id="clock">día 0, 00:00</span>
     </div>
   </section>
 
   <div class="main">
     <section class="panel" aria-labelledby="grid-h">
       <div class="panel-head">
-        <h2 id="grid-h">Las GPUs</h2>
-        <span class="small mono" id="clock">día 0, 00:00</span>
+        <h2 id="grid-h">Las 256 GPUs</h2>
+        <span class="tag">cada fila: un servidor de 8 GPUs</span>
       </div>
       <div class="racks" id="racks"></div>
       <div class="legend">
-        <span><i style="background:var(--cell)"></i>libre</span>
-        <span><i style="background:var(--c2)"></i>un color por trabajo</span>
-        <span><i style="background:repeating-linear-gradient(135deg,var(--warn) 0 3px,transparent 3px 6px);outline:1px solid var(--warn);outline-offset:-1px"></i>retenida sin correr</span>
-        <span><i style="border:1px dashed var(--faint)"></i>servidor vacío</span>
+        <span><i class="sw-free"></i>libre</span>
+        <span><i class="sw-run"></i>corriendo (un color por trabajo)</span>
+        <span><i class="sw-held"></i>retenida sin correr (sólo de a un pod)</span>
+        <span><i class="sw-empty"></i>servidor vacío</span>
       </div>
+      <p class="small">La simulación arranca con un día y medio ya corrido, para no empezar con el clúster vacío (salvo de a un pod). Con el mouse sobre una GPU se ve de qué trabajo es. Dentro de un servidor las GPUs se hablan rápido; entre servidores, por la red, y entre racks, por un switch más compartido.</p>
     </section>
 
     <div class="side">
       <section class="panel" aria-labelledby="q-h">
-        <div class="panel-head"><h2 id="q-h">La cola</h2><span class="small mono" id="qcount">0 esperando</span></div>
+        <div class="panel-head"><h2 id="q-h">La cola</h2><span class="tag" id="qcount">0 esperando</span></div>
         <div class="queue" id="queue"></div>
-        <p class="headinfo" id="headinfo"></p>
-        <p class="small">Cada etiqueta es un trabajo esperando: cuántas GPUs pide y hace cuánto espera. El recuadrado es el que el planificador atiende primero. <b>·s</b>: sensible a la localidad.</p>
+        <p class="headinfo calm" id="headinfo"></p>
+        <p class="small">Cada etiqueta es un trabajo esperando, en el orden en que lo atiende el planificador: cuántas GPUs pide y hace cuánto espera. El recuadrado es el primero. <b>·s</b>: sensible a la localidad (repartido corre al 50–60%).</p>
       </section>
       <section class="panel" aria-labelledby="inst-h">
-        <div class="panel-head"><h2 id="inst-h">Instrumentos</h2><span class="small">últimos 200 trabajos</span></div>
+        <div class="panel-head"><h2 id="inst-h">Instrumentos</h2><span class="tag">últimos 200 trabajos</span></div>
         <p class="banner" id="dead" hidden></p>
         <div class="gauges">
-          <div class="gauge"><b id="g-jct">–</b><span>JCT promedio</span></div>
-          <div class="gauge"><b id="g-util">–</b><span>GPUs asignadas ahora</span></div>
-          <div class="gauge"><b id="g-w1">–</b><span>espera, trabajos de 1 GPU</span></div>
-          <div class="gauge"><b id="g-w8">–</b><span>espera, trabajos de más de 8</span></div>
+          <div class="gauge"><b id="g-jct">–</b><span>JCT promedio (llegada → fin)</span></div>
+          <div class="gauge"><b id="g-util">–</b><span>de las GPUs, asignadas ahora</span></div>
+          <div class="gauge"><b id="g-w1">–</b><span>espera media, trabajos de 1 GPU</span></div>
+          <div class="gauge"><b id="g-w8">–</b><span>espera media, trabajos de más de 8</span></div>
           <div class="gauge"><b id="g-frag">–</b><span>de las libres, en servidores a medio usar</span></div>
-          <div class="gauge"><b id="g-pre">–</b><span>preempciones</span></div>
+          <div class="gauge"><b id="g-pre">–</b><span>desalojos (preempciones)</span></div>
         </div>
         <p class="note" id="explain"></p>
       </section>
@@ -190,18 +285,19 @@ tr.best td { color: var(--accent); }
   </div>
 
   <section class="panel" aria-labelledby="cmp-h">
-    <div class="panel-head">
+    <div class="panel-head cmp-head">
       <h2 id="cmp-h">Todos los planificadores, con la misma carga</h2>
       <button class="btn primary" id="cmp-run">Comparar</button>
     </div>
     <p class="small" id="cmp-desc">Corre 3.000 trabajos a la carga elegida con cada planificador, sin animación. Tarda unos segundos.</p>
     <div class="tablewrap">
+      <p class="empty-state" id="cmp-empty">Apretá <b>Comparar</b> para ver los siete planificadores lado a lado.</p>
       <table id="cmp" hidden>
-        <thead><tr><th>Planificador</th><th>JCT prom.</th><th>espera 1</th><th>espera &gt;8</th><th>frag. &gt;8</th><th>más lento</th><th>preempc.</th></tr></thead>
+        <thead><tr><th>Planificador</th><th>JCT prom.</th><th>espera, 1 GPU</th><th>espera, &gt;8</th><th>frag. &gt;8</th><th>más lento</th><th>desalojos</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
-    <p class="foot">frag. &gt;8: de la espera de los trabajos de más de 8 GPUs, cuánta fue con GPUs libres de sobra pero repartidas. Más lento: tiempo corriendo sobre el ideal, trabajos de varias GPUs. El mismo modelo que <span class="mono">go run ./cmd/sim</span> del repositorio planificar-gpus,. Las proporciones de la carga y las velocidades son ilustrativas; la forma es la de Philly (Jeon et al., ATC 2019).</p>
+    <p class="foot"><b>frag. &gt;8</b>: de la espera de los trabajos de más de 8 GPUs, cuánta fue con GPUs libres de sobra pero repartidas. <b>Más lento</b>: tiempo corriendo sobre el ideal, trabajos de varias GPUs (1,00× es sin penalidad). El mismo modelo que <code>go run ./cmd/sim</code> del repositorio planificar-gpus. Las proporciones de la carga y las velocidades son ilustrativas; la forma es la de Philly (Jeon et al., ATC 2019).</p>
   </section>
 </div>
 
@@ -397,9 +493,10 @@ class Sim {
 // ---------- Interfaz ----------
 const $ = s => document.querySelector(s);
 const opt = { order: "bf", place: "cons", load: 0.9, preempt: 60 };
+const WARM = 36 * 3600;
 const PRE = [0, 60, 300, 600, 1800], SPEEDS = [300, 900, 1800, 3600, 3 * 3600];
 let speedV = 1800, playing = true, sim, vt = 0, last = 0, seed = 21;
-const COLORS = 8, col = k => `var(--c${k % COLORS})`;
+const COLORS = 8, col = k => `var(--s${k % COLORS})`;
 const policy = () => ({ order: opt.order, place: opt.place, preempt: opt.preempt });
 
 function seg(id, key, cb) {
@@ -409,7 +506,7 @@ function seg(id, key, cb) {
     opt[key] = b.dataset.v; root.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); cb && cb(); reset();
   });
 }
-seg("#order", "order", () => { $("#place").querySelectorAll("button").forEach(b => b.disabled = opt.order === "pod"); });
+seg("#order", "order", syncControls);
 seg("#place", "place");
 const fmtDur = s => isNaN(s) ? "–" : s >= 86400 * 2 ? (s / 86400).toFixed(1).replace(".", ",") + " d" : s >= 3600 ? (s / 3600).toFixed(1).replace(".", ",") + " h" : s >= 60 ? Math.round(s / 60) + " min" : Math.round(s) + " s";
 const fmtH = s => isNaN(s) ? "–" : (s / 3600).toFixed(2).replace(".", ",") + " h";
@@ -417,7 +514,15 @@ const pctf = v => isNaN(v) ? "–" : Math.round(100 * v) + "%";
 $("#load").addEventListener("input", e => { opt.load = +e.target.value / 100; $("#load-v").textContent = e.target.value + "%"; reset(); });
 $("#pre").addEventListener("input", e => { opt.preempt = PRE[+e.target.value]; $("#pre-v").textContent = fmtDur(opt.preempt) === "0 s" ? "gratis" : fmtDur(opt.preempt); reset(); });
 $("#speed").addEventListener("input", e => { speedV = SPEEDS[+e.target.value]; $("#speed-v").textContent = speedV >= 3600 ? (speedV / 3600) + " h/s" : (speedV / 60) + " min/s"; });
-$("#play").addEventListener("click", () => { playing = !playing; $("#play").textContent = playing ? "Pausa" : "Seguir"; });
+function setPlaying(v) { playing = v; $("#play").innerHTML = playing ? `<span class="ico" aria-hidden="true">❚❚</span><span>Pausa</span>` : `<span class="ico" aria-hidden="true">▶</span><span>Seguir</span>`; render(); }
+$("#play").addEventListener("click", () => setPlaying(!playing));
+function syncControls() {
+  const pod = opt.order === "pod", preemptive = opt.order === "las" || opt.order === "srtf";
+  $("#place").querySelectorAll("button").forEach(b => b.disabled = pod);
+  $("#place-hint").textContent = pod ? "Sin gang no hay ubicación que elegir: cada trabajo toma GPUs de a una donde las encuentre." : "Si un trabajo de varias GPUs espera a tenerlas juntas (mismo servidor, o servidores vacíos de un rack) o arranca repartido.";
+  $("#pre").disabled = !preemptive;
+  $("#pre-hint").textContent = preemptive ? "Tiempo que pierde el desalojado guardando y recargando su checkpoint." : "Sólo cuenta con 2D-LAS y SRTF, que desalojan trabajos; los demás nunca desalojan.";
+}
 $("#reset").addEventListener("click", () => { seed++; reset(); });
 
 // La grilla: un div por GPU, se pinta en cada render.
@@ -451,15 +556,17 @@ function explain() {
     cons: " Consolidar si importa: sólo los trabajos sensibles a la localidad (·s) esperan su lugar; los demás van donde haya.",
   };
   $("#explain").textContent = o[opt.order] + (opt.order === "pod" ? "" : pl[opt.place]);
-  $("#pre-field").style.opacity = opt.order === "las" || opt.order === "srtf" ? 1 : 0.5;
 }
 function reset() {
+  syncControls();
   sim = new Sim(trace(1500, opt.load, seed), policy());
-  vt = 0; explain(); render();
+  // Arranca con el clúster ya andando (salvo de a un pod, para ver cómo se traba).
+  vt = opt.order === "pod" ? 0 : WARM; sim.runUntil(vt);
+  explain(); render();
 }
 function render() {
   const day = Math.floor(vt / 86400), h = Math.floor(vt % 86400 / 3600), m = Math.floor(vt % 3600 / 60);
-  $("#clock").textContent = `día ${day}, ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  $("#clock").textContent = `día ${day}, ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")} simulado` + (sim.dead ? " · trabado" : playing ? "" : " · en pausa");
   // Ocupación por servidor: lista de (trabajo, GPUs, retenida).
   const occ = Array.from({ length: NSRV }, () => []);
   for (const j of sim.active) {
@@ -483,9 +590,8 @@ function render() {
   // La cola, en el orden en que la atiende el planificador.
   const waiting = sim.ordered().filter(j => !j.place && j.arrival <= vt);
   $("#qcount").textContent = `${waiting.length} esperando`;
-  const shown = waiting.slice(0, 36);
-  $("#queue").innerHTML = shown.map((j, i) => `<span class="job${i === 0 ? " head" : ""}" style="background:${col(j.id)}" title="trabajo ${j.id}">${j.gpus}${j.sens ? "·s" : ""}<small>${fmtDur(vt - j.since)}</small></span>`).join("") +
-    (waiting.length > shown.length ? `<span class="small">+${waiting.length - shown.length} más</span>` : "") || `<span class="small">nadie espera</span>`;
+  const shown = waiting.slice(0, 40);
+  $("#queue").innerHTML = shown.map((j, i) => `<span class="job${i === 0 ? " head" : ""}" style="background:${col(j.id)};color:var(--on-s${j.id % COLORS})" title="trabajo ${j.id}: ${j.gpus} GPU${j.gpus > 1 ? "s" : ""}${j.sens ? ", sensible a la localidad" : ""}">${j.gpus}${j.sens ? "·s" : ""}<small>${fmtDur(vt - j.since)}</small></span>`).join("") || `<span class="empty">Nadie espera: todo lo que llegó está corriendo.</span>`;
   const free = sim.c.totalFree(), hj = waiting[0];
   let info = "";
   if (hj) {
@@ -495,6 +601,7 @@ function render() {
     else info = `El primero pide <b>${hj.gpus}</b> GPUs y hay ${free} libres: espera a que terminen otros.` + (opt.order === "fifo" ? ` Con FIFO, nadie le pasa por adelante: <b>${free}</b> GPUs quedan sin usar.` : "");
   }
   $("#headinfo").innerHTML = info || "La cola está vacía.";
+  $("#headinfo").classList.toggle("calm", !hj);
   // Instrumentos.
   const s = sim.summary(200);
   const set = (id, txt, cls) => { const e = $(id); e.textContent = txt; e.className = cls || ""; };
@@ -504,7 +611,7 @@ function render() {
   set("#g-frag", pctf(sim.c.frag())); set("#g-pre", String(sim.preempt));
   const dead = $("#dead");
   dead.hidden = !sim.dead;
-  if (sim.dead) dead.textContent = "Trabado: no queda ninguna GPU libre, nadie corre, y cada trabajo retiene GPUs que otro necesita. Nadie va a avanzar nunca.";
+  if (sim.dead) dead.innerHTML = "<b>Trabado (deadlock).</b> No queda ninguna GPU libre, nadie corre, y cada trabajo retiene GPUs que otro necesita: nadie va a avanzar nunca. Reiniciá o elegí otro orden.";
 }
 let uiAcc = 0;
 function frame(ts) {
@@ -532,15 +639,15 @@ const CONFIGS = [
 $("#cmp-run").addEventListener("click", () => {
   const btn = $("#cmp-run"); btn.disabled = true;
   const jobs = trace(3000, opt.load, seed), rows = [];
-  const tb = $("#cmp tbody"); tb.innerHTML = ""; $("#cmp").hidden = false;
+  const tb = $("#cmp tbody"); tb.innerHTML = ""; $("#cmp").hidden = false; $("#cmp-empty").hidden = true;
   let k = 0;
   const one = () => {
     if (k === CONFIGS.length) {
       const ok = rows.filter(r => !r.dead), best = ok.reduce((a, r) => r.s.jct < a.s.jct ? r : a, ok[0]);
       tb.innerHTML = rows.map(r => r.dead
-        ? `<tr><td>${r.name}</td><td colspan="6" style="text-align:left">trabado a los ${fmtDur(r.at)}, con ${r.s.n} de ${jobs.length} terminados</td></tr>`
+        ? `<tr><td>${r.name}</td><td colspan="6" class="dead">trabado a los ${fmtDur(r.at)}, con ${r.s.n} de ${jobs.length} terminados</td></tr>`
         : `<tr class="${r === best ? "best" : ""}"><td>${r.name}</td><td>${fmtH(r.s.jct)}</td><td>${fmtDur(r.s.w1)}</td><td>${fmtDur(r.s.w8)}</td><td>${pctf(r.s.frag8)}</td><td>${isNaN(r.s.slow) ? "–" : r.s.slow.toFixed(2).replace(".", ",") + "×"}</td><td>${r.pre}</td></tr>`).join("");
-      $("#cmp-desc").textContent = `${jobs.length} trabajos al ${Math.round(100 * opt.load)}% de carga, preempción de ${fmtDur(opt.preempt)}. En verde, el de menor JCT promedio.`;
+      $("#cmp-desc").textContent = `${jobs.length.toLocaleString("es-AR")} trabajos al ${Math.round(100 * opt.load)}% de carga, desalojo de ${opt.preempt ? fmtDur(opt.preempt) : "costo cero"} (sólo 2D-LAS y SRTF). Resaltado, el de menor JCT promedio.`;
       btn.disabled = false; return;
     }
     const [name, o] = CONFIGS[k++];
@@ -556,5 +663,5 @@ $("#cmp-run").addEventListener("click", () => {
 reset();
 requestAnimationFrame(frame);
 </script>
-
+</body>
 </html>
